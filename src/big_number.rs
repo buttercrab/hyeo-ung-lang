@@ -1,116 +1,69 @@
 use std::cmp::{max, min};
-use std::ops;
-use std::ops::Mul;
-use std::panic::resume_unwind;
+use std::fmt;
 
-#[cfg(target_pointer_width = "64")]
-pub struct BigNumber {
+pub struct Num {
     pos: bool,
-    nan: bool,
     val: Vec<u32>,
 }
 
-#[cfg(target_pointer_width = "32")]
-struct BigNumber {
-    pos: bool,
-    nan: bool,
-    val: Vec<u16>,
-}
-
-#[cfg(target_pointer_width = "64")]
-fn new(n: isize) -> BigNumber {
-    if n >= 0 {
-        BigNumber {
-            pos: true,
-            nan: false,
-            val: vec![n as u32],
-        }
-    } else {
-        BigNumber {
-            pos: true,
-            nan: false,
-            val: vec![(-n) as u32],
+impl Num {
+    pub fn new(n: isize) -> Num {
+        if n >= 0 {
+            Num {
+                pos: true,
+                val: vec![n as u32],
+            }
+        } else {
+            Num {
+                pos: true,
+                val: vec![(-n) as u32],
+            }
         }
     }
-}
 
-#[cfg(target_pointer_width = "32")]
-fn new(n: isize) -> BigNumber {
-    if n >= 0 {
-        BigNumber {
+    pub fn from_vec(v: Vec<u32>) -> Num {
+        let mut res = Num {
             pos: true,
-            nan: false,
-            val: vec![n as u16],
-        }
-    } else {
-        BigNumber {
+            val: v,
+        };
+        res.shrink_to_fit();
+        res
+    }
+
+    pub fn zero() -> Num {
+        Num {
             pos: true,
-            nan: false,
-            val: vec![(-n) as u16],
+            val: vec![0],
         }
     }
-}
 
-#[cfg(target_pointer_width = "64")]
-fn from_vec(v: Vec<u32>) -> BigNumber {
-    let mut res = BigNumber {
-        pos: true,
-        nan: false,
-        val: v,
-    };
-    res.shrink_to_fit();
-    res
-}
-
-#[cfg(target_pointer_width = "32")]
-fn from_vec(v: Vec<u16>) -> BigNumber {
-    let mut res = BigNumber {
-        pos: true,
-        nan: false,
-        val: v,
-    };
-    res.shrink_to_fit();
-    res
-}
-
-fn zero() -> BigNumber {
-    BigNumber {
-        pos: true,
-        nan: false,
-        val: vec![0],
+    pub fn one() -> Num {
+        Num {
+            pos: true,
+            val: vec![1],
+        }
     }
-}
 
-fn one() -> BigNumber {
-    BigNumber {
-        pos: true,
-        nan: false,
-        val: vec![1],
+    pub fn clone(&self) -> Num {
+        Num {
+            pos: self.pos,
+            val: self.val.clone(),
+        }
     }
-}
 
-fn nan() -> BigNumber {
-    BigNumber {
-        pos: true,
-        nan: true,
-        val: vec![],
-    }
-}
-
-impl BigNumber {
-    fn is_pos(&self) -> bool {
+    pub fn is_pos(&self) -> bool {
         self.pos
     }
 
-    fn is_nan(&self) -> bool {
-        self.nan
+    pub fn is_zero(&self) -> bool {
+        self.val == vec![0]
     }
 
-    fn to_string(&self) -> String {
+    pub fn to_string(&self) -> String {
         self.to_string_base(10)
     }
 
-    fn to_string_base(&self, base: usize) -> String {
+    pub fn to_string_base(&self, _base: usize) -> String {
         // TODO: https://en.wikipedia.org/wiki/Double_dabble
         unimplemented!()
     }
@@ -124,7 +77,6 @@ impl BigNumber {
         }
     }
 
-    #[cfg(target_pointer_width = "64")]
     fn add_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
@@ -150,125 +102,174 @@ impl BigNumber {
         v
     }
 
-    #[cfg(target_pointer_width = "32")]
-    fn add_core(lhs: &Vec<u16>, rhs: &Vec<u16>) -> Vec<u16> {
-        let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
+    fn sub_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> (Vec<u32>, bool) {
+        let mut v = vec![0; max(lhs.len(), rhs.len())];
 
-        for i in 0..min(lhs.len(), rhs.len()) {
-            let mut t = (lhs[i] as u32) + (rhs[i] as u32) + (v[i] as u32);
-            if t > u16::max_value() as u32 {
-                v[i + 1] += 1;
-                t -= u16::max_value() as u32;
-            }
-            v[i] = t as u16;
-        }
-
-        let t = if lhs.len() < rhs.len() {
-            rhs
+        let (a, b, swapped) = if Num::less(lhs, rhs) {
+            (lhs, rhs, false)
         } else {
-            lhs
+            (rhs, lhs, true)
         };
 
-        for i in min(lhs.len(), rhs.len())..t.len() {
-            v[i] = t[i];
+        for i in 0..a.len() {
+            let mut t = (a[i] as i64) - (b[i] as i64) - (v[i] as i64);
+            if t < 0 {
+                v[i + 1] += 1;
+                t += u32::max_value() as i64;
+            }
+            v[i] = t as u32;
         }
+
+        for i in a.len()..b.len() {
+            let mut t = (b[i] as i64) - (v[i] as i64);
+            if t < 0 {
+                v[i + 1] += 1;
+                t += u32::max_value() as i64;
+            }
+            v[i] = t as u32;
+        }
+
+        (v, swapped)
+    }
+
+    // TODO: https://en.wikipedia.org/wiki/Sch%C3%B6nhage%E2%80%93Strassen_algorithm
+    fn mult_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
+        let mut v = vec![0; lhs.len() + rhs.len() + 1];
+
+        for i in 0..(lhs.len() + rhs.len()) {}
 
         v
     }
 
-    #[cfg(target_pointer_width = "64")]
-    fn sub_core(&self, rhs: &BigNumber) -> BigNumber {
-        one()
+    // TODO: https://en.wikipedia.org/wiki/Division_algorithm
+    fn div_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
+        unimplemented!()
     }
 
-    #[cfg(target_pointer_width = "32")]
-    fn sub_core(&self, rhs: &BigNumber) -> BigNumber {
-        one()
-    }
-
-    #[cfg(target_pointer_width = "64")]
-    fn mult_core(&self, rhs: &BigNumber) -> BigNumber {
-        one()
-    }
-
-    #[cfg(target_pointer_width = "32")]
-    fn mult_core(&self, rhs: &BigNumber) -> BigNumber {
-        one()
-    }
-
-    fn minus(&mut self) {
-        if self.pos {
-            self.pos = false;
+    fn less<T: PartialOrd>(lhs: &Vec<T>, rhs: &Vec<T>) -> bool {
+        if lhs.len() != rhs.len() {
+            lhs.len() < rhs.len()
         } else {
-            self.pos = true;
+            for i in (0..lhs.len()).rev() {
+                if lhs[i] != rhs[i] {
+                    return lhs[i] < rhs[i];
+                }
+            }
+            false
         }
     }
-}
 
-impl ops::Add<BigNumber> for BigNumber {
-    type Output = BigNumber;
+    pub fn minus(&mut self) {
+        self.pos = !self.pos;
+    }
 
-    fn add(self, rhs: BigNumber) -> Self::Output {
-        if self.nan || rhs.nan {
-            return nan();
-        }
-
-        if self.pos {
+    pub fn add(lhs: &Num, rhs: &Num) -> Num {
+        let mut need_flip = false;
+        let mut res = Num::from_vec(if lhs.pos {
             if rhs.pos {
-                from_vec(BigNumber::add_core(&self.val, &rhs.val))
+                Num::add_core(&lhs.val, &rhs.val)
             } else {
-                self.sub_core(&rhs)
+                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                need_flip = need_flip ^ swapped;
+                tmp
             }
         } else {
-            let mut res = if rhs.pos {
-                self.sub_core(&rhs)
+            let t = if rhs.pos {
+                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                need_flip ^= swapped;
+                tmp
             } else {
-                from_vec(BigNumber::add_core(&self.val, &rhs.val))
+                Num::add_core(&lhs.val, &rhs.val)
             };
-            res.minus();
-            res
-        }
-    }
-}
-
-impl ops::Sub<BigNumber> for BigNumber {
-    type Output = BigNumber;
-
-    fn sub(self, rhs: BigNumber) -> Self::Output {
-        if self.nan || rhs.nan {
-            return nan();
-        }
-
-        if self.pos {
-            if rhs.pos {
-                self.sub_core(&rhs)
-            } else {
-                self.add_core(&rhs)
-            }
-        } else {
-            let mut res = if rhs.pos {
-                self.add_core(&rhs)
-            } else {
-                self.sub_core(&rhs)
-            };
-            res.minus();
-            res
-        }
-    }
-}
-
-impl ops::Mul<BigNumber> for BigNumber {
-    type Output = BigNumber;
-
-    fn mul(self, rhs: BigNumber) -> Self::Output {
-        if self.nan || rhs.nan {
-            return nan();
-        }
-
-        let mut res = self.mult_core(&rhs);
-        if self.pos ^ rhs.pos {
+            need_flip = !need_flip;
+            t
+        });
+        if need_flip {
             res.minus();
         }
+        res.shrink_to_fit();
         res
+    }
+
+    pub fn sub(lhs: &Num, rhs: &Num) -> Num {
+        let mut need_flip = false;
+        let mut res = Num::from_vec(if lhs.pos {
+            if !rhs.pos {
+                Num::add_core(&lhs.val, &rhs.val)
+            } else {
+                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                need_flip = need_flip ^ swapped;
+                tmp
+            }
+        } else {
+            let t = if !rhs.pos {
+                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                need_flip ^= swapped;
+                tmp
+            } else {
+                Num::add_core(&lhs.val, &rhs.val)
+            };
+            need_flip = !need_flip;
+            t
+        });
+        if need_flip {
+            res.minus();
+        }
+        res.shrink_to_fit();
+        res
+    }
+
+    pub fn mul(lhs: &Num, rhs: &Num) -> Num {
+        let mut res = Num::from_vec(Num::mult_core(&lhs.val, &rhs.val));
+        if lhs.pos ^ rhs.pos {
+            res.minus();
+        }
+        res.shrink_to_fit();
+        res
+    }
+
+    pub fn div(lhs: &Num, rhs: &Num) -> Num {
+        let mut res = Num::from_vec(Num::div_core(&lhs.val, &rhs.val));
+        if !lhs.pos {
+            res = Num::add(&res, &Num::one());
+        }
+        if !rhs.pos {
+            res.minus()
+        }
+        res.shrink_to_fit();
+        res
+    }
+
+    pub fn rem(lhs: &Num, rhs: &Num) -> Num {
+        let q = Num::div(&lhs, &rhs);
+        Num::sub(&lhs, &Num::mul(&q, &rhs))
+    }
+
+    // TODO: https://en.wikipedia.org/wiki/Lehmer%27s_GCD_algorithm
+    pub fn gcd(lhs: &Num, rhs: &Num) -> Num {
+        unimplemented!()
+    }
+
+    pub fn neg(v: &Num) -> Num {
+        Num {
+            pos: !v.pos,
+            val: v.val.clone(),
+        }
+    }
+}
+
+impl PartialEq for Num {
+    fn eq(&self, other: &Self) -> bool {
+        if self.is_zero() && other.is_zero() {
+            true
+        } else {
+            self.pos == other.pos && self.val == other.val
+        }
+    }
+}
+
+impl fmt::Debug for Num {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_string())
     }
 }
