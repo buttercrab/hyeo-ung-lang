@@ -1,5 +1,6 @@
+use std::{fmt, ops};
 use std::cmp::{max, min};
-use std::fmt;
+use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 pub struct Num {
     pos: bool,
@@ -276,6 +277,16 @@ impl Num {
             val: v.val.clone(),
         }
     }
+
+    pub fn set_copy(&mut self, rhs: &Num) {
+        self.val = rhs.val.clone();
+        self.pos = rhs.pos;
+    }
+
+    pub fn set_move(&mut self, rhs: Num) {
+        self.val = rhs.val;
+        self.pos = rhs.pos;
+    }
 }
 
 impl PartialEq for Num {
@@ -291,5 +302,83 @@ impl PartialEq for Num {
 impl fmt::Debug for Num {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_string())
+    }
+}
+
+impl ops::Add<&Num> for &Num {
+    type Output = Num;
+
+    fn add(self, rhs: &Num) -> Self::Output {
+        Num::add(self, rhs)
+    }
+}
+
+impl ops::AddAssign<&Num> for Num {
+    fn add_assign(&mut self, rhs: &Num) {
+        self.set_move(&*self + rhs);
+    }
+}
+
+impl ops::Sub<&Num> for &Num {
+    type Output = Num;
+
+    fn sub(self, rhs: &Num) -> Self::Output {
+        Num::sub(self, rhs)
+    }
+}
+
+impl ops::SubAssign<&Num> for Num {
+    fn sub_assign(&mut self, rhs: &Num) {
+        self.set_move(&*self - rhs);
+    }
+}
+
+impl ops::Mul<&Num> for &Num {
+    type Output = Num;
+
+    fn mul(self, rhs: &Num) -> Self::Output {
+        Num::mul(self, rhs)
+    }
+}
+
+impl ops::MulAssign<&Num> for Num {
+    fn mul_assign(&mut self, rhs: &Num) {
+        self.set_move(&*self * rhs);
+    }
+}
+
+impl ops::Div<&Num> for &Num {
+    type Output = Num;
+
+    fn div(self, rhs: &Num) -> Self::Output {
+        Num::div(self, rhs)
+    }
+}
+
+impl ops::DivAssign<&Num> for Num {
+    fn div_assign(&mut self, rhs: &Num) {
+        self.set_move(&*self / rhs);
+    }
+}
+
+impl ops::Rem<&Num> for &Num {
+    type Output = Num;
+
+    fn rem(self, rhs: &Num) -> Self::Output {
+        Num::rem(self, rhs)
+    }
+}
+
+impl ops::RemAssign<&Num> for Num {
+    fn rem_assign(&mut self, rhs: &Num) {
+        self.set_move(&*self % rhs);
+    }
+}
+
+impl ops::Neg for &Num {
+    type Output = Num;
+
+    fn neg(self) -> Self::Output {
+        Num::neg(self)
     }
 }

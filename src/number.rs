@@ -42,7 +42,7 @@ impl RatNum {
 
     pub fn to_string(&self) -> String {
         if self.is_nan() {
-            format!("NaN")
+            format!("너무 커엇...")
         } else {
             format!("{}/{}", self.up.to_string(), self.down.to_string())
         }
@@ -50,8 +50,8 @@ impl RatNum {
 
     fn optimize(&mut self) {
         let g = Num::gcd(&self.up, &self.down);
-        self.up = Num::div(&self.up, &g);
-        self.down = Num::div(&self.down, &g);
+        self.up /= &g;
+        self.down /= &g;
         if !self.down.is_pos() {
             self.down.minus();
             self.up.minus();
@@ -78,8 +78,8 @@ impl RatNum {
         }
 
         let mut res = RatNum {
-            up: Num::add(&Num::mul(&lhs.up, &rhs.down), &Num::mul(&lhs.down, &rhs.up)),
-            down: Num::mul(&lhs.down, &rhs.down),
+            up: &(&lhs.up * &rhs.down) + &(&lhs.down * &rhs.up),
+            down: &lhs.down * &rhs.down,
         };
         res.optimize();
         res
@@ -91,8 +91,8 @@ impl RatNum {
         }
 
         let mut res = RatNum {
-            up: Num::mul(&lhs.up, &rhs.up),
-            down: Num::mul(&lhs.down, &rhs.down),
+            up: &lhs.up * &rhs.up,
+            down: &lhs.down * &rhs.down,
         };
         res.optimize();
         res

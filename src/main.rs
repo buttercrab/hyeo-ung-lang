@@ -1,6 +1,9 @@
 use hyeo_ung_lang::big_number::Num;
 
 fn main() {
-    let a = Num::new(0);
-    println!("{}", a.is_zero());
+    let mut a = Num::one();
+    let b = Num::new(2);
+    a += &b;
+
+    print!("{}", a.to_string())
 }
