@@ -40,10 +40,22 @@ impl RatNum {
         self.down.is_zero()
     }
 
+    pub fn to_string(&self) -> String {
+        if self.is_nan() {
+            format!("NaN")
+        } else {
+            format!("{}/{}", self.up.to_string(), self.down.to_string())
+        }
+    }
+
     fn optimize(&mut self) {
         let g = Num::gcd(&self.up, &self.down);
         self.up = Num::div(&self.up, &g);
         self.down = Num::div(&self.down, &g);
+        if !self.down.is_pos() {
+            self.down.minus();
+            self.up.minus();
+        }
     }
 
     pub fn minus(&mut self) {
