@@ -1,4 +1,6 @@
 use std::mem::swap;
+use std::ops;
+use std::ops::{Add, Mul, Neg};
 
 use crate::big_number::Num;
 
@@ -96,5 +98,58 @@ impl RatNum {
         };
         res.optimize();
         res
+    }
+
+    pub fn neg(v: &RatNum) -> RatNum {
+        RatNum {
+            up: (-&v.up).clone(),
+            down: (&v.down).clone(),
+        }
+    }
+
+    pub fn set_copy(&mut self, rhs: &RatNum) {
+        self.up.set_copy(&rhs.up);
+        self.down.set_copy(&rhs.down);
+    }
+
+    pub fn set_move(&mut self, rhs: RatNum) {
+        self.up.set_move(rhs.up);
+        self.down.set_move(rhs.down);
+    }
+}
+
+impl ops::Add<&RatNum> for &RatNum {
+    type Output = RatNum;
+
+    fn add(self, rhs: &RatNum) -> Self::Output {
+        RatNum::add(self, rhs)
+    }
+}
+
+impl ops::AddAssign<&RatNum> for RatNum {
+    fn add_assign(&mut self, rhs: &RatNum) {
+        self.set_move(&*self + rhs);
+    }
+}
+
+impl ops::Mul<&RatNum> for &RatNum {
+    type Output = RatNum;
+
+    fn mul(self, rhs: &RatNum) -> Self::Output {
+        RatNum::mul(self, rhs)
+    }
+}
+
+impl ops::MulAssign<&RatNum> for RatNum {
+    fn mul_assign(&mut self, rhs: &RatNum) {
+        self.set_move(&*self * rhs);
+    }
+}
+
+impl ops::Neg for &RatNum {
+    type Output = RatNum;
+
+    fn neg(self) -> Self::Output {
+        RatNum::neg(self)
     }
 }
