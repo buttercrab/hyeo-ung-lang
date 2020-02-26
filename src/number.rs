@@ -65,6 +65,10 @@ impl RatNum {
     pub fn flip(&mut self) {
         if !self.is_nan() {
             swap(&mut self.up, &mut self.down);
+            if !self.down.is_pos() {
+                self.down.minus();
+                self.up.minus();
+            }
         }
     }
 

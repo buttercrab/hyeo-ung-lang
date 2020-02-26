@@ -59,12 +59,17 @@ impl Num {
         self.val == vec![0]
     }
 
+    // TODO
+    pub fn from_string(str: String) -> Num {
+        unimplemented!()
+    }
+
     pub fn to_string(&self) -> String {
         self.to_string_base(10)
     }
 
+    // TODO: https://en.wikipedia.org/wiki/Double_dabble
     pub fn to_string_base(&self, _base: usize) -> String {
-        // TODO: https://en.wikipedia.org/wiki/Double_dabble
         unimplemented!()
     }
 
@@ -103,9 +108,9 @@ impl Num {
     }
 
     fn sub_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> (Vec<u32>, bool) {
-        let mut v = vec![0; max(lhs.len(), rhs.len())];
+        let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
-        let (a, b, swapped) = if Num::less(lhs, rhs) {
+        let (b, a, swapped) = if Num::less(lhs, rhs) {
             (lhs, rhs, false)
         } else {
             (rhs, lhs, true)
@@ -113,7 +118,7 @@ impl Num {
 
         for i in 0..a.len() {
             let mut t = (a[i] as i64) - (b[i] as i64) - (v[i] as i64);
-            if t < 0 {
+            while t < 0 {
                 v[i + 1] += 1;
                 t += u32::max_value() as i64;
             }
@@ -136,9 +141,24 @@ impl Num {
     fn mult_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
         let mut v = vec![0; lhs.len() + rhs.len() + 1];
 
-        for i in 0..(lhs.len() + rhs.len()) {}
+        for i in 0..(lhs.len() + rhs.len()) {
+            for j in max(0, i - rhs.len())..min(i, lhs.len()) {
+                let mut t = (lhs[j] as u64) * (rhs[j] as u64);
+                v[i] += t % u32::max_value() as u64;
+                v[i + 1] += v[i] / u32::max_value() as u64;
+                v[i] %= u32::max_value() as u64;
+                v[i + 1] += t / u32::max_value() as u64;
+                v[i + 2] += v[i + 1] / u32::max_value() as u64;
+                v[i + 1] %= u32::max_value() as u64;
+            }
+        }
 
-        v
+        let mut res: Vec<u32> = vec![0; v.len()];
+        for i in 0..v.len() {
+            res[i] = v[i] as u32;
+        }
+
+        res
     }
 
     // TODO: https://en.wikipedia.org/wiki/Division_algorithm
