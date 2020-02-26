@@ -17,6 +17,7 @@
 - Interpreter
 - Compiler
 - Fast Speed (Algorithm)
+- Optimization
 - Debugger
 - Nice Compile Error
 - String to Hyeo-ung Code Generator
@@ -25,15 +26,17 @@
 ## Implementation
 
 ```
-Hyeo-ung code
-
-      |
-      V
-
-  Rust code
-
-      | 
-      V
-
-Binary Program
+ Complier:      | Interpreter:
+                | 
+ Hyeo-ung code  |  Hyeo-ung code
+                | 
+       |        |        |
+       V        |        V
+                | 
+   Rust code    | Execute by line
+                | 
+       |        | 
+       V        | 
+                | 
+ Binary Program | 
 ```
