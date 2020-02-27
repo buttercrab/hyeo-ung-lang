@@ -16,6 +16,8 @@
 - Big Number
 - Interpreter
   + `$ hyeong`
+- Code runner
+  + `$ hyeong run FILE`
 - Compiler
   + `$ hyeong build FILE --flags...`
 - Fast Speed (Algorithm)
