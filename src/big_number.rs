@@ -1,6 +1,5 @@
 use std::{fmt, ops};
 use std::cmp::{max, min, Ordering};
-use std::error::Error;
 
 pub struct Num {
     pos: bool,
@@ -60,25 +59,36 @@ impl Num {
         self.val == vec![0]
     }
 
-    pub fn from_string(s: String) -> Result<Num, ()> {
+    pub fn from_string(s: String) -> Num {
         Num::from_string_base(s, 10)
     }
 
-    pub fn from_string_base(s: String, _base: usize) -> Result<Num, ()> {
-        // let mut res = Num::new(0);
-        // let mut i = 0usize;
-        // let arr = s.chars().collect();
-        // if s.starts_with('-') {
-        //     res.pos = false;
-        //     i = 1;
-        // }
+    // assert: _base <= 36
+    pub fn from_string_base(s: String, _base: usize) -> Num {
+        let base = Num::new(_base as isize);
+        let mut res = Num::new(0);
+        let mut i = 0usize;
+        let arr = s.chars().collect::<Vec<char>>();
+        if s.starts_with('-') {
+            res.pos = false;
+            i = 1;
+        }
 
-        // while i < arr.len() {
-        //
-        // }
+        while i < arr.len() {
+            let c = arr[i];
+            let k = if '0' <= c && c <= '9' {
+                c as isize - '0' as isize
+            } else if 'A' <= c && c <= 'Z' {
+                c as isize - 'A' as isize + 10
+            } else {
+                0
+            };
+            res *= &base;
+            res += &Num::new(k);
+            i += 1;
+        }
 
-        // Result::Ok(res)
-        unimplemented!()
+        res
     }
 
     pub fn to_string(&self) -> String {
@@ -86,7 +96,7 @@ impl Num {
     }
 
     // TODO: https://en.wikipedia.org/wiki/Double_dabble
-    // assert: _base < 36
+    // assert: _base <= 36
     pub fn to_string_base(&self, _base: usize) -> String {
         let base = Num::new(_base as isize);
         let mut res = String::new();
