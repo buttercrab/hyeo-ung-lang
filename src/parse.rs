@@ -94,6 +94,21 @@ impl Command {
                     t /= 3;
 
                     if command.cnt1 != 0 {
+                        leaf = &mut temp_area;
+                        match cmd_leaf {
+                            Area::Val {
+                                type_: _,
+                                left: _,
+                                right: ref mut right,
+                            } => {
+                                *right = Box::new(area);
+                            }
+                            Area::Nil => {
+                                command.area = area;
+                            }
+                        }
+                        area = Area::Nil;
+                        leaf = &mut area;
                         res.push(command);
                         command = Command::new(t as u8);
                     } else {
@@ -103,6 +118,7 @@ impl Command {
                     command.cnt1 = 1;
                     command.cnt2 = 0;
                     command.area = Area::Nil;
+                    cmd_leaf = &mut command.area;
 
                     if t < 6 {
                         0
@@ -115,10 +131,88 @@ impl Command {
                     }
                     state
                 } else if c == '?' {
+                    leaf = &mut temp_area;
+                    match cmd_leaf {
+                        Area::Val {
+                            type_: _,
+                            left: _,
+                            right: ref mut right,
+                        } => {
+                            *right = Box::new(Area::Val {
+                                type_: 0,
+                                left: Box::new(area),
+                                right: Box::new(Area::Nil),
+                            });
+                            cmd_leaf = &mut *right;
+                        }
+                        Area::Nil => {
+                            cmd_leaf = &mut temp_area;
+                            command.area = Area::Val {
+                                type_: 0,
+                                left: Box::new(area),
+                                right: Box::new(Area::Nil),
+                            };
+                            cmd_leaf = &mut command.area;
+                        }
+                    }
+                    area = Area::Nil;
+                    leaf = &mut area;
                     2
                 } else if c == '!' {
+                    match leaf {
+                        Area::Val {
+                            type_: _,
+                            left: _,
+                            right: ref mut right,
+                        } => {
+                            *right = match right.as_ref() {
+                                Area::Val {
+                                    type_: t,
+                                    left: _,
+                                    right: _,
+                                } => Box::new(Area::Val {
+                                    type_: 1,
+                                    left: Box::new(Area::new(*t)),
+                                    right: Box::new(Area::Nil),
+                                }),
+                                Area::Nil => Box::new(Area::new(1)),
+                            };
+                            leaf = &mut *right;
+                        }
+                        Area::Nil => {
+                            leaf = &mut temp_area;
+                            area = Area::new(1);
+                            leaf = &mut area;
+                        }
+                    }
                     2
-                } else if let Some(t) = "♥❤💕💖💗💘💙💚💛💜💝♡".find(c) {
+                } else if let Some(mut t) = "♥❤💕💖💗💘💙💚💛💜💝♡".find(c) {
+                    t += 2;
+                    match leaf {
+                        Area::Val {
+                            type_: _,
+                            left: _,
+                            right: ref mut right,
+                        } => {
+                            *right = match right.as_mut() {
+                                Area::Val {
+                                    type_: _,
+                                    left: _,
+                                    right: ref mut right,
+                                } => {
+                                    return Result::Err(Error::new(1, i));
+                                }
+                                Area::Nil => {
+                                    Box::new(Area::new(t as u8))
+                                }
+                            };
+                        }
+                        Area::Nil => {
+                            leaf = &mut temp_area;
+                            area = Area::new(t as u8);
+                            leaf = &mut area;
+                        }
+                    }
                     2
                 } else {
                     continue;
