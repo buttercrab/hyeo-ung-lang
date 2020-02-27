@@ -99,6 +99,15 @@ impl Command {
         let mut line_count = 0;
         let mut last_line_started = 0;
 
+        let mut sum = [0usize, 0usize, 0usize, 0usize, 0usize, 0usize];
+        let mut partial_sum = code.chars().map(|x| {
+            if let Some(t) = "엉앙앗읏읍윽".find(x) {
+                sum[t / 3] = 1;
+            }
+            sum
+        }).rev().collect::<Vec<[usize; 6]>>();
+        partial_sum.reverse();
+
         for (i, c) in code.chars().enumerate() {
             if c.is_whitespace() {
                 if c == '\n' {
@@ -111,6 +120,20 @@ impl Command {
             state = match state {
                 0 | 2 => if let Some(mut t) = "형항핫흣흡흑혀하흐".find(c) {
                     t /= 3;
+
+                    if t == 6 {
+                        if partial_sum[i][0] == 0 {
+                            continue;
+                        }
+                    } else if t == 7 {
+                        if partial_sum[i][1..3].iter().sum::<usize>() == 0 {
+                            continue;
+                        }
+                    } else if t == 8 {
+                        if partial_sum[i][3..6].iter().sum::<usize>() == 0 {
+                            continue;
+                        }
+                    }
 
                     if command.cnt1 != 0 {
                         match cmd_leaf {
