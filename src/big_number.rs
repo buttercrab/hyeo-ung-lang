@@ -1,5 +1,6 @@
 use std::{fmt, ops};
-use std::cmp::{max, min};
+use std::cmp::{max, min, Ordering};
+use std::error::Error;
 
 pub struct Num {
     pos: bool,
@@ -59,8 +60,24 @@ impl Num {
         self.val == vec![0]
     }
 
-    // TODO
-    pub fn from_string(str: String) -> Num {
+    pub fn from_string(s: String) -> Result<Num, ()> {
+        Num::from_string_base(s, 10)
+    }
+
+    pub fn from_string_base(s: String, _base: usize) -> Result<Num, ()> {
+        // let mut res = Num::new(0);
+        // let mut i = 0usize;
+        // let arr = s.chars().collect();
+        // if s.starts_with('-') {
+        //     res.pos = false;
+        //     i = 1;
+        // }
+
+        // while i < arr.len() {
+        //
+        // }
+
+        // Result::Ok(res)
         unimplemented!()
     }
 
@@ -69,8 +86,25 @@ impl Num {
     }
 
     // TODO: https://en.wikipedia.org/wiki/Double_dabble
+    // assert: _base < 36
     pub fn to_string_base(&self, _base: usize) -> String {
-        unimplemented!()
+        let base = Num::new(_base as isize);
+        let mut res = String::new();
+        let mut num = self.clone();
+        while !num.is_zero() {
+            let k = &num % &base;
+            num /= &base;
+
+            res.push(if k.val[0] < 10 {
+                ('0' as u8 + k.val[0] as u8) as char
+            } else {
+                ('a' as u8 + k.val[0] as u8 - 10) as char
+            });
+        }
+        if !self.pos {
+            res.push('-')
+        }
+        res.chars().rev().collect()
     }
 
     fn shrink_to_fit(&mut self) {
@@ -87,7 +121,7 @@ impl Num {
 
         for i in 0..min(lhs.len(), rhs.len()) {
             let mut t = (lhs[i] as u64) + (rhs[i] as u64) + (v[i] as u64);
-            if t > u32::max_value() as u64 {
+            if t >= u32::max_value() as u64 {
                 v[i + 1] += 1;
                 t -= u32::max_value() as u64;
             }
@@ -104,13 +138,14 @@ impl Num {
             v[i] = t[i];
         }
 
+        v.shrink_to_fit();
         v
     }
 
     fn sub_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> (Vec<u32>, bool) {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
-        let (b, a, swapped) = if Num::less(lhs, rhs) {
+        let (b, a, swapped) = if Num::less_core(lhs, rhs) {
             (lhs, rhs, false)
         } else {
             (rhs, lhs, true)
@@ -134,6 +169,7 @@ impl Num {
             v[i] = t as u32;
         }
 
+        v.shrink_to_fit();
         (v, swapped)
     }
 
@@ -158,6 +194,7 @@ impl Num {
             res[i] = v[i] as u32;
         }
 
+        res.shrink_to_fit();
         res
     }
 
@@ -166,7 +203,7 @@ impl Num {
         unimplemented!()
     }
 
-    fn less<T: PartialOrd>(lhs: &Vec<T>, rhs: &Vec<T>) -> bool {
+    fn less_core<T: PartialOrd>(lhs: &Vec<T>, rhs: &Vec<T>) -> bool {
         if lhs.len() != rhs.len() {
             lhs.len() < rhs.len()
         } else {
@@ -267,7 +304,15 @@ impl Num {
 
     // TODO: https://en.wikipedia.org/wiki/Lehmer%27s_GCD_algorithm
     pub fn gcd(lhs: &Num, rhs: &Num) -> Num {
-        unimplemented!()
+        let mut a = lhs.clone();
+        let mut b = rhs.clone();
+        while !b.is_zero() {
+            let d = &a % &b;
+            let c = b;
+            a = c;
+            b = d;
+        }
+        a
     }
 
     pub fn neg(v: &Num) -> Num {
@@ -298,8 +343,56 @@ impl PartialEq for Num {
     }
 }
 
+impl PartialOrd for Num {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self < other {
+            Option::Some(Ordering::Less)
+        } else {
+            if self > other {
+                Option::Some(Ordering::Greater)
+            } else {
+                Option::Some(Ordering::Equal)
+            }
+        }
+    }
+
+    fn lt(&self, other: &Self) -> bool {
+        if self.pos {
+            if other.pos {
+                Num::less_core(&self.val, &other.val)
+            } else {
+                true
+            }
+        } else {
+            if other.pos {
+                false
+            } else {
+                !Num::less_core(&other.val, &self.val)
+            }
+        }
+    }
+
+    fn le(&self, other: &Self) -> bool {
+        !(other < self)
+    }
+
+    fn gt(&self, other: &Self) -> bool {
+        other < self
+    }
+
+    fn ge(&self, other: &Self) -> bool {
+        !(self < other)
+    }
+}
+
 impl fmt::Debug for Num {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.to_string())
+    }
+}
+
+impl fmt::Display for Num {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }

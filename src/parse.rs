@@ -1,28 +1,29 @@
+use std::error::Error;
 use std::fmt;
 
-pub struct Error {
+pub struct ParseError {
     no: u8,
     line: usize,
     location: usize,
     content: String,
 }
 
-impl Error {
-    pub fn new(no: u8, line: usize, location: usize) -> Error {
+impl ParseError {
+    pub fn new(no: u8, line: usize, location: usize) -> ParseError {
         match no {
-            1 => Error {
+            1 => ParseError {
                 no,
                 line,
                 location,
                 content: "Not right character".to_string(),
             },
-            2 => Error {
+            2 => ParseError {
                 no,
                 line,
                 location,
                 content: "Last command didn't finish".to_string(),
             },
-            _ => Error {
+            _ => ParseError {
                 no,
                 line,
                 location,
@@ -32,7 +33,7 @@ impl Error {
     }
 }
 
-impl fmt::Display for Error {
+impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "error[{}] {}:{}:{}", self.no, self.line, self.location, self.content)
     }
@@ -68,7 +69,7 @@ impl Command {
         '\u{AC00}' <= c && c <= '\u{D7A3}'
     }
 
-    pub fn parse(code: String) -> Result<Vec<Command>, Error> {
+    pub fn parse(code: String) -> Result<Vec<Command>, ParseError> {
         let mut res: Vec<Command> = Vec::new();
 
         // command.type_:
@@ -289,12 +290,12 @@ impl Command {
                     }
                 }
 
-                _ => return Result::Err(Error::new(100, line_count, i - last_line_started))
+                _ => return Result::Err(ParseError::new(100, line_count, i - last_line_started))
             };
         }
 
         if state == 1 {
-            Result::Err(Error::new(2, line_count, code.len() - last_line_started))
+            Result::Err(ParseError::new(2, line_count, code.len() - last_line_started))
         } else {
             match cmd_leaf {
                 Area::Val {
@@ -315,18 +316,23 @@ impl Command {
 }
 
 impl Command {
-    fn area_to_string(s: &mut String, area: &Area) {
+    fn area_to_string(s: &mut String, area: &Area, need: bool) {
         match area {
             Area::Val {
                 ref type_,
                 ref left,
                 ref right
             } => {
-                s.push("?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize]);
-                Command::area_to_string(s, left);
-                Command::area_to_string(s, right);
+                let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
+                s.push(c);
+                Command::area_to_string(s, left, c == '?' || c == '!');
+                Command::area_to_string(s, right, c == '?' || c == '!');
             }
-            Area::Nil => {}
+            Area::Nil => {
+                if need {
+                    s.push('_')
+                }
+            }
         }
     }
 }
@@ -335,10 +341,7 @@ impl fmt::Display for Command {
     // for debug
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut area = String::new();
-        Command::area_to_string(&mut area, &self.area);
-        if area.is_empty() {
-            area = String::from("none")
-        }
+        Command::area_to_string(&mut area, &self.area, true);
         write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {}", self.type_, self.cnt1, self.cnt2, area)
     }
 }
