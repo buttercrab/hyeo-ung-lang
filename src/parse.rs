@@ -1,5 +1,4 @@
 use std::fmt;
-use std::fmt::Formatter;
 
 pub struct Error {
     no: u8,
@@ -34,7 +33,7 @@ impl Error {
 }
 
 impl fmt::Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "error[{}] {}:{}:{}", self.no, self.line, self.location, self.content)
     }
 }
@@ -54,6 +53,8 @@ pub struct Command {
 
 
 impl Command {
+    const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
+
     pub fn new(type_: u8) -> Command {
         Command {
             type_,
@@ -176,10 +177,10 @@ impl Command {
                 } else if c == '!' {
                     match leaf {
                         Area::Val {
-                            type_: _,
+                            ref type_,
                             left: _,
                             ref mut right,
-                        } => {
+                        } => if *type_ <= 1 {
                             *right = match right.as_ref() {
                                 Area::Val {
                                     type_: t,
@@ -193,34 +194,35 @@ impl Command {
                                 Area::Nil => Box::new(Area::new(1)),
                             };
                             leaf = &mut *right;
-                        }
+                        } else {
+                            area = Area::Val {
+                                type_: 1,
+                                left: Box::new(Area::new(*type_)),
+                                right: Box::new(Area::Nil),
+                            };
+                            leaf = &mut area;
+                        },
                         Area::Nil => {
                             area = Area::new(1);
                             leaf = &mut area;
                         }
                     }
                     2
-                } else if let Some(mut t) = "♥❤💕💖💗💘💙💚💛💜💝♡".find(c) {
+                } else if let Some(mut t) = Command::HEARTS.iter().position(|&x| x == c) {
                     t += 2;
                     match leaf {
                         Area::Val {
-                            type_: _,
+                            ref type_,
                             left: _,
                             ref mut right,
-                        } => {
-                            *right = match right.as_mut() {
-                                Area::Val {
-                                    type_: _,
-                                    left: _,
-                                    right: _,
-                                } => {
-                                    return Result::Err(Error::new(1, line_count + 1, i - last_line_started));
-                                }
+                        } => if *type_ <= 1 {
+                            match right.as_ref() {
                                 Area::Nil => {
-                                    Box::new(Area::new(t as u8))
+                                    *right = Box::new(Area::new(t as u8));
                                 }
-                            };
-                        }
+                                _ => {}
+                            }
+                        },
                         Area::Nil => {
                             area = Area::new(t as u8);
                             leaf = &mut area;
@@ -271,8 +273,50 @@ impl Command {
         if state == 1 {
             Result::Err(Error::new(2, line_count, code.len() - last_line_started))
         } else {
+            match cmd_leaf {
+                Area::Val {
+                    type_: _,
+                    left: _,
+                    ref mut right,
+                } => {
+                    *right = Box::new(area);
+                }
+                Area::Nil => {
+                    command.area = area;
+                }
+            }
+            res.push(command);
             Result::Ok(res)
         }
+    }
+}
+
+impl Command {
+    fn area_to_string(s: &mut String, area: &Area) {
+        match area {
+            Area::Val {
+                ref type_,
+                ref left,
+                ref right
+            } => {
+                s.push("?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize]);
+                Command::area_to_string(s, left);
+                Command::area_to_string(s, right);
+            }
+            Area::Nil => {}
+        }
+    }
+}
+
+impl fmt::Display for Command {
+    // for debug
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut area = String::new();
+        Command::area_to_string(&mut area, &self.area);
+        if area.is_empty() {
+            area = String::from("none")
+        }
+        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {}", self.type_, self.cnt1, self.cnt2, area)
     }
 }
 

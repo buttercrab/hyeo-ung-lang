@@ -23,13 +23,15 @@ fn main() {
     match file.read_to_string(&mut s) {
         Err(why) => panic!("couldn't read {}: {}", display,
                            why.description()),
-        Ok(_) => print!("{} contains:\n{}", display, s),
+        Ok(_) => println!("{} contains:\n{}", display, s),
     }
 
     let a = Command::parse(s);
     match a {
         Ok(t) => {
-            println!("{}", t.len());
+            for i in 0..t.len() {
+                println!("{}", t[i]);
+            }
         },
         Err(e) => {
             eprintln!("{}", e);
