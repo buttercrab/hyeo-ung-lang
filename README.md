@@ -22,6 +22,7 @@
 - Nice Compile Error
 - String to Hyeo-ung Code Generator
 - Prove whether it is Turing Complete
+- No unsafe rust code
 
 ## Implementation
 
