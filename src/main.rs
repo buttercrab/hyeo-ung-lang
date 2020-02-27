@@ -3,7 +3,6 @@ use std::fs::File;
 use std::io::Read;
 use std::path::Path;
 
-use hyeo_ung_lang::big_number::Num;
 use hyeo_ung_lang::parse::Command;
 
 fn main() {
@@ -33,7 +32,7 @@ fn main() {
             println!("{}", t.len());
         },
         Err(e) => {
-            eprintln!("{}", e.get_error());
+            eprintln!("{}", e);
         }
     }
 }

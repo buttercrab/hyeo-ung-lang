@@ -41,3 +41,9 @@
                 | 
  Binary Program | 
 ```
+
+# Implemented
+
+- Big Number: Almost done (`from_string`, `to_string`, `div`, `gcd` to be done)
+- Compiler:
+  + parser: O(n) algorithm **iterates whole code only once**

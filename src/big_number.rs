@@ -1,6 +1,5 @@
 use std::{fmt, ops};
 use std::cmp::{max, min};
-use std::ops::{Add, Div, Mul, Neg, Rem, Sub};
 
 pub struct Num {
     pos: bool,
@@ -144,7 +143,7 @@ impl Num {
 
         for i in 0..(lhs.len() + rhs.len()) {
             for j in max(0, i - rhs.len())..min(i, lhs.len()) {
-                let mut t = (lhs[j] as u64) * (rhs[j] as u64);
+                let t = (lhs[j] as u64) * (rhs[j] as u64);
                 v[i] += t % u32::max_value() as u64;
                 v[i + 1] += v[i] / u32::max_value() as u64;
                 v[i] %= u32::max_value() as u64;

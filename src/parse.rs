@@ -1,3 +1,44 @@
+use std::fmt;
+use std::fmt::Formatter;
+
+pub struct Error {
+    no: u8,
+    line: usize,
+    location: usize,
+    content: String,
+}
+
+impl Error {
+    pub fn new(no: u8, line: usize, location: usize) -> Error {
+        match no {
+            1 => Error {
+                no,
+                line,
+                location,
+                content: "Not right character".to_string(),
+            },
+            2 => Error {
+                no,
+                line,
+                location,
+                content: "Last command didn't finish".to_string(),
+            },
+            _ => Error {
+                no,
+                line,
+                location,
+                content: "Error occurred in compiler: make an issue".to_string(),
+            }
+        }
+    }
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "error[{}] {}:{}:{}", self.no, self.line, self.location, self.content)
+    }
+}
+
 pub struct Command {
     // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
     // 1: 항, 하앙, 하아앙, 하아아앙 ...
@@ -11,37 +52,6 @@ pub struct Command {
     area: Area,
 }
 
-pub struct Error {
-    no: u8,
-    location: usize,
-    content: String,
-}
-
-impl Error {
-    pub fn get_error(&self) -> String {
-        format!("Error no {} Line {}: {}", self.no, self.location, self.content)
-    }
-
-    pub fn new(type_: u8, location: usize) -> Error {
-        match type_ {
-            1 => Error {
-                no: type_,
-                location,
-                content: "Not right character".to_string(),
-            },
-            2 => Error {
-                no: type_,
-                location,
-                content: "Last command didn't finish".to_string(),
-            },
-            _ => Error {
-                no: type_,
-                location,
-                content: "Error occurred in compiler: make an issue".to_string(),
-            }
-        }
-    }
-}
 
 impl Command {
     pub fn new(type_: u8) -> Command {
@@ -82,24 +92,31 @@ impl Command {
         // 2: can come: hangul, area (after area starts)
         let mut state = 0u8;
         let mut area = Area::Nil;
-        let mut temp_area = Area::Nil;
         let mut leaf = &mut area;
         let mut cmd_leaf = &mut command.area;
 
+        let mut line_count = 0;
+        let mut last_line_started = 0;
+
         for (i, c) in code.chars().enumerate() {
-            if c.is_whitespace() { continue; }
+            if c.is_whitespace() {
+                if c == '\n' {
+                    line_count += 1;
+                    last_line_started = i + 1;
+                }
+                continue;
+            }
 
             state = match state {
                 0 | 2 => if let Some(mut t) = "형항핫흣흡흑혀하흐".find(c) {
                     t /= 3;
 
                     if command.cnt1 != 0 {
-                        leaf = &mut temp_area;
                         match cmd_leaf {
                             Area::Val {
                                 type_: _,
                                 left: _,
-                                right: ref mut right,
+                                ref mut right,
                             } => {
                                 *right = Box::new(area);
                             }
@@ -131,12 +148,11 @@ impl Command {
                     }
                     state
                 } else if c == '?' {
-                    leaf = &mut temp_area;
                     match cmd_leaf {
                         Area::Val {
                             type_: _,
                             left: _,
-                            right: ref mut right,
+                            ref mut right,
                         } => {
                             *right = Box::new(Area::Val {
                                 type_: 0,
@@ -146,7 +162,6 @@ impl Command {
                             cmd_leaf = &mut *right;
                         }
                         Area::Nil => {
-                            cmd_leaf = &mut temp_area;
                             command.area = Area::Val {
                                 type_: 0,
                                 left: Box::new(area),
@@ -163,7 +178,7 @@ impl Command {
                         Area::Val {
                             type_: _,
                             left: _,
-                            right: ref mut right,
+                            ref mut right,
                         } => {
                             *right = match right.as_ref() {
                                 Area::Val {
@@ -180,7 +195,6 @@ impl Command {
                             leaf = &mut *right;
                         }
                         Area::Nil => {
-                            leaf = &mut temp_area;
                             area = Area::new(1);
                             leaf = &mut area;
                         }
@@ -192,15 +206,15 @@ impl Command {
                         Area::Val {
                             type_: _,
                             left: _,
-                            right: ref mut right,
+                            ref mut right,
                         } => {
                             *right = match right.as_mut() {
                                 Area::Val {
                                     type_: _,
                                     left: _,
-                                    right: ref mut right,
+                                    right: _,
                                 } => {
-                                    return Result::Err(Error::new(1, i));
+                                    return Result::Err(Error::new(1, line_count + 1, i - last_line_started));
                                 }
                                 Area::Nil => {
                                     Box::new(Area::new(t as u8))
@@ -208,7 +222,6 @@ impl Command {
                             };
                         }
                         Area::Nil => {
-                            leaf = &mut temp_area;
                             area = Area::new(t as u8);
                             leaf = &mut area;
                         }
@@ -251,12 +264,12 @@ impl Command {
                     }
                 }
 
-                _ => return Result::Err(Error::new(100, i))
+                _ => return Result::Err(Error::new(100, line_count, i - last_line_started))
             };
         }
 
         if state == 1 {
-            Result::Err(Error::new(2, code.len()))
+            Result::Err(Error::new(2, line_count, code.len() - last_line_started))
         } else {
             Result::Ok(res)
         }
@@ -294,9 +307,4 @@ impl Area {
             right: Box::new(Area::Nil),
         }
     }
-}
-
-pub struct State {
-    length: usize,
-    type_: u8,
 }
