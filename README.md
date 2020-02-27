@@ -15,12 +15,16 @@
 
 - Big Number
 - Interpreter
+  + `$ hyeong`
 - Compiler
+  + `$ hyeong build FILE --flags...`
 - Fast Speed (Algorithm)
 - Optimization
 - Debugger
+  + `$ hyeong debug FILE --flag...`
 - Nice Compile Error
 - String to Hyeo-ung Code Generator
+  + `$ hyeong string "Hello, World!"`
 - Prove whether it is Turing Complete
 - No unsafe rust code
 
