@@ -131,9 +131,9 @@ impl Num {
 
         for i in 0..min(lhs.len(), rhs.len()) {
             let mut t = (lhs[i] as u64) + (rhs[i] as u64) + (v[i] as u64);
-            if t >= u32::max_value() as u64 {
-                v[i + 1] += 1;
-                t -= u32::max_value() as u64;
+            if t >= 1u64 << 32 {
+                v[i + 1] = 1;
+                t -= 1u64 << 32;
             }
             v[i] = t as u32;
         }
@@ -145,7 +145,12 @@ impl Num {
         };
 
         for i in min(lhs.len(), rhs.len())..t.len() {
-            v[i] = t[i];
+            let mut s = (t[i] as u64) + (v[i] as u64);
+            if s >= 1u64 << 32 {
+                v[i + 1] = 1;
+                s -= 1u64 << 32;
+            }
+            v[i] = s as u32;
         }
 
         v.shrink_to_fit();
@@ -156,16 +161,20 @@ impl Num {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
         let (b, a, swapped) = if Num::less_core(lhs, rhs) {
-            (lhs, rhs, false)
+            (lhs, rhs, true)
         } else {
-            (rhs, lhs, true)
+            (rhs, lhs, false)
         };
 
         for i in 0..a.len() {
-            let mut t = (a[i] as i64) - (b[i] as i64) - (v[i] as i64);
+            let mut t = if i < b.len() {
+                (a[i] as i64) - (b[i] as i64) - (v[i] as i64)
+            } else {
+                (a[i] as i64) - (v[i] as i64)
+            };
             while t < 0 {
                 v[i + 1] += 1;
-                t += u32::max_value() as i64;
+                t += 1i64 << 32;
             }
             v[i] = t as u32;
         }
@@ -174,7 +183,7 @@ impl Num {
             let mut t = (b[i] as i64) - (v[i] as i64);
             if t < 0 {
                 v[i + 1] += 1;
-                t += u32::max_value() as i64;
+                t += 1i64 << 32;
             }
             v[i] = t as u32;
         }
@@ -190,12 +199,12 @@ impl Num {
         for i in 0..(lhs.len() + rhs.len()) {
             for j in max(0, i - rhs.len())..min(i, lhs.len()) {
                 let t = (lhs[j] as u64) * (rhs[j] as u64);
-                v[i] += t % u32::max_value() as u64;
-                v[i + 1] += v[i] / u32::max_value() as u64;
-                v[i] %= u32::max_value() as u64;
-                v[i + 1] += t / u32::max_value() as u64;
-                v[i + 2] += v[i + 1] / u32::max_value() as u64;
-                v[i + 1] %= u32::max_value() as u64;
+                v[i] += t % (1u64 << 32);
+                v[i + 1] += v[i] / (1u64 << 32);
+                v[i] %= (1u64 << 32);
+                v[i + 1] += t / (1u64 << 32);
+                v[i + 2] += v[i + 1] / (1u64 << 32);
+                v[i + 1] %= (1u64 << 32);
             }
         }
 
@@ -237,7 +246,7 @@ impl Num {
                 Num::add_core(&lhs.val, &rhs.val)
             } else {
                 let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
-                need_flip = need_flip ^ swapped;
+                need_flip ^= swapped;
                 tmp
             }
         } else {
@@ -248,7 +257,7 @@ impl Num {
             } else {
                 Num::add_core(&lhs.val, &rhs.val)
             };
-            need_flip = !need_flip;
+            need_flip ^= true;
             t
         });
         if need_flip {
@@ -265,7 +274,7 @@ impl Num {
                 Num::add_core(&lhs.val, &rhs.val)
             } else {
                 let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
-                need_flip = need_flip ^ swapped;
+                need_flip ^= swapped;
                 tmp
             }
         } else {
@@ -276,7 +285,7 @@ impl Num {
             } else {
                 Num::add_core(&lhs.val, &rhs.val)
             };
-            need_flip = !need_flip;
+            need_flip ^= true;
             t
         });
         if need_flip {
