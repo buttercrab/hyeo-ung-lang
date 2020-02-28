@@ -91,7 +91,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "hyeo-ung-lang"
+name = "hyeong"
 version = "0.1.0"
 dependencies = [
  "clap",

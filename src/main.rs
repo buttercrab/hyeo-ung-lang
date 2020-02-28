@@ -1,6 +1,6 @@
 use clap::*;
 
-use hyeo_ung_lang::io;
+use hyeong::io;
 
 fn main() {
     let matches = App::new("hyeong")

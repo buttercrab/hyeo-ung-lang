@@ -10,6 +10,7 @@
 </p>
 
 [Hyeo-ung Programming Language](https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069) compiler written in rust.
+(Developing)
 
 ## Goal
 
@@ -71,3 +72,10 @@
   + `$ hyeong update`
 - Interpreter
   + `$ hyeong`
+  
+## How to install
+
+*(will be published when stable version comes out)*
+
+```shell script
+```
