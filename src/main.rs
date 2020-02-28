@@ -1,40 +1,102 @@
-use std::error::Error;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-
-use hyeo_ung_lang::parse::Command;
+use clap::*;
 
 fn main() {
-    let path = Path::new("hello.txt");
-    let display = path.display();
-
-    // Open the path in read-only mode, returns `io::Result<File>`
-    let mut file = match File::open(&path) {
-        // The `description` method of `io::Error` returns a string that
-        // describes the error
-        Err(why) => panic!("couldn't open {}: {}", display,
-                           why.description()),
-        Ok(file) => file,
-    };
-
-    // Read the file contents into a string, returns `io::Result<usize>`
-    let mut s = String::new();
-    match file.read_to_string(&mut s) {
-        Err(why) => panic!("couldn't read {}: {}", display,
-                           why.description()),
-        Ok(_) => println!("{} contains:\n{}", display, s),
-    }
-
-    let a = Command::parse(s);
-    match a {
-        Ok(t) => {
-            for i in 0..t.len() {
-                println!("{}", t[i]);
-            }
-        },
-        Err(e) => {
-            eprintln!("{}", e);
-        }
-    }
+    let matches = App::new("hyeong")
+        .version("0.1.0")
+        .about("Hyeo-ung programming language tool")
+        .subcommand(
+            App::new("build")
+                .about("Compiles hyeong code")
+                .arg(
+                    Arg::with_name("input")
+                        .value_name("input_file")
+                        .takes_value(true)
+                        .required(true)
+                        .help("input file to compile")
+                )
+                .arg(
+                    Arg::with_name("optimize")
+                        .value_name("optimize")
+                        .takes_value(true)
+                        .short('O')
+                        .long("optimize")
+                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
+                )
+                .arg(
+                    Arg::with_name("output")
+                        .value_name("output")
+                        .takes_value(true)
+                        .short('o')
+                        .long("output")
+                        .help("binary output file (filename by default)")
+                )
+                .arg(
+                    Arg::with_name("warning")
+                        .value_name("warning")
+                        .takes_value(true)
+                        .short('W')
+                        .long("warn")
+                        .help("warning level (0/none: no warning, 1/all: all warning [default]")
+                )
+        )
+        .subcommand(
+            App::new("check")
+                .about("Parse your code and check if you are right")
+                .arg(
+                    Arg::with_name("input")
+                        .value_name("input_file")
+                        .takes_value(true)
+                        .required(true)
+                        .help("input file to check")
+                )
+        )
+        .subcommand(
+            App::new("debug")
+                .about("Debug your code command by command")
+                .arg(
+                    Arg::with_name("input")
+                        .value_name("input_file")
+                        .takes_value(true)
+                        .required(true)
+                        .help("input file to debug")
+                )
+                .arg(
+                    Arg::with_name("from")
+                        .value_name("from")
+                        .takes_value(true)
+                        .short('f')
+                        .long("from")
+                        .help("place to start debugging from (0 by default)")
+                )
+        )
+        .subcommand(
+            App::new("run")
+                .about("Run hyeong code directly")
+                .arg(
+                    Arg::with_name("input")
+                        .value_name("input_file")
+                        .takes_value(true)
+                        .required(true)
+                        .help("input file to run")
+                )
+                .arg(
+                    Arg::with_name("optimize")
+                        .value_name("optimize")
+                        .takes_value(true)
+                        .short('O')
+                        .long("optimize")
+                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
+                )
+        )
+        .subcommand(
+            App::new("update")
+                .about("Update this tool")
+                .arg(
+                    Arg::with_name("version")
+                        .value_name("version")
+                        .takes_value(true)
+                        .help("update to specific version (latest by default)")
+                )
+        )
+        .get_matches();
 }
