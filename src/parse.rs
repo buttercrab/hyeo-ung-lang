@@ -10,13 +10,13 @@ pub struct ParseError {
 impl ParseError {
     pub fn new(no: u8, line: usize, location: usize) -> ParseError {
         match no {
-            1 => ParseError {
+            0x1 => ParseError {
                 no,
                 line,
                 location,
                 content: "Not right character".to_string(),
             },
-            2 => ParseError {
+            0x2 => ParseError {
                 no,
                 line,
                 location,
@@ -34,7 +34,7 @@ impl ParseError {
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "error[{}] {}:{}:{}", self.no, self.line, self.location, self.content)
+        write!(f, "error[{:04X}] {}:{}:{}", self.no, self.line, self.location, self.content)
     }
 }
 
@@ -289,12 +289,12 @@ impl Command {
                     }
                 }
 
-                _ => return Result::Err(ParseError::new(100, line_count, i - last_line_started))
+                _ => return Result::Err(ParseError::new(0x10, line_count, i - last_line_started))
             };
         }
 
         if state == 1 {
-            Result::Err(ParseError::new(2, line_count, code.len() - last_line_started))
+            Result::Err(ParseError::new(0x2, line_count, code.len() - last_line_started))
         } else {
             match cmd_leaf {
                 Area::Val {
