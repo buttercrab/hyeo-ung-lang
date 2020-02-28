@@ -78,7 +78,7 @@ impl Command {
     }
 
     pub fn to_string(&self) -> String {
-        format!("{} {}_{}_{} : {}",
+        format!("{}   {}_{}_{} : {}",
                 (&*format!("{}:{}", self.line, self.loc)).yellow()
                 , COMMANDS[self.type_ as usize], self.cnt1, self.cnt2, self.area)
     }
