@@ -78,4 +78,5 @@
 *(will be published when stable version comes out)*
 
 ```shell script
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh" | /bin/bash
 ```
