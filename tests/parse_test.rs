@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod parse_test {
-    use hyeo_ung_lang::parse;
+    use hyeong::parse;
 
     fn basic_test(code: &str, res: &str) {
         let t = if let Ok(t) = parse::parse(code.parse().unwrap()) {

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod big_number_test {
-    use hyeo_ung_lang::big_number::Num;
+    use hyeong::big_number::Num;
 
     #[test]
     fn add_test01() {
