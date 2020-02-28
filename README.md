@@ -50,6 +50,7 @@
 
 ## Implemented
 
-- Big Number: Almost done (`from_string`, `to_string`, `div` to be done)
+- Big Number:
+  + Arithmetic operators, `to_string` and `from_string` method
 - Compiler:
   + parser: O(n) algorithm **iterates whole code exactly twice**

@@ -15,7 +15,7 @@ impl Num {
             }
         } else {
             Num {
-                pos: true,
+                pos: false,
                 val: vec![(-n) as u32],
             }
         }
@@ -67,15 +67,13 @@ impl Num {
     pub fn from_string_base(s: String, _base: usize) -> Num {
         let base = Num::new(_base as isize);
         let mut res = Num::new(0);
-        let mut i = 0usize;
-        let arr = s.chars().collect::<Vec<char>>();
-        if s.starts_with('-') {
-            res.pos = false;
-            i = 1;
-        }
+        let mut flip = false;
 
-        while i < arr.len() {
-            let c = arr[i];
+        for (i, c) in s.chars().enumerate() {
+            if i == 0 && c == '-' {
+                flip = true;
+                continue;
+            }
             let k = if '0' <= c && c <= '9' {
                 c as isize - '0' as isize
             } else if 'A' <= c && c <= 'Z' {
@@ -85,9 +83,11 @@ impl Num {
             };
             res *= &base;
             res += &Num::new(k);
-            i += 1;
         }
 
+        if flip {
+            res.pos = false;
+        }
         res
     }
 
@@ -101,6 +101,8 @@ impl Num {
         let base = Num::new(_base as isize);
         let mut res = String::new();
         let mut num = self.clone();
+        num.pos = true;
+
         while !num.is_zero() {
             let k = &num % &base;
             num /= &base;
@@ -108,9 +110,10 @@ impl Num {
             res.push(if k.val[0] < 10 {
                 ('0' as u8 + k.val[0] as u8) as char
             } else {
-                ('a' as u8 + k.val[0] as u8 - 10) as char
+                ('A' as u8 + k.val[0] as u8 - 10) as char
             });
         }
+
         if !self.pos {
             res.push('-')
         }
@@ -119,7 +122,7 @@ impl Num {
 
     fn shrink_to_fit(&mut self) {
         while match self.val.last() {
-            Some(x) => *x == 0,
+            Some(x) => *x == 0 && self.val.len() > 1,
             None => false,
         } {
             self.val.pop();
@@ -153,33 +156,37 @@ impl Num {
             v[i] = s as u32;
         }
 
-        v.shrink_to_fit();
         v
     }
 
     fn sub_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> (Vec<u32>, bool) {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
-        let (b, a, swapped) = if Num::less_core(lhs, rhs) {
-            (lhs, rhs, true)
+        // a > b => a - b
+        let (a, b, swapped) = if Num::less_core(lhs, rhs) {
+            (rhs, lhs, true)
         } else {
-            (rhs, lhs, false)
+            (lhs, rhs, false)
         };
 
-        for i in 0..a.len() {
-            let mut t = if i < b.len() {
-                (a[i] as i64) - (b[i] as i64) - (v[i] as i64)
-            } else {
-                (a[i] as i64) - (v[i] as i64)
-            };
-            while t < 0 {
-                v[i + 1] += 1;
+        for i in 0..b.len() {
+            let mut t = (a[i] as i64) - (b[i] as i64) - (v[i] as i64);
+            if t < 0 {
+                v[i + 1] = 1;
                 t += 1i64 << 32;
             }
             v[i] = t as u32;
         }
 
-        v.shrink_to_fit();
+        for i in b.len()..a.len() {
+            let mut t = (a[i] as i64) - (v[i] as i64);
+            if t < 0 {
+                v[i + 1] = 1;
+                t += 1i64 << 32;
+            }
+            v[i] = t as u32;
+        }
+
         (v, swapped)
     }
 
@@ -187,37 +194,56 @@ impl Num {
     fn mult_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
         let mut v = vec![0; lhs.len() + rhs.len() + 1];
 
-        for i in 0..(lhs.len() + rhs.len()) {
-            for j in max(0, i - rhs.len())..min(i, lhs.len()) {
-                let t = (lhs[j] as u64) * (rhs[j] as u64);
-                v[i] += t % (1u64 << 32);
-                v[i + 1] += v[i] / (1u64 << 32);
-                v[i] %= (1u64 << 32);
-                v[i + 1] += t / (1u64 << 32);
-                v[i + 2] += v[i + 1] / (1u64 << 32);
-                v[i + 1] %= (1u64 << 32);
+        for i in 0..lhs.len() {
+            if lhs[i] == 0 {
+                continue;
+            }
+
+            for j in 0..rhs.len() {
+                let t = (lhs[i] as u64) * (rhs[j] as u64);
+                v[i + j] += t % (1u64 << 32);
+                v[i + j + 1] += t / (1u64 << 32);
+                v[i + j + 1] += v[i + j] / (1u64 << 32);
+                v[i + j] %= 1u64 << 32;
             }
         }
 
-        let mut res: Vec<u32> = vec![0; v.len()];
-        for i in 0..v.len() {
-            res[i] = v[i] as u32;
-        }
-
-        res.shrink_to_fit();
-        res
+        v.iter().map(|&x| x as u32).collect()
     }
 
     // TODO: https://en.wikipedia.org/wiki/Division_algorithm
     fn div_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
-        unimplemented!()
+        let mut v = vec![0; max(lhs.len(), rhs.len())];
+
+        for i in (0..v.len()).rev() {
+            for j in (0..32).rev() {
+                v[i] += 1u32 << j;
+                if Num::less_core(lhs, &Num::mult_core(&v, rhs)) {
+                    v[i] -= 1u32 << j;
+                }
+            }
+        }
+
+        v
     }
 
-    fn less_core<T: PartialOrd>(lhs: &Vec<T>, rhs: &Vec<T>) -> bool {
-        if lhs.len() != rhs.len() {
-            lhs.len() < rhs.len()
+    fn less_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> bool {
+        let mut a = lhs.len() - 1;
+        let mut b = rhs.len() - 1;
+
+        while a > 0 && lhs[a] == 0 {
+            a -= 1;
+        }
+
+        while b > 0 && rhs[b] == 0 {
+            b -= 1;
+        }
+
+        if a != b {
+            a < b
         } else {
-            for i in (0..lhs.len()).rev() {
+            a += 1;
+            for i in (0..a).rev() {
                 if lhs[i] != rhs[i] {
                     return lhs[i] < rhs[i];
                 }
@@ -251,6 +277,7 @@ impl Num {
             need_flip ^= true;
             t
         });
+
         if need_flip {
             res.minus();
         }
@@ -291,19 +318,18 @@ impl Num {
         if lhs.pos ^ rhs.pos {
             res.minus();
         }
-        res.shrink_to_fit();
         res
     }
 
     pub fn div(lhs: &Num, rhs: &Num) -> Num {
         let mut res = Num::from_vec(Num::div_core(&lhs.val, &rhs.val));
         if !lhs.pos {
-            res = Num::add(&res, &Num::one());
+            res += &Num::one();
+            res.minus();
         }
         if !rhs.pos {
-            res.minus()
+            res.minus();
         }
-        res.shrink_to_fit();
         res
     }
 
