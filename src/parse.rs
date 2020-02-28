@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::fmt;
 
+use colored::Colorize;
+
 pub struct ParseError {
     no: u8,
     line: usize,
@@ -57,6 +59,8 @@ pub struct Command {
     type_: u8,
     cnt1: u128,
     cnt2: u128,
+    line: usize,
+    loc: usize,
     area: Area,
 }
 
@@ -67,8 +71,16 @@ impl Command {
             type_,
             cnt1: 0,
             cnt2: 0,
+            line: 0,
+            loc: 0,
             area: Area::Nil,
         }
+    }
+
+    pub fn to_string(&self) -> String {
+        format!("{} {}_{}_{} : {}",
+                (&*format!("{}:{}", self.line, self.loc)).yellow()
+                , COMMANDS[self.type_ as usize], self.cnt1, self.cnt2, self.area)
     }
 }
 
@@ -81,6 +93,7 @@ impl fmt::Display for Command {
     }
 }
 
+const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
 const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
 
 fn is_hangul_syllable(c: char) -> bool {
@@ -100,12 +113,7 @@ pub fn parse(code: String) -> Result<Vec<Command>, ParseError> {
     // 6: 혀
     // 7: 하
     // 8: 흐
-    let mut command = Command {
-        type_: 0,
-        cnt1: 0,
-        cnt2: 0,
-        area: Area::Nil,
-    };
+    let mut command = Command::new(0);
 
     // 0: can come: hangul, dot, area
     // 1: can come: hangul (after hangul starts)
@@ -178,6 +186,8 @@ pub fn parse(code: String) -> Result<Vec<Command>, ParseError> {
                 command.cnt1 = 1;
                 command.cnt2 = 0;
                 command.area = Area::Nil;
+                command.line = line_count + 1;
+                command.loc = i - last_line_started;
                 cmd_leaf = &mut command.area;
 
                 if t < 6 {
@@ -383,5 +393,16 @@ impl Area {
             left: Box::new(Area::Nil),
             right: Box::new(Area::Nil),
         }
+    }
+}
+
+impl fmt::Display for Area {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut s = String::new();
+        area_to_string(&mut s, self, false);
+        if s.is_empty() {
+            s = "(no area)".to_string();
+        }
+        write!(f, "{}", s)
     }
 }
