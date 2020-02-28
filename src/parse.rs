@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::fmt;
 
 pub struct ParseError {
@@ -31,6 +32,14 @@ impl ParseError {
         }
     }
 }
+
+impl fmt::Debug for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "error[{:04X}] {}:{}:{}", self.no, self.line, self.location, self.content)
+    }
+}
+
+impl Error for ParseError {}
 
 impl fmt::Display for ParseError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

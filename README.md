@@ -54,3 +54,20 @@
   + Arithmetic operators, `to_string` and `from_string` method
 - Compiler:
   + parser: O(n) algorithm **iterates whole code exactly twice**
+  
+---
+
+## Feature
+
+- Compile hyeo-ung code
+  + `$ hyeong build FILE -O2 -Wall`
+- Parse hyeo-ung code
+  + `$ hyeong check FILE`
+- Debug hyeo-ung code
+  + `$ hyeong debug FILE --from 12`
+- Run directly without making binary file
+  + `$ hyeong run FILE -O2 -Wall`
+- Update this tool
+  + `$ hyeong update`
+- Interpreter
+  + `$ hyeong`

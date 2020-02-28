@@ -1,5 +1,7 @@
 use clap::*;
 
+use hyeo_ung_lang::io::IO;
+
 fn main() {
     let matches = App::new("hyeong")
         .version("0.1.0")
@@ -87,6 +89,14 @@ fn main() {
                         .long("optimize")
                         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
                 )
+                .arg(
+                    Arg::with_name("warning")
+                        .value_name("warning")
+                        .takes_value(true)
+                        .short('W')
+                        .long("warn")
+                        .help("warning level (0/none: no warning, 1/all: all warning [default]")
+                )
         )
         .subcommand(
             App::new("update")
@@ -99,4 +109,27 @@ fn main() {
                 )
         )
         .get_matches();
+
+    if let Some(ref matches) = matches.subcommand_matches("build") {
+        // build
+        let code = IO::read_file(matches.value_of("input").unwrap());
+    } else if let Some(ref matches) = matches.subcommand_matches("check") {
+        // check
+        let code = IO::read_file(matches.value_of("input").unwrap());
+    } else if let Some(ref matches) = matches.subcommand_matches("debug") {
+        // debug
+        let code = IO::read_file(matches.value_of("input").unwrap());
+    } else if let Some(ref matches) = matches.subcommand_matches("run") {
+        // run
+        let code = IO::read_file(matches.value_of("input").unwrap());
+    } else if let Some(ref matches) = matches.subcommand_matches("update") {
+        // update
+        let version = if let Some(t) = matches.value_of("version") {
+            t
+        } else {
+            "latest"
+        };
+    } else {
+        // interpreter
+    }
 }
