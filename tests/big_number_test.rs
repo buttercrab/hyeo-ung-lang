@@ -130,4 +130,11 @@ mod big_number_test {
 
         assert_eq!(a.to_string(), "1234");
     }
+
+    #[test]
+    fn to_string_test02() {
+        let a = Num::new(-1234);
+
+        assert_eq!(a.to_string(), "-1234");
+    }
 }
