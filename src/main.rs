@@ -116,6 +116,9 @@ fn main() {
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         // check
         let code = io::read_file(matches.value_of("input").unwrap());
+        for (i, c) in code.iter().enumerate() {
+            println!("{}. {}", i, c)
+        }
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
         // debug
         let code = io::read_file(matches.value_of("input").unwrap());
