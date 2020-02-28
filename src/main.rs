@@ -1,6 +1,6 @@
 use clap::*;
 
-use hyeo_ung_lang::io::IO;
+use hyeo_ung_lang::io;
 
 fn main() {
     let matches = App::new("hyeong")
@@ -112,16 +112,16 @@ fn main() {
 
     if let Some(ref matches) = matches.subcommand_matches("build") {
         // build
-        let code = IO::read_file(matches.value_of("input").unwrap());
+        let code = io::read_file(matches.value_of("input").unwrap());
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         // check
-        let code = IO::read_file(matches.value_of("input").unwrap());
+        let code = io::read_file(matches.value_of("input").unwrap());
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
         // debug
-        let code = IO::read_file(matches.value_of("input").unwrap());
+        let code = io::read_file(matches.value_of("input").unwrap());
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
         // run
-        let code = IO::read_file(matches.value_of("input").unwrap());
+        let code = io::read_file(matches.value_of("input").unwrap());
     } else if let Some(ref matches) = matches.subcommand_matches("update") {
         // update
         let version = if let Some(t) = matches.value_of("version") {

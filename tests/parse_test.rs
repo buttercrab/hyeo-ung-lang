@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod parse_test {
-    use hyeo_ung_lang::parse::Command;
+    use hyeo_ung_lang::parse;
 
     fn basic_test(code: &str, res: &str) {
-        let t = if let Ok(t) = Command::parse(code.parse().unwrap()) {
+        let t = if let Ok(t) = parse::parse(code.parse().unwrap()) {
             assert_eq!(t.len(), 1);
             format!("{}", t[0])
         } else {
