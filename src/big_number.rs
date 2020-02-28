@@ -179,15 +179,6 @@ impl Num {
             v[i] = t as u32;
         }
 
-        for i in a.len()..b.len() {
-            let mut t = (b[i] as i64) - (v[i] as i64);
-            if t < 0 {
-                v[i + 1] += 1;
-                t += 1i64 << 32;
-            }
-            v[i] = t as u32;
-        }
-
         v.shrink_to_fit();
         (v, swapped)
     }
