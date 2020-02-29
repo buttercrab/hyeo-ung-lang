@@ -28,6 +28,9 @@
   + `$ hyeong string "Hello, World!"`
 - [ ] Prove whether it is Turing Complete
 - [x] No unsafe rust code
+- [ ] Documented code
+- [ ] Language tutorial (English)
+- [ ] Examples
 
 ## Implementation
 
