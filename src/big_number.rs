@@ -1237,7 +1237,7 @@ impl ops::RemAssign<&BigNum> for BigNum {
     /// a %= &b;
     ///
     /// assert_eq!("6", a.to_string());
-    /// ``
+    /// ```
     fn rem_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self % rhs);
     }
