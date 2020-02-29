@@ -1,6 +1,6 @@
 use clap::*;
 
-use hyeong::io;
+use hyeong::{interpreter, io};
 
 fn main() {
     let matches = App::new("hyeong")
@@ -135,5 +135,6 @@ fn main() {
         };
     } else {
         // interpreter
+        interpreter::Interpreter::new().run();
     }
 }
