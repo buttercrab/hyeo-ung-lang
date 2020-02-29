@@ -14,22 +14,20 @@
 
 ## Goal
 
-- Big Number
-- Interpreter
+- [x] Big Number
+- [x] Interpreter
   + `$ hyeong`
-- Code runner
+- [ ] Code runner
   + `$ hyeong run FILE`
-- Compiler
+- [x] Compiler
   + `$ hyeong build FILE --flags...`
-- Fast Speed (Algorithm)
-- Optimization
-- Debugger
+- [ ] Optimization
+- [ ] Debugger
   + `$ hyeong debug FILE --flag...`
-- Nice Compile Error
-- String to Hyeo-ung Code Generator
+- [ ] String to Hyeo-ung Code Generator
   + `$ hyeong string "Hello, World!"`
-- Prove whether it is Turing Complete
-- No unsafe rust code
+- [ ] Prove whether it is Turing Complete
+- [x] No unsafe rust code
 
 ## Implementation
 
