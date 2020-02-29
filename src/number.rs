@@ -1,39 +1,39 @@
 use std::mem::swap;
 use std::ops;
 
-use crate::big_number::Num;
+use crate::big_number::BigNum;
 
-pub struct RatNum {
-    up: Num,
-    down: Num,
+pub struct Num {
+    up: BigNum,
+    down: BigNum,
 }
 
-impl RatNum {
-    pub fn new(n: isize) -> RatNum {
-        RatNum {
-            up: Num::new(n),
-            down: Num::one(),
+impl Num {
+    pub fn new(n: isize) -> Num {
+        Num {
+            up: BigNum::new(n),
+            down: BigNum::one(),
         }
     }
 
-    pub fn zero() -> RatNum {
-        RatNum {
-            up: Num::zero(),
-            down: Num::one(),
+    pub fn zero() -> Num {
+        Num {
+            up: BigNum::zero(),
+            down: BigNum::one(),
         }
     }
 
-    pub fn one() -> RatNum {
-        RatNum {
-            up: Num::one(),
-            down: Num::one(),
+    pub fn one() -> Num {
+        Num {
+            up: BigNum::one(),
+            down: BigNum::one(),
         }
     }
 
-    pub fn nan() -> RatNum {
-        RatNum {
-            up: Num::one(),
-            down: Num::zero(),
+    pub fn nan() -> Num {
+        Num {
+            up: BigNum::one(),
+            down: BigNum::zero(),
         }
     }
 
@@ -50,7 +50,7 @@ impl RatNum {
     }
 
     fn optimize(&mut self) {
-        let g = Num::gcd(&self.up, &self.down);
+        let g = BigNum::gcd(&self.up, &self.down);
         self.up /= &g;
         self.down /= &g;
         if !self.down.is_pos() {
@@ -73,12 +73,12 @@ impl RatNum {
         }
     }
 
-    pub fn add(lhs: &RatNum, rhs: &RatNum) -> RatNum {
+    pub fn add(lhs: &Num, rhs: &Num) -> Num {
         if lhs.is_nan() || rhs.is_nan() {
-            return RatNum::nan();
+            return Num::nan();
         }
 
-        let mut res = RatNum {
+        let mut res = Num {
             up: &(&lhs.up * &rhs.down) + &(&lhs.down * &rhs.up),
             down: &lhs.down * &rhs.down,
         };
@@ -86,12 +86,12 @@ impl RatNum {
         res
     }
 
-    pub fn mul(lhs: &RatNum, rhs: &RatNum) -> RatNum {
+    pub fn mul(lhs: &Num, rhs: &Num) -> Num {
         if lhs.is_nan() || rhs.is_nan() {
-            return RatNum::nan();
+            return Num::nan();
         }
 
-        let mut res = RatNum {
+        let mut res = Num {
             up: &lhs.up * &rhs.up,
             down: &lhs.down * &rhs.down,
         };
@@ -99,56 +99,56 @@ impl RatNum {
         res
     }
 
-    pub fn neg(v: &RatNum) -> RatNum {
-        RatNum {
+    pub fn neg(v: &Num) -> Num {
+        Num {
             up: (-&v.up).clone(),
             down: (&v.down).clone(),
         }
     }
 
-    pub fn set_copy(&mut self, rhs: &RatNum) {
+    pub fn set_copy(&mut self, rhs: &Num) {
         self.up.set_copy(&rhs.up);
         self.down.set_copy(&rhs.down);
     }
 
-    pub fn set_move(&mut self, rhs: RatNum) {
+    pub fn set_move(&mut self, rhs: Num) {
         self.up.set_move(rhs.up);
         self.down.set_move(rhs.down);
     }
 }
 
-impl ops::Add<&RatNum> for &RatNum {
-    type Output = RatNum;
+impl ops::Add<&Num> for &Num {
+    type Output = Num;
 
-    fn add(self, rhs: &RatNum) -> Self::Output {
-        RatNum::add(self, rhs)
+    fn add(self, rhs: &Num) -> Self::Output {
+        Num::add(self, rhs)
     }
 }
 
-impl ops::AddAssign<&RatNum> for RatNum {
-    fn add_assign(&mut self, rhs: &RatNum) {
+impl ops::AddAssign<&Num> for Num {
+    fn add_assign(&mut self, rhs: &Num) {
         self.set_move(&*self + rhs);
     }
 }
 
-impl ops::Mul<&RatNum> for &RatNum {
-    type Output = RatNum;
+impl ops::Mul<&Num> for &Num {
+    type Output = Num;
 
-    fn mul(self, rhs: &RatNum) -> Self::Output {
-        RatNum::mul(self, rhs)
+    fn mul(self, rhs: &Num) -> Self::Output {
+        Num::mul(self, rhs)
     }
 }
 
-impl ops::MulAssign<&RatNum> for RatNum {
-    fn mul_assign(&mut self, rhs: &RatNum) {
+impl ops::MulAssign<&Num> for Num {
+    fn mul_assign(&mut self, rhs: &Num) {
         self.set_move(&*self * rhs);
     }
 }
 
-impl ops::Neg for &RatNum {
-    type Output = RatNum;
+impl ops::Neg for &Num {
+    type Output = Num;
 
     fn neg(self) -> Self::Output {
-        RatNum::neg(self)
+        Num::neg(self)
     }
 }

@@ -1,28 +1,28 @@
 use std::{fmt, ops};
 use std::cmp::{max, min, Ordering};
 
-pub struct Num {
+pub struct BigNum {
     pos: bool,
     val: Vec<u32>,
 }
 
-impl Num {
-    pub fn new(n: isize) -> Num {
+impl BigNum {
+    pub fn new(n: isize) -> BigNum {
         if n >= 0 {
-            Num {
+            BigNum {
                 pos: true,
                 val: vec![n as u32],
             }
         } else {
-            Num {
+            BigNum {
                 pos: false,
                 val: vec![(-n) as u32],
             }
         }
     }
 
-    pub fn from_vec(v: Vec<u32>) -> Num {
-        let mut res = Num {
+    pub fn from_vec(v: Vec<u32>) -> BigNum {
+        let mut res = BigNum {
             pos: true,
             val: v,
         };
@@ -30,22 +30,22 @@ impl Num {
         res
     }
 
-    pub fn zero() -> Num {
-        Num {
+    pub fn zero() -> BigNum {
+        BigNum {
             pos: true,
             val: vec![0],
         }
     }
 
-    pub fn one() -> Num {
-        Num {
+    pub fn one() -> BigNum {
+        BigNum {
             pos: true,
             val: vec![1],
         }
     }
 
-    pub fn clone(&self) -> Num {
-        Num {
+    pub fn clone(&self) -> BigNum {
+        BigNum {
             pos: self.pos,
             val: self.val.clone(),
         }
@@ -59,14 +59,14 @@ impl Num {
         self.val == vec![0]
     }
 
-    pub fn from_string(s: String) -> Num {
-        Num::from_string_base(s, 10)
+    pub fn from_string(s: String) -> BigNum {
+        BigNum::from_string_base(s, 10)
     }
 
     // assert: _base <= 36
-    pub fn from_string_base(s: String, _base: usize) -> Num {
-        let base = Num::new(_base as isize);
-        let mut res = Num::new(0);
+    pub fn from_string_base(s: String, _base: usize) -> BigNum {
+        let base = BigNum::new(_base as isize);
+        let mut res = BigNum::new(0);
         let mut flip = false;
 
         for (i, c) in s.chars().enumerate() {
@@ -82,7 +82,7 @@ impl Num {
                 0
             };
             res *= &base;
-            res += &Num::new(k);
+            res += &BigNum::new(k);
         }
 
         if flip {
@@ -98,7 +98,7 @@ impl Num {
     // TODO: https://en.wikipedia.org/wiki/Double_dabble
     // assert: _base <= 36
     pub fn to_string_base(&self, _base: usize) -> String {
-        let base = Num::new(_base as isize);
+        let base = BigNum::new(_base as isize);
         let mut res = String::new();
         let mut num = self.clone();
         num.pos = true;
@@ -163,7 +163,7 @@ impl Num {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
         // a > b => a - b
-        let (a, b, swapped) = if Num::less_core(lhs, rhs) {
+        let (a, b, swapped) = if BigNum::less_core(lhs, rhs) {
             (rhs, lhs, true)
         } else {
             (lhs, rhs, false)
@@ -218,7 +218,7 @@ impl Num {
         for i in (0..v.len()).rev() {
             for j in (0..32).rev() {
                 v[i] += 1u32 << j;
-                if Num::less_core(lhs, &Num::mult_core(&v, rhs)) {
+                if BigNum::less_core(lhs, &BigNum::mult_core(&v, rhs)) {
                     v[i] -= 1u32 << j;
                 }
             }
@@ -256,23 +256,23 @@ impl Num {
         self.pos = !self.pos;
     }
 
-    pub fn add(lhs: &Num, rhs: &Num) -> Num {
+    pub fn add(lhs: &BigNum, rhs: &BigNum) -> BigNum {
         let mut need_flip = false;
-        let mut res = Num::from_vec(if lhs.pos {
+        let mut res = BigNum::from_vec(if lhs.pos {
             if rhs.pos {
-                Num::add_core(&lhs.val, &rhs.val)
+                BigNum::add_core(&lhs.val, &rhs.val)
             } else {
-                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                let (tmp, swapped) = BigNum::sub_core(&lhs.val, &rhs.val);
                 need_flip ^= swapped;
                 tmp
             }
         } else {
             let t = if rhs.pos {
-                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                let (tmp, swapped) = BigNum::sub_core(&lhs.val, &rhs.val);
                 need_flip ^= swapped;
                 tmp
             } else {
-                Num::add_core(&lhs.val, &rhs.val)
+                BigNum::add_core(&lhs.val, &rhs.val)
             };
             need_flip ^= true;
             t
@@ -285,23 +285,23 @@ impl Num {
         res
     }
 
-    pub fn sub(lhs: &Num, rhs: &Num) -> Num {
+    pub fn sub(lhs: &BigNum, rhs: &BigNum) -> BigNum {
         let mut need_flip = false;
-        let mut res = Num::from_vec(if lhs.pos {
+        let mut res = BigNum::from_vec(if lhs.pos {
             if !rhs.pos {
-                Num::add_core(&lhs.val, &rhs.val)
+                BigNum::add_core(&lhs.val, &rhs.val)
             } else {
-                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                let (tmp, swapped) = BigNum::sub_core(&lhs.val, &rhs.val);
                 need_flip ^= swapped;
                 tmp
             }
         } else {
             let t = if !rhs.pos {
-                let (tmp, swapped) = Num::sub_core(&lhs.val, &rhs.val);
+                let (tmp, swapped) = BigNum::sub_core(&lhs.val, &rhs.val);
                 need_flip ^= swapped;
                 tmp
             } else {
-                Num::add_core(&lhs.val, &rhs.val)
+                BigNum::add_core(&lhs.val, &rhs.val)
             };
             need_flip ^= true;
             t
@@ -313,18 +313,18 @@ impl Num {
         res
     }
 
-    pub fn mul(lhs: &Num, rhs: &Num) -> Num {
-        let mut res = Num::from_vec(Num::mult_core(&lhs.val, &rhs.val));
+    pub fn mul(lhs: &BigNum, rhs: &BigNum) -> BigNum {
+        let mut res = BigNum::from_vec(BigNum::mult_core(&lhs.val, &rhs.val));
         if lhs.pos ^ rhs.pos {
             res.minus();
         }
         res
     }
 
-    pub fn div(lhs: &Num, rhs: &Num) -> Num {
-        let mut res = Num::from_vec(Num::div_core(&lhs.val, &rhs.val));
+    pub fn div(lhs: &BigNum, rhs: &BigNum) -> BigNum {
+        let mut res = BigNum::from_vec(BigNum::div_core(&lhs.val, &rhs.val));
         if !lhs.pos {
-            res += &Num::one();
+            res += &BigNum::one();
             res.minus();
         }
         if !rhs.pos {
@@ -333,13 +333,13 @@ impl Num {
         res
     }
 
-    pub fn rem(lhs: &Num, rhs: &Num) -> Num {
-        let q = Num::div(&lhs, &rhs);
-        Num::sub(&lhs, &Num::mul(&q, &rhs))
+    pub fn rem(lhs: &BigNum, rhs: &BigNum) -> BigNum {
+        let q = BigNum::div(&lhs, &rhs);
+        BigNum::sub(&lhs, &BigNum::mul(&q, &rhs))
     }
 
     // TODO: https://en.wikipedia.org/wiki/Lehmer%27s_GCD_algorithm
-    pub fn gcd(lhs: &Num, rhs: &Num) -> Num {
+    pub fn gcd(lhs: &BigNum, rhs: &BigNum) -> BigNum {
         let mut a = lhs.clone();
         let mut b = rhs.clone();
         while !b.is_zero() {
@@ -351,25 +351,25 @@ impl Num {
         a
     }
 
-    pub fn neg(v: &Num) -> Num {
-        Num {
+    pub fn neg(v: &BigNum) -> BigNum {
+        BigNum {
             pos: !v.pos,
             val: v.val.clone(),
         }
     }
 
-    pub fn set_copy(&mut self, rhs: &Num) {
+    pub fn set_copy(&mut self, rhs: &BigNum) {
         self.val = rhs.val.clone();
         self.pos = rhs.pos;
     }
 
-    pub fn set_move(&mut self, rhs: Num) {
+    pub fn set_move(&mut self, rhs: BigNum) {
         self.val = rhs.val;
         self.pos = rhs.pos;
     }
 }
 
-impl PartialEq for Num {
+impl PartialEq for BigNum {
     fn eq(&self, other: &Self) -> bool {
         if self.is_zero() && other.is_zero() {
             true
@@ -379,7 +379,7 @@ impl PartialEq for Num {
     }
 }
 
-impl PartialOrd for Num {
+impl PartialOrd for BigNum {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self < other {
             Option::Some(Ordering::Less)
@@ -395,7 +395,7 @@ impl PartialOrd for Num {
     fn lt(&self, other: &Self) -> bool {
         if self.pos {
             if other.pos {
-                Num::less_core(&self.val, &other.val)
+                BigNum::less_core(&self.val, &other.val)
             } else {
                 true
             }
@@ -403,7 +403,7 @@ impl PartialOrd for Num {
             if other.pos {
                 false
             } else {
-                !Num::less_core(&other.val, &self.val)
+                !BigNum::less_core(&other.val, &self.val)
             }
         }
     }
@@ -421,92 +421,92 @@ impl PartialOrd for Num {
     }
 }
 
-impl fmt::Debug for Num {
+impl fmt::Debug for BigNum {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
-impl fmt::Display for Num {
+impl fmt::Display for BigNum {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.to_string())
     }
 }
 
-impl ops::Add<&Num> for &Num {
-    type Output = Num;
+impl ops::Add<&BigNum> for &BigNum {
+    type Output = BigNum;
 
-    fn add(self, rhs: &Num) -> Self::Output {
-        Num::add(self, rhs)
+    fn add(self, rhs: &BigNum) -> Self::Output {
+        BigNum::add(self, rhs)
     }
 }
 
-impl ops::AddAssign<&Num> for Num {
-    fn add_assign(&mut self, rhs: &Num) {
+impl ops::AddAssign<&BigNum> for BigNum {
+    fn add_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self + rhs);
     }
 }
 
-impl ops::Sub<&Num> for &Num {
-    type Output = Num;
+impl ops::Sub<&BigNum> for &BigNum {
+    type Output = BigNum;
 
-    fn sub(self, rhs: &Num) -> Self::Output {
-        Num::sub(self, rhs)
+    fn sub(self, rhs: &BigNum) -> Self::Output {
+        BigNum::sub(self, rhs)
     }
 }
 
-impl ops::SubAssign<&Num> for Num {
-    fn sub_assign(&mut self, rhs: &Num) {
+impl ops::SubAssign<&BigNum> for BigNum {
+    fn sub_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self - rhs);
     }
 }
 
-impl ops::Mul<&Num> for &Num {
-    type Output = Num;
+impl ops::Mul<&BigNum> for &BigNum {
+    type Output = BigNum;
 
-    fn mul(self, rhs: &Num) -> Self::Output {
-        Num::mul(self, rhs)
+    fn mul(self, rhs: &BigNum) -> Self::Output {
+        BigNum::mul(self, rhs)
     }
 }
 
-impl ops::MulAssign<&Num> for Num {
-    fn mul_assign(&mut self, rhs: &Num) {
+impl ops::MulAssign<&BigNum> for BigNum {
+    fn mul_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self * rhs);
     }
 }
 
-impl ops::Div<&Num> for &Num {
-    type Output = Num;
+impl ops::Div<&BigNum> for &BigNum {
+    type Output = BigNum;
 
-    fn div(self, rhs: &Num) -> Self::Output {
-        Num::div(self, rhs)
+    fn div(self, rhs: &BigNum) -> Self::Output {
+        BigNum::div(self, rhs)
     }
 }
 
-impl ops::DivAssign<&Num> for Num {
-    fn div_assign(&mut self, rhs: &Num) {
+impl ops::DivAssign<&BigNum> for BigNum {
+    fn div_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self / rhs);
     }
 }
 
-impl ops::Rem<&Num> for &Num {
-    type Output = Num;
+impl ops::Rem<&BigNum> for &BigNum {
+    type Output = BigNum;
 
-    fn rem(self, rhs: &Num) -> Self::Output {
-        Num::rem(self, rhs)
+    fn rem(self, rhs: &BigNum) -> Self::Output {
+        BigNum::rem(self, rhs)
     }
 }
 
-impl ops::RemAssign<&Num> for Num {
-    fn rem_assign(&mut self, rhs: &Num) {
+impl ops::RemAssign<&BigNum> for BigNum {
+    fn rem_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self % rhs);
     }
 }
 
-impl ops::Neg for &Num {
-    type Output = Num;
+impl ops::Neg for &BigNum {
+    type Output = BigNum;
 
     fn neg(self) -> Self::Output {
-        Num::neg(self)
+        BigNum::neg(self)
     }
 }
