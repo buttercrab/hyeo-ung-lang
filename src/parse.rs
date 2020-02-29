@@ -113,7 +113,25 @@ impl fmt::Display for Command {
 const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
 const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
 
-fn is_hangul_syllable(c: char) -> bool {
+/// Check if the character is hangul
+///
+/// # Example
+///
+/// ```
+/// use hyeong::parse;
+///
+/// assert_eq!(true, parse::is_hangul_syllable('가'));
+/// assert_eq!(true, parse::is_hangul_syllable('힣'));
+/// assert_eq!(false, parse::is_hangul_syllable('a'));
+/// assert_eq!(false, parse::is_hangul_syllable('م'));
+/// assert_eq!(false, parse::is_hangul_syllable('ý'));
+/// assert_eq!(false, parse::is_hangul_syllable('ם'));
+/// assert_eq!(false, parse::is_hangul_syllable('न'));
+/// assert_eq!(false, parse::is_hangul_syllable('こ'));
+/// assert_eq!(false, parse::is_hangul_syllable('你'));
+/// assert_eq!(false, parse::is_hangul_syllable('д'));
+/// ```
+pub fn is_hangul_syllable(c: char) -> bool {
     '\u{AC00}' <= c && c <= '\u{D7A3}'
 }
 
