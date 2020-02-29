@@ -2,3 +2,5 @@
 .idea
 
 *.txt
+Cargo.lock
+doc

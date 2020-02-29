@@ -19,9 +19,9 @@ impl Interpreter {
     }
 
     pub fn run(&mut self) -> ! {
-        let mut state = self.state.clone();
         let running = Arc::new(AtomicBool::new(true));
         let r = running.clone();
+
         ctrlc::set_handler(move || {
             if r.load(Ordering::SeqCst) {
                 r.store(false, Ordering::SeqCst);
@@ -30,34 +30,40 @@ impl Interpreter {
                 r.store(true, Ordering::SeqCst);
             }
         }).expect("Error setting Ctrl-C handler");
+
         println!("Hyeo-ung programming language");
         println!("type help for help");
+
         loop {
             print!("{} ", ">".bright_blue());
             stdout().flush();
             running.store(true, Ordering::SeqCst);
             let input = io::read_line();
             running.store(false, Ordering::SeqCst);
+
             match input.as_str() {
                 "\n" => {
                     continue;
                 }
+
                 "help\n" => {
                     println!("help  Print this");
                     println!("exit  Exit this interpreter");
                     println!("      You can also exit by typing \"흑.하앙...\"");
                     continue;
                 }
+
                 "" | "exit\n" => {
                     process::exit(0);
                 }
+
                 _ => {
                     let code = match parse::parse(input) {
                         Ok(t) => t,
                         Err(e) => io::print_error(e),
                     };
                     for c in code.iter() {
-                        state = execute::execute(state, c);
+                        execute::execute(&mut self.state, c);
                     }
                 }
             }

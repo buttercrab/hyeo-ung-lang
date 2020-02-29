@@ -12,6 +12,4 @@ impl State {
     }
 }
 
-pub fn execute(state: State, code: &parse::Command) -> State {
-    State::new()
-}
+pub fn execute(state: &mut State, code: &parse::Command) {}
