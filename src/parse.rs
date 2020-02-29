@@ -3,49 +3,67 @@ use std::fmt;
 
 use colored::Colorize;
 
-pub struct ParseError {
-    no: u8,
-    line: usize,
-    location: usize,
-    content: String,
+pub enum Area {
+    //  0: ?
+    //  1: !
+    //  2: ♥
+    //  3: ❤
+    //  4: 💕
+    //  5: 💖
+    //  6: 💗
+    //  7: 💘
+    //  8: 💙
+    //  9: 💚
+    // 10: 💛
+    // 11: 💜
+    // 12: 💝
+    // 13: ♡
+    Val {
+        type_: u8,
+        left: Box<Area>,
+        right: Box<Area>,
+    },
+    Nil,
 }
 
-impl ParseError {
-    pub fn new(no: u8, line: usize, location: usize) -> ParseError {
-        match no {
-            0x1 => ParseError {
-                no,
-                line,
-                location,
-                content: "Not right character".to_string(),
-            },
-            0x2 => ParseError {
-                no,
-                line,
-                location,
-                content: "Last command didn't finish".to_string(),
-            },
-            _ => ParseError {
-                no,
-                line,
-                location,
-                content: "Error occurred in compiler: make an issue".to_string(),
-            }
+impl Area {
+    pub fn new(type_: u8) -> Area {
+        Area::Val {
+            type_,
+            left: Box::new(Area::Nil),
+            right: Box::new(Area::Nil),
         }
     }
 }
 
-impl fmt::Debug for ParseError {
+impl fmt::Display for Area {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "error[{:04X}] {}:{}:{}", self.no, self.line, self.location, self.content)
+        let mut s = String::new();
+        area_to_string(&mut s, self, false);
+        if s.is_empty() {
+            s = "(no area)".to_string();
+        }
+        write!(f, "{}", s)
     }
 }
 
-impl Error for ParseError {}
-
-impl fmt::Display for ParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "error[{:04X}] {}:{}:{}", self.no, self.line, self.location, self.content)
+fn area_to_string(s: &mut String, area: &Area, need: bool) {
+    match area {
+        Area::Val {
+            ref type_,
+            ref left,
+            ref right
+        } => {
+            let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
+            s.push(c);
+            area_to_string(s, left, c == '?' || c == '!');
+            area_to_string(s, right, c == '?' || c == '!');
+        }
+        Area::Nil => {
+            if need {
+                s.push('_')
+            }
+        }
     }
 }
 
@@ -63,7 +81,6 @@ pub struct Command {
     loc: usize,
     area: Area,
 }
-
 
 impl Command {
     pub fn new(type_: u8) -> Command {
@@ -100,7 +117,7 @@ fn is_hangul_syllable(c: char) -> bool {
     '\u{AC00}' <= c && c <= '\u{D7A3}'
 }
 
-pub fn parse(code: String) -> Result<Vec<Command>, ParseError> {
+pub fn parse(code: String) -> Vec<Command> {
     let mut res: Vec<Command> = Vec::new();
 
     // command.type_:
@@ -318,91 +335,22 @@ pub fn parse(code: String) -> Result<Vec<Command>, ParseError> {
                 }
             }
 
-            _ => return Result::Err(ParseError::new(0x10, line_count, i - last_line_started))
+            _ => unreachable!()
         };
     }
 
-    if state == 1 {
-        Result::Err(ParseError::new(0x2, line_count, code.len() - last_line_started))
-    } else {
-        match cmd_leaf {
-            Area::Val {
-                type_: _,
-                left: _,
-                ref mut right,
-            } => {
-                *right = Box::new(area);
-            }
-            Area::Nil => {
-                command.area = area;
-            }
-        }
-        res.push(command);
-        Result::Ok(res)
-    }
-}
-
-fn area_to_string(s: &mut String, area: &Area, need: bool) {
-    match area {
+    match cmd_leaf {
         Area::Val {
-            ref type_,
-            ref left,
-            ref right
+            type_: _,
+            left: _,
+            ref mut right,
         } => {
-            let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
-            s.push(c);
-            area_to_string(s, left, c == '?' || c == '!');
-            area_to_string(s, right, c == '?' || c == '!');
+            *right = Box::new(area);
         }
         Area::Nil => {
-            if need {
-                s.push('_')
-            }
+            command.area = area;
         }
     }
-}
-
-
-pub enum Area {
-    //  0: ?
-    //  1: !
-    //  2: ♥
-    //  3: ❤
-    //  4: 💕
-    //  5: 💖
-    //  6: 💗
-    //  7: 💘
-    //  8: 💙
-    //  9: 💚
-    // 10: 💛
-    // 11: 💜
-    // 12: 💝
-    // 13: ♡
-    Val {
-        type_: u8,
-        left: Box<Area>,
-        right: Box<Area>,
-    },
-    Nil,
-}
-
-impl Area {
-    pub fn new(type_: u8) -> Area {
-        Area::Val {
-            type_,
-            left: Box::new(Area::Nil),
-            right: Box::new(Area::Nil),
-        }
-    }
-}
-
-impl fmt::Display for Area {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut s = String::new();
-        area_to_string(&mut s, self, false);
-        if s.is_empty() {
-            s = "(no area)".to_string();
-        }
-        write!(f, "{}", s)
-    }
+    res.push(command);
+    res
 }

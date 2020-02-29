@@ -3,14 +3,9 @@ mod parse_test {
     use hyeong::parse;
 
     fn basic_test(code: &str, res: &str) {
-        let t = if let Ok(t) = parse::parse(code.parse().unwrap()) {
-            assert_eq!(t.len(), 1);
-            format!("{}", t[0])
-        } else {
-            "".to_string()
-        };
+        let t = format!("{}", parse::parse(code.parse().unwrap())[0]);
 
-        assert_eq!(t, res.to_string())
+        assert_eq!(t, res.to_string());
     }
 
     #[test]

@@ -13,10 +13,7 @@ pub fn read_file(file: &str) -> Vec<parse::Command> {
         Err(e) => print_error(e),
     };
 
-    match parse::parse(code) {
-        Ok(t) => t,
-        Err(e) => print_error(e),
-    }
+    parse::parse(code)
 }
 
 fn read_file_base(file: &str) -> Result<String, io::Error> {

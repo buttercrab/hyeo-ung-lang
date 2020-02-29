@@ -58,10 +58,7 @@ impl Interpreter {
                 }
 
                 _ => {
-                    let code = match parse::parse(input) {
-                        Ok(t) => t,
-                        Err(e) => io::print_error(e),
-                    };
+                    let code = parse::parse(input);
                     for c in code.iter() {
                         execute::execute(&mut self.state, c);
                     }
