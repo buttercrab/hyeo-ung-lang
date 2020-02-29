@@ -47,7 +47,7 @@ impl BigNum {
     /// let b = BigNum::new(-4321);
     ///
     /// assert_eq!("1234", a.to_string());
-    /// assert_eq!("-4321", a.to_string());
+    /// assert_eq!("-4321", b.to_string());
     /// ```
     pub fn new(n: isize) -> BigNum {
         if n >= 0 {
@@ -314,6 +314,10 @@ impl BigNum {
             } else {
                 ('A' as u8 + k.val[0] as u8 - 10) as char
             });
+        }
+
+        if res.is_empty() {
+            res = "0".to_string();
         }
 
         if !self.pos {
@@ -665,7 +669,7 @@ impl BigNum {
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
     ///
-    /// assert_eq!("-48", BigNum::div(&a, &b).to_string());
+    /// assert_eq!("-40", BigNum::div(&a, &b).to_string());
     /// ```
     pub fn div(lhs: &BigNum, rhs: &BigNum) -> BigNum {
         let mut res = BigNum::from_vec(BigNum::div_core(&lhs.val, &rhs.val));
@@ -1142,7 +1146,7 @@ impl ops::Div<&BigNum> for &BigNum {
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
     ///
-    /// assert_eq!("-48", (&a / &b).to_string());
+    /// assert_eq!("-40", (&a / &b).to_string());
     /// ```
     fn div(self, rhs: &BigNum) -> Self::Output {
         BigNum::div(self, rhs)
@@ -1173,7 +1177,7 @@ impl ops::DivAssign<&BigNum> for BigNum {
     /// let b = BigNum::new(31);
     /// a /= &b;
     ///
-    /// assert_eq!("-48", a.to_string());
+    /// assert_eq!("-40", a.to_string());
     /// ```
     fn div_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self / rhs);
