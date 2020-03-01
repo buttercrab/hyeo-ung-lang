@@ -12,4 +12,4 @@ impl State {
     }
 }
 
-pub fn execute(state: &mut State, code: &parse::Command) {}
+pub fn execute(state: &mut State, code: &parse::UnOptCode) {}

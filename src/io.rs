@@ -7,7 +7,7 @@ use colored::Colorize;
 
 use crate::parse;
 
-pub fn read_file(file: &str) -> Vec<parse::Command> {
+pub fn read_file(file: &str) -> Vec<parse::UnOptCode> {
     let code = match read_file_base(file) {
         Ok(t) => t,
         Err(e) => print_error(e),

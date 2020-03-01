@@ -7,9 +7,9 @@ impl Builder {
         Builder {}
     }
 
-    pub fn add(&self, code: parse::Command) {}
+    pub fn add(&self, code: parse::UnOptCode) {}
 }
 
-pub fn optimize(code: Vec<parse::Command>, level: usize) -> (execute::State, Vec<parse::Command>) {
+pub fn optimize(code: Vec<parse::UnOptCode>, level: usize) -> (execute::State, Vec<parse::UnOptCode>) {
     (execute::State::new(), vec![])
 }

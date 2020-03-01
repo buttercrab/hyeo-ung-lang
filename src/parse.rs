@@ -66,7 +66,7 @@ fn area_to_string(s: &mut String, area: &Area, need: bool) {
     }
 }
 
-pub struct Command {
+pub struct UnOptCode {
     // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
     // 1: 항, 하앙, 하아앙, 하아아앙 ...
     // 2: 핫, 하앗, 하아앗, 하아아앗 ...
@@ -81,9 +81,9 @@ pub struct Command {
     area: Area,
 }
 
-impl Command {
-    pub fn new(type_: u8) -> Command {
-        Command {
+impl UnOptCode {
+    pub fn new(type_: u8) -> UnOptCode {
+        UnOptCode {
             type_,
             cnt1: 0,
             cnt2: 0,
@@ -100,7 +100,7 @@ impl Command {
     }
 }
 
-impl fmt::Display for Command {
+impl fmt::Display for UnOptCode {
     // for debug
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut area = String::new();
@@ -134,8 +134,8 @@ pub fn is_hangul_syllable(c: char) -> bool {
     '\u{AC00}' <= c && c <= '\u{D7A3}'
 }
 
-pub fn parse(code: String) -> Vec<Command> {
-    let mut res: Vec<Command> = Vec::new();
+pub fn parse(code: String) -> Vec<UnOptCode> {
+    let mut res: Vec<UnOptCode> = Vec::new();
 
     // command.type_:
     // 0: 형
@@ -147,7 +147,7 @@ pub fn parse(code: String) -> Vec<Command> {
     // 6: 혀
     // 7: 하
     // 8: 흐
-    let mut command = Command::new(0);
+    let mut command = UnOptCode::new(0);
 
     // 0: can come: hangul, dot, area
     // 1: can come: hangul (after hangul starts)
@@ -212,7 +212,7 @@ pub fn parse(code: String) -> Vec<Command> {
                     area = Area::Nil;
                     leaf = &mut area;
                     res.push(command);
-                    command = Command::new(t as u8);
+                    command = UnOptCode::new(t as u8);
                 } else {
                     command.type_ = t as u8;
                 }
