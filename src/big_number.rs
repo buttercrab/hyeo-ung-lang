@@ -656,10 +656,10 @@ impl BigNum {
     ///
     /// # Warning
     ///
-    /// In Rust `-1234 / 31 == -39` (same calculation as below).
-    /// But in this lib, it is focused in the remainder:
-    /// if `a / b == q` then `a == q * b + r` and always `0 <= r < b`
-    /// Python works same like this lib.
+    /// In Python `-1234 / 31 == -40` (same calculation as below).
+    /// But in this lib, it works like this:
+    /// always `|a| / |b| == |q|` (rounding to zero)
+    /// Rust works same like this lib.
     ///
     /// # Examples
     ///
@@ -669,17 +669,12 @@ impl BigNum {
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
     ///
-    /// assert_eq!("-40", BigNum::div(&a, &b).to_string());
+    /// assert_eq!("-39", BigNum::div(&a, &b).to_string());
     /// ```
     pub fn div(lhs: &BigNum, rhs: &BigNum) -> BigNum {
         let mut res = BigNum::from_vec(BigNum::div_core(&lhs.val, &rhs.val));
 
-        if !lhs.pos {
-            res += &BigNum::one();
-            res.minus();
-        }
-
-        if !rhs.pos {
+        if lhs.pos ^ rhs.pos {
             res.minus();
         }
 
@@ -695,10 +690,10 @@ impl BigNum {
     ///
     /// # Warning
     ///
-    /// In Rust `-1234 % 31 == -25` (same calculation as below)
-    /// But in this lib, it is focused in the remainder:
-    /// if `a % b == r` then `a == q * b + r` and always `0 <= r < b`
-    /// Python works same like this lib
+    /// In Python `-1234 / 31 == -40` (same calculation as below).
+    /// But in this lib, it works like this:
+    /// always `|a| / |b| == |q|` (rounding to zero)
+    /// Rust works same like this lib.
     ///
     /// # Examples
     ///
@@ -708,7 +703,7 @@ impl BigNum {
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
     ///
-    /// assert_eq!("6", BigNum::rem(&a, &b).to_string());
+    /// assert_eq!("-25", BigNum::rem(&a, &b).to_string());
     /// ```
     pub fn rem(lhs: &BigNum, rhs: &BigNum) -> BigNum {
         let q = BigNum::div(&lhs, &rhs);
@@ -716,7 +711,6 @@ impl BigNum {
     }
 
     /// Get greatest common value of two number and make new `BigNum` as result
-    /// Only works with positive numbers (we didn't test other signs)
     ///
     /// # Time Complexity
     ///
@@ -852,31 +846,9 @@ impl PartialOrd for BigNum {
     /// });
     /// ```
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self < other {
-            Option::Some(Ordering::Less)
-        } else {
-            if self > other {
-                Option::Some(Ordering::Greater)
-            } else {
-                Option::Some(Ordering::Equal)
-            }
-        }
-    }
-
-    /// Compare function of two `BigNum`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::big_number::BigNum;
-    ///
-    /// let a = BigNum::new(1234);
-    /// let b = BigNum::new(4321);
-    ///
-    /// assert_eq!(true, &a < &b);
-    /// ```
-    fn lt(&self, other: &Self) -> bool {
-        if self.pos {
+        if self == other {
+            Option::Some(Ordering::Equal)
+        } else if if self.pos {
             if other.pos {
                 BigNum::less_core(&self.val, &other.val)
             } else {
@@ -888,55 +860,11 @@ impl PartialOrd for BigNum {
             } else {
                 !BigNum::less_core(&other.val, &self.val)
             }
+        } {
+            Option::Some(Ordering::Less)
+        } else {
+            Option::Some(Ordering::Greater)
         }
-    }
-
-    /// Compare function of two `BigNum`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::big_number::BigNum;
-    ///
-    /// let a = BigNum::new(1234);
-    /// let b = BigNum::new(4321);
-    ///
-    /// assert_eq!(true, &a <= &b);
-    /// ```
-    fn le(&self, other: &Self) -> bool {
-        !(other < self)
-    }
-
-    /// Compare function of two `BigNum`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::big_number::BigNum;
-    ///
-    /// let a = BigNum::new(1234);
-    /// let b = BigNum::new(4321);
-    ///
-    /// assert_eq!(false, &a > &b);
-    /// ```
-    fn gt(&self, other: &Self) -> bool {
-        other < self
-    }
-
-    /// Compare function of two `BigNum`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::big_number::BigNum;
-    ///
-    /// let a = BigNum::new(1234);
-    /// let b = BigNum::new(4321);
-    ///
-    /// assert_eq!(false, &a >= &b);
-    /// ```
-    fn ge(&self, other: &Self) -> bool {
-        !(self < other)
     }
 }
 
@@ -1133,10 +1061,10 @@ impl ops::Div<&BigNum> for &BigNum {
     ///
     /// # Warning
     ///
-    /// In Rust `-1234 / 31 == -39` (same calculation as below).
-    /// But in this lib, it is focused in the remainder:
-    /// if `a / b == q` then `a == q * b + r` and always `0 <= r < b`
-    /// Python works same like this lib.
+    /// In Python `-1234 / 31 == -40` (same calculation as below).
+    /// But in this lib, it works like this:
+    /// always `|a| / |b| == |q|` (rounding to zero)
+    /// Rust works same like this lib.
     ///
     /// # Examples
     ///
@@ -1146,7 +1074,7 @@ impl ops::Div<&BigNum> for &BigNum {
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
     ///
-    /// assert_eq!("-40", (&a / &b).to_string());
+    /// assert_eq!("-39", (&a / &b).to_string());
     /// ```
     fn div(self, rhs: &BigNum) -> Self::Output {
         BigNum::div(self, rhs)
@@ -1163,10 +1091,10 @@ impl ops::DivAssign<&BigNum> for BigNum {
     ///
     /// # Warning
     ///
-    /// In Rust `-1234 / 31 == -39` (same calculation as below).
-    /// But in this lib, it is focused in the remainder:
-    /// if `a / b == q` then `a == q * b + r` and always `0 <= r < b`
-    /// Python works same like this lib.
+    /// In Python `-1234 / 31 == -40` (same calculation as below).
+    /// But in this lib, it works like this:
+    /// always `|a| / |b| == |q|` (rounding to zero)
+    /// Rust works same like this lib.
     ///
     /// # Examples
     ///
@@ -1177,7 +1105,7 @@ impl ops::DivAssign<&BigNum> for BigNum {
     /// let b = BigNum::new(31);
     /// a /= &b;
     ///
-    /// assert_eq!("-40", a.to_string());
+    /// assert_eq!("-39", a.to_string());
     /// ```
     fn div_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self / rhs);
@@ -1196,10 +1124,10 @@ impl ops::Rem<&BigNum> for &BigNum {
     ///
     /// # Warning
     ///
-    /// In Rust `-1234 % 31 == -25` (same calculation as below)
-    /// But in this lib, it is focused in the remainder:
-    /// if `a % b == r` then `a == q * b + r` and always `0 <= r < b`
-    /// Python works same like this lib
+    /// In Python `-1234 / 31 == -40` (same calculation as below).
+    /// But in this lib, it works like this:
+    /// always `|a| / |b| == |q|` (rounding to zero)
+    /// Rust works same like this lib.
     ///
     /// # Examples
     ///
@@ -1209,7 +1137,7 @@ impl ops::Rem<&BigNum> for &BigNum {
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
     ///
-    /// assert_eq!("6", (&a % &b).to_string());
+    /// assert_eq!("-25", (&a % &b).to_string());
     /// ```
     fn rem(self, rhs: &BigNum) -> Self::Output {
         BigNum::rem(self, rhs)
@@ -1226,10 +1154,10 @@ impl ops::RemAssign<&BigNum> for BigNum {
     ///
     /// # Warning
     ///
-    /// In Rust `-1234 % 31 == -25` (same calculation as below)
-    /// But in this lib, it is focused in the remainder:
-    /// if `a % b == r` then `a == q * b + r` and always `0 <= r < b`
-    /// Python works same like this lib
+    /// In Python `-1234 / 31 == -40` (same calculation as below).
+    /// But in this lib, it works like this:
+    /// always `|a| / |b| == |q|` (rounding to zero)
+    /// Rust works same like this lib.
     ///
     /// # Examples
     ///
@@ -1240,7 +1168,7 @@ impl ops::RemAssign<&BigNum> for BigNum {
     /// let b = BigNum::new(31);
     /// a %= &b;
     ///
-    /// assert_eq!("6", a.to_string());
+    /// assert_eq!("-25", a.to_string());
     /// ```
     fn rem_assign(&mut self, rhs: &BigNum) {
         self.set_move(&*self % rhs);

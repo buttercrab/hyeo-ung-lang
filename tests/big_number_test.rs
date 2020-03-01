@@ -100,7 +100,7 @@ mod big_number_test {
 
         // warn: this number is different from rust
         // this is valid when remainder is always pos
-        assert_eq!(c, BigNum::new(-40));
+        assert_eq!(c, BigNum::new(-1234 / 31));
     }
 
     #[test]
