@@ -2,6 +2,7 @@ use clap::*;
 
 use hyeong::{interpreter, io};
 
+#[cfg_attr(tarpaulin, skip)]
 fn main() {
     let matches = App::new("hyeong")
         .version("0.1.0")
