@@ -1,8 +1,11 @@
 <h1 align="center">Hyeo-ung Programming Language</h1>
 
 <p align="center">
-<a href="https://github.com/buttercrab/hyeo-ung-lang/actions?query=workflow%3ARust">
-<img alt="Github Action" src="https://img.shields.io/github/workflow/status/buttercrab/hyeo-ung-lang/Rust?style=flat-square"/>
+<a href="https://travis-ci.com/buttercrab/hyeo-ung-lang">
+<img alt="Travis CI" src="https://img.shields.io/travis/com/buttercrab/hyeo-ung-lang?style=flat-square"/>
+</a>
+<a href="https://codecov.io/gh/buttercrab/hyeo-ung-lang">
+<img alt="Codecov" src="https://img.shields.io/codecov/c/github/buttercrab/hyeo-ung-lang?style=flat-square"/>
 </a>
 <a href="https://github.com/buttercrab/hyeo-ung-lang/blob/master/LICENSE">
 <img alt="License" src="https://img.shields.io/github/license/buttercrab/hyeo-ung-lang?style=flat-square"/>

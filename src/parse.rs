@@ -1,5 +1,4 @@
 use std::fmt;
-use std::fmt::{Error, Formatter};
 
 use colored::Colorize;
 
