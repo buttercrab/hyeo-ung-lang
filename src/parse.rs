@@ -1,22 +1,45 @@
 use std::fmt;
+use std::fmt::{Error, Formatter};
 
 use colored::Colorize;
 
+/// Area Part of each code
+/// Since the area has binary operator,
+/// It is saved as binary tree(ast).
+///
+/// # Type
+///
+/// Each value of `type_` that is representing
+///
+/// - `00: ?`
+/// - `01: !`
+/// - `02: ♥`
+/// - `03: ❤`
+/// - `04: 💕`
+/// - `05: 💖`
+/// - `06: 💗`
+/// - `07: 💘`
+/// - `08: 💙`
+/// - `09: 💚`
+/// - `10: 💛`
+/// - `11: 💜`
+/// - `12: 💝`
+/// - `13: ♡`
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::parse;
+///
+/// let a = parse::Area::Val {
+///     type_: 0,
+///     left: Box::new(parse::Area::new(2)),
+///     right: Box::new(parse::Area::Nil),
+/// };
+///
+/// assert_eq!("[♥]?[_]", format!("{}", a));
+/// ```
 pub enum Area {
-    //  0: ?
-    //  1: !
-    //  2: ♥
-    //  3: ❤
-    //  4: 💕
-    //  5: 💖
-    //  6: 💗
-    //  7: 💘
-    //  8: 💙
-    //  9: 💚
-    // 10: 💛
-    // 11: 💜
-    // 12: 💝
-    // 13: ♡
     Val {
         type_: u8,
         left: Box<Area>,
@@ -26,6 +49,15 @@ pub enum Area {
 }
 
 impl Area {
+    /// New `Area` that is leaf node
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::parse;
+    ///
+    /// let a = parse::Area::new(10);
+    /// ```
     pub fn new(type_: u8) -> Area {
         Area::Val {
             type_,
@@ -35,18 +67,7 @@ impl Area {
     }
 }
 
-impl fmt::Display for Area {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut s = String::new();
-        area_to_string(&mut s, self, false);
-        if s.is_empty() {
-            s = "(no area)".to_string();
-        }
-        write!(f, "{}", s)
-    }
-}
-
-fn area_to_string(s: &mut String, area: &Area, need: bool) {
+fn area_to_string_debug(s: &mut String, area: &Area) {
     match area {
         Area::Val {
             ref type_,
@@ -55,14 +76,56 @@ fn area_to_string(s: &mut String, area: &Area, need: bool) {
         } => {
             let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
             s.push(c);
-            area_to_string(s, left, c == '?' || c == '!');
-            area_to_string(s, right, c == '?' || c == '!');
-        }
-        Area::Nil => {
-            if need {
-                s.push('_')
+            if *type_ <= 1 {
+                area_to_string_debug(s, left);
+                area_to_string_debug(s, right);
             }
         }
+        Area::Nil => {
+            s.push('_');
+        }
+    }
+}
+
+impl fmt::Debug for Area {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut s = String::new();
+        area_to_string_debug(&mut s, self);
+        write!(f, "{}", s)
+    }
+}
+
+fn area_to_string_display(s: &mut String, area: &Area) {
+    match area {
+        Area::Val {
+            ref type_,
+            ref left,
+            ref right
+        } => {
+            let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
+            if *type_ <= 1 {
+                s.push('[');
+                area_to_string_display(s, left);
+                s.push(']');
+                s.push(c);
+                s.push('[');
+                area_to_string_display(s, right);
+                s.push(']');
+            } else {
+                s.push(c);
+            }
+        }
+        Area::Nil => {
+            s.push('_');
+        }
+    }
+}
+
+impl fmt::Display for Area {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut s = String::new();
+        area_to_string_display(&mut s, self);
+        write!(f, "{}", s)
     }
 }
 
@@ -100,12 +163,11 @@ impl UnOptCode {
     }
 }
 
-impl fmt::Display for UnOptCode {
-    // for debug
+impl fmt::Debug for UnOptCode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut area = String::new();
-        area_to_string(&mut area, &self.area, true);
-        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {}", self.type_, self.cnt1, self.cnt2, area)
+        area_to_string_debug(&mut area, &self.area);
+        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {:?}", self.type_, self.cnt1, self.cnt2, area)
     }
 }
 
