@@ -1,176 +1,6 @@
-use std::fmt;
+use crate::code;
 
-use colored::Colorize;
-
-/// Area Part of each code
-/// Since the area has binary operator,
-/// It is saved as binary tree(ast).
-///
-/// # Type
-///
-/// Each value of `type_` that is representing
-///
-/// - `00: ?`
-/// - `01: !`
-/// - `02: ♥`
-/// - `03: ❤`
-/// - `04: 💕`
-/// - `05: 💖`
-/// - `06: 💗`
-/// - `07: 💘`
-/// - `08: 💙`
-/// - `09: 💚`
-/// - `10: 💛`
-/// - `11: 💜`
-/// - `12: 💝`
-/// - `13: ♡`
-///
-/// # Examples
-///
-/// ```
-/// use hyeong::parse;
-///
-/// let a = parse::Area::Val {
-///     type_: 0,
-///     left: Box::new(parse::Area::new(2)),
-///     right: Box::new(parse::Area::Nil),
-/// };
-///
-/// assert_eq!("[♥]?[_]", format!("{}", a));
-/// ```
-pub enum Area {
-    Val {
-        type_: u8,
-        left: Box<Area>,
-        right: Box<Area>,
-    },
-    Nil,
-}
-
-impl Area {
-    /// New `Area` that is leaf node
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::parse;
-    ///
-    /// let a = parse::Area::new(10);
-    /// ```
-    pub fn new(type_: u8) -> Area {
-        Area::Val {
-            type_,
-            left: Box::new(Area::Nil),
-            right: Box::new(Area::Nil),
-        }
-    }
-}
-
-fn area_to_string_debug(s: &mut String, area: &Area) {
-    match area {
-        Area::Val {
-            ref type_,
-            ref left,
-            ref right
-        } => {
-            let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
-            s.push(c);
-            if *type_ <= 1 {
-                area_to_string_debug(s, left);
-                area_to_string_debug(s, right);
-            }
-        }
-        Area::Nil => {
-            s.push('_');
-        }
-    }
-}
-
-impl fmt::Debug for Area {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut s = String::new();
-        area_to_string_debug(&mut s, self);
-        write!(f, "{}", s)
-    }
-}
-
-fn area_to_string_display(s: &mut String, area: &Area) {
-    match area {
-        Area::Val {
-            ref type_,
-            ref left,
-            ref right
-        } => {
-            let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
-            if *type_ <= 1 {
-                s.push('[');
-                area_to_string_display(s, left);
-                s.push(']');
-                s.push(c);
-                s.push('[');
-                area_to_string_display(s, right);
-                s.push(']');
-            } else {
-                s.push(c);
-            }
-        }
-        Area::Nil => {
-            s.push('_');
-        }
-    }
-}
-
-impl fmt::Display for Area {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut s = String::new();
-        area_to_string_display(&mut s, self);
-        write!(f, "{}", s)
-    }
-}
-
-pub struct UnOptCode {
-    // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
-    // 1: 항, 하앙, 하아앙, 하아아앙 ...
-    // 2: 핫, 하앗, 하아앗, 하아아앗 ...
-    // 3: 흣, 흐읏, 흐으읏, 흐으으읏 ...
-    // 4: 흡, 흐읍, 흐으읍, 흐으으읍 ...
-    // 5: 흑, 흐윽, 흐으윽, 흐으으윽 ...
-    type_: u8,
-    cnt1: u128,
-    cnt2: u128,
-    line: usize,
-    loc: usize,
-    area: Area,
-}
-
-impl UnOptCode {
-    pub fn new(type_: u8) -> UnOptCode {
-        UnOptCode {
-            type_,
-            cnt1: 0,
-            cnt2: 0,
-            line: 0,
-            loc: 0,
-            area: Area::Nil,
-        }
-    }
-
-    pub fn to_string(&self) -> String {
-        format!("{}   {}_{}_{} : {}",
-                (&*format!("{}:{}", self.line, self.loc)).yellow()
-                , COMMANDS[self.type_ as usize], self.cnt1, self.cnt2, self.area)
-    }
-}
-
-impl fmt::Debug for UnOptCode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut area = String::new();
-        area_to_string_debug(&mut area, &self.area);
-        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {:?}", self.type_, self.cnt1, self.cnt2, area)
-    }
-}
-
-const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
+pub(crate) const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
 const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
 
 /// Check if the character is hangul
@@ -195,8 +25,8 @@ pub fn is_hangul_syllable(c: char) -> bool {
     '\u{AC00}' <= c && c <= '\u{D7A3}'
 }
 
-pub fn parse(code: String) -> Vec<UnOptCode> {
-    let mut res: Vec<UnOptCode> = Vec::new();
+pub fn parse(code: String) -> Vec<code::UnOptCode> {
+    let mut res: Vec<code::UnOptCode> = Vec::new();
 
     // command.type_:
     // 0: 형
@@ -208,13 +38,13 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
     // 6: 혀
     // 7: 하
     // 8: 흐
-    let mut command = UnOptCode::new(0);
+    let mut command = code::UnOptCode::new(0);
 
     // 0: can come: hangul, dot, area
     // 1: can come: hangul (after hangul starts)
     // 2: can come: hangul, area (after area starts)
     let mut state = 0u8;
-    let mut area = Area::Nil;
+    let mut area = code::Area::Nil;
     let mut leaf = &mut area;
     let mut cmd_leaf = &mut command.area;
 
@@ -259,28 +89,28 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
 
                 if command.cnt1 != 0 {
                     match cmd_leaf {
-                        Area::Val {
+                        code::Area::Val {
                             type_: _,
                             left: _,
                             ref mut right,
                         } => {
                             *right = Box::new(area);
                         }
-                        Area::Nil => {
+                        code::Area::Nil => {
                             command.area = area;
                         }
                     }
-                    area = Area::Nil;
+                    area = code::Area::Nil;
                     leaf = &mut area;
                     res.push(command);
-                    command = UnOptCode::new(t as u8);
+                    command = code::UnOptCode::new(t as u8);
                 } else {
                     command.type_ = t as u8;
                 }
 
                 command.cnt1 = 1;
                 command.cnt2 = 0;
-                command.area = Area::Nil;
+                command.area = code::Area::Nil;
                 command.line = line_count + 1;
                 command.loc = i - last_line_started;
                 cmd_leaf = &mut command.area;
@@ -297,60 +127,60 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
                 state
             } else if c == '?' {
                 match cmd_leaf {
-                    Area::Val {
+                    code::Area::Val {
                         type_: _,
                         left: _,
                         ref mut right,
                     } => {
-                        *right = Box::new(Area::Val {
+                        *right = Box::new(code::Area::Val {
                             type_: 0,
                             left: Box::new(area),
-                            right: Box::new(Area::Nil),
+                            right: Box::new(code::Area::Nil),
                         });
                         cmd_leaf = &mut *right;
                     }
-                    Area::Nil => {
-                        command.area = Area::Val {
+                    code::Area::Nil => {
+                        command.area = code::Area::Val {
                             type_: 0,
                             left: Box::new(area),
-                            right: Box::new(Area::Nil),
+                            right: Box::new(code::Area::Nil),
                         };
                         cmd_leaf = &mut command.area;
                     }
                 }
-                area = Area::Nil;
+                area = code::Area::Nil;
                 leaf = &mut area;
                 2
             } else if c == '!' {
                 match leaf {
-                    Area::Val {
+                    code::Area::Val {
                         ref type_,
                         left: _,
                         ref mut right,
                     } => if *type_ <= 1 {
                         *right = match right.as_ref() {
-                            Area::Val {
+                            code::Area::Val {
                                 type_: t,
                                 left: _,
                                 right: _,
-                            } => Box::new(Area::Val {
+                            } => Box::new(code::Area::Val {
                                 type_: 1,
-                                left: Box::new(Area::new(*t)),
-                                right: Box::new(Area::Nil),
+                                left: Box::new(code::Area::new(*t)),
+                                right: Box::new(code::Area::Nil),
                             }),
-                            Area::Nil => Box::new(Area::new(1)),
+                            code::Area::Nil => Box::new(code::Area::new(1)),
                         };
                         leaf = &mut *right;
                     } else {
-                        area = Area::Val {
+                        area = code::Area::Val {
                             type_: 1,
-                            left: Box::new(Area::new(*type_)),
-                            right: Box::new(Area::Nil),
+                            left: Box::new(code::Area::new(*type_)),
+                            right: Box::new(code::Area::Nil),
                         };
                         leaf = &mut area;
                     },
-                    Area::Nil => {
-                        area = Area::new(1);
+                    code::Area::Nil => {
+                        area = code::Area::new(1);
                         leaf = &mut area;
                     }
                 }
@@ -358,20 +188,20 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
             } else if let Some(mut t) = HEARTS.iter().position(|&x| x == c) {
                 t += 2;
                 match leaf {
-                    Area::Val {
+                    code::Area::Val {
                         ref type_,
                         left: _,
                         ref mut right,
                     } => if *type_ <= 1 {
                         match right.as_ref() {
-                            Area::Nil => {
-                                *right = Box::new(Area::new(t as u8));
+                            code::Area::Nil => {
+                                *right = Box::new(code::Area::new(t as u8));
                             }
                             _ => {}
                         }
                     },
-                    Area::Nil => {
-                        area = Area::new(t as u8);
+                    code::Area::Nil => {
+                        area = code::Area::new(t as u8);
                         leaf = &mut area;
                     }
                 }
@@ -418,14 +248,14 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
     }
 
     match cmd_leaf {
-        Area::Val {
+        code::Area::Val {
             type_: _,
             left: _,
             ref mut right,
         } => {
             *right = Box::new(area);
         }
-        Area::Nil => {
+        code::Area::Nil => {
             command.area = area;
         }
     }

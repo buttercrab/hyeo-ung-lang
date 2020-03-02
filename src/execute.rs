@@ -1,4 +1,4 @@
-use crate::parse;
+use crate::code;
 
 pub struct State {}
 
@@ -12,4 +12,4 @@ impl State {
     }
 }
 
-pub fn execute(state: &mut State, code: &parse::UnOptCode) {}
+pub fn execute(state: &mut State, code: &dyn code::Code) {}

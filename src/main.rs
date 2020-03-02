@@ -1,9 +1,12 @@
+use std::num::ParseIntError;
+
 use clap::*;
 
-use hyeong::{interpreter, io};
+use hyeong::{compile, execute, interpreter, io, update};
 
 #[cfg_attr(tarpaulin, skip)]
-fn main() {
+#[tokio::main]
+async fn main() {
     let matches = App::new("hyeong")
         .version("0.1.0")
         .about("Hyeo-ung programming language tool")
@@ -113,9 +116,18 @@ fn main() {
 
     if let Some(ref matches) = matches.subcommand_matches("build") {
         // build
-        let code = io::read_file(matches.value_of("input").unwrap());
+        let un_opt_code = io::read_file(matches.value_of("input").unwrap());
+        let level_str = match matches.value_of("optimize") {
+            Some(level) => level,
+            None => "2",
+        };
+        let level = match level_str.parse::<usize>() {
+            Ok(level) => level,
+            Err(e) => io::print_error(e),
+        };
+
+        let (state, opt_code) = compile::optimize(un_opt_code, level);
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
-        // check
         let file = matches.value_of("input").unwrap();
         let code = io::read_file(file);
         for c in code.iter() {
@@ -125,17 +137,40 @@ fn main() {
         // debug
         let code = io::read_file(matches.value_of("input").unwrap());
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
-        // run
-        let code = io::read_file(matches.value_of("input").unwrap());
-    } else if let Some(ref matches) = matches.subcommand_matches("update") {
-        // update
-        let version = if let Some(t) = matches.value_of("version") {
-            t
-        } else {
-            "latest"
+        let un_opt_code = io::read_file(matches.value_of("input").unwrap());
+        let level_str = match matches.value_of("optimize") {
+            Some(level) => level,
+            None => "2",
         };
+        let level = match level_str.parse::<usize>() {
+            Ok(level) => level,
+            Err(e) => io::print_error(e),
+        };
+
+        let (mut state, opt_code) = compile::optimize(un_opt_code, level);
+        for code in opt_code {
+            execute::execute(&mut state, &code);
+        }
+    } else if let Some(ref matches) = matches.subcommand_matches("update") {
+        let cur_version = update::get_current_version();
+        let version = match update::get_update_version(
+            if let Some(t) = matches.value_of("version") {
+                t
+            } else {
+                "latest"
+            }
+        ).await {
+            Ok(version) => version,
+            Err(e) => io::print_error(e),
+        };
+
+        if cur_version != version {
+            // update
+        } else {
+            io::print_warn("This is the same version");
+            io::print_note("Check repository: https://github.com/buttercrab/hyeo-ung-lang");
+        }
     } else {
-        // interpreter
         interpreter::Interpreter::new().run();
     }
 }

@@ -5,9 +5,9 @@ use std::io::Read;
 
 use colored::Colorize;
 
-use crate::parse;
+use crate::{code, parse};
 
-pub fn read_file(file: &str) -> Vec<parse::UnOptCode> {
+pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     let code = match read_file_base(file) {
         Ok(t) => t,
         Err(e) => print_error(e),
@@ -25,15 +25,27 @@ fn read_file_base(file: &str) -> Result<String, io::Error> {
     Ok(res)
 }
 
-pub fn print_error<T: Error>(err: T) -> ! {
-    println!("[{}] {:?}", "error".red(), err);
-    process::exit(1);
-}
-
 pub fn read_line() -> String {
     let mut res = String::new();
     match io::stdin().read_line(&mut res) {
         Ok(_) => res,
         Err(e) => print_error(e),
     }
+}
+
+pub fn print_error<T: Error>(err: T) -> ! {
+    println!("[{}] {:?}", "error".red(), err);
+    process::exit(1);
+}
+
+pub fn print_log(msg: &str) {
+    println!("[{}] {}", "log".blue(), msg);
+}
+
+pub fn print_warn(msg: &str) {
+    println!("[{}] {}", "warn".yellow(), msg);
+}
+
+pub fn print_note(msg: &str) {
+    println!("[{}] {}", "note".bright_cyan(), msg);
 }

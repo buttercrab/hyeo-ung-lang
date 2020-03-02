@@ -104,7 +104,7 @@ mod big_number_test {
     }
 
     #[test]
-    fn sub_test05() {
+    fn sub_test06() {
         let a = BigNum::new(-1234);
         let b = BigNum::new(4321);
         let c = &a - &b;

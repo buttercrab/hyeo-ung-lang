@@ -1,4 +1,4 @@
-use std::{fmt, ops};
+use std::{error, fmt, ops};
 use std::cmp::{max, min, Ordering};
 
 #[derive(Debug)]
@@ -6,6 +6,17 @@ pub enum Error {
     ParseError,
     BaseSizeError(usize),
 }
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::ParseError => write!(f, "Parse Error"),
+            Error::BaseSizeError(s) => write!(f, "Base Size Error: size = {}", s),
+        }
+    }
+}
+
+impl error::Error for Error {}
 
 /// `BigNum` for big number handling
 /// - Using `Vec<u32>` for data and using `u32::max_value()` as base of the number
