@@ -6,6 +6,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use colored::Colorize;
 
 use crate::{execute, io, parse};
+use crate::io::print_error;
 
 pub struct Interpreter {
     state: execute::State
@@ -26,7 +27,9 @@ impl Interpreter {
             if r.load(Ordering::SeqCst) {
                 r.store(false, Ordering::SeqCst);
                 print!("\ntype \"흑.하앙...\" or \"exit\" to exit\n> ");
-                stdout().flush();
+                if let Result::Err(e) = stdout().flush() {
+                    print_error(e);
+                }
                 r.store(true, Ordering::SeqCst);
             }
         }).expect("Error setting Ctrl-C handler");
@@ -36,7 +39,9 @@ impl Interpreter {
 
         loop {
             print!("{} ", ">".bright_blue());
-            stdout().flush();
+            if let Result::Err(e) = stdout().flush() {
+                print_error(e);
+            }
             running.store(true, Ordering::SeqCst);
             let input = io::read_line();
             running.store(false, Ordering::SeqCst);

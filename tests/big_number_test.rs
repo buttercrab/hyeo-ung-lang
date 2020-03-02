@@ -22,11 +22,11 @@ mod big_number_test {
 
     #[test]
     fn add_test03() {
-        let a = BigNum::from_string("123456789123456789".to_string());
-        let b = BigNum::from_string("987654321987654321".to_string());
+        let a = BigNum::from_string("123456789123456789".to_string()).unwrap();
+        let b = BigNum::from_string("987654321987654321".to_string()).unwrap();
         let c = &a + &b;
 
-        assert_eq!(c, BigNum::from_string("1111111111111111110".to_string()));
+        assert_eq!(c, BigNum::from_string("1111111111111111110".to_string()).unwrap());
     }
 
     #[test]
@@ -49,11 +49,11 @@ mod big_number_test {
 
     #[test]
     fn sub_test03() {
-        let a = BigNum::from_string("123456789123456789".to_string());
-        let b = BigNum::from_string("987654321987654321".to_string());
+        let a = BigNum::from_string("123456789123456789".to_string()).unwrap();
+        let b = BigNum::from_string("987654321987654321".to_string()).unwrap();
         let c = &b - &a;
 
-        assert_eq!(c, BigNum::from_string("864197532864197532".to_string()));
+        assert_eq!(c, BigNum::from_string("864197532864197532".to_string()).unwrap());
     }
 
     #[test]
@@ -76,11 +76,11 @@ mod big_number_test {
 
     #[test]
     fn mul_test03() {
-        let a = BigNum::from_string("238147328478237427348273487283478237482374".to_string());
-        let b = BigNum::from_string("238478237492847735678364128937128937943".to_string());
+        let a = BigNum::from_string("238147328478237427348273487283478237482374".to_string()).unwrap();
+        let b = BigNum::from_string("238478237492847735678364128937128937943".to_string()).unwrap();
         let c = &a * &b;
 
-        assert_eq!(c, BigNum::from_string("56792955159120326139782764143873306061725717545674087612268430742682680802316682".to_string()));
+        assert_eq!(c, BigNum::from_string("56792955159120326139782764143873306061725717545674087612268430742682680802316682".to_string()).unwrap());
     }
 
     #[test]
@@ -105,21 +105,21 @@ mod big_number_test {
 
     #[test]
     fn from_string_test01() {
-        let a = BigNum::from_string("1234".to_string());
+        let a = BigNum::from_string("1234".to_string()).unwrap();
 
         assert_eq!(a, BigNum::new(1234));
     }
 
     #[test]
     fn from_string_test02() {
-        let a = BigNum::from_string("-1234".to_string());
+        let a = BigNum::from_string("-1234".to_string()).unwrap();
 
         assert_eq!(a, BigNum::new(-1234));
     }
 
     #[test]
     fn from_string_test03() {
-        let a = BigNum::from_string("12392389128391823928391123".to_string());
+        let a = BigNum::from_string("12392389128391823928391123".to_string()).unwrap();
 
         assert_eq!(a, BigNum::from_vec(vec![3443848659, 3267458252, 671792]));
     }

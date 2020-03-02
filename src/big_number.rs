@@ -1,6 +1,12 @@
 use std::{fmt, ops};
 use std::cmp::{max, min, Ordering};
 
+#[derive(Debug)]
+pub enum Error {
+    ParseError,
+    BaseSizeError(usize),
+}
+
 /// `BigNum` for big number handling
 /// - Using `Vec<u32>` for data and using `u32::max_value()` as base of the number
 /// - Can handle negative numbers
@@ -13,8 +19,8 @@ use std::cmp::{max, min, Ordering};
 /// // Ways to make 10
 /// let a = BigNum::new(10);
 /// let b = BigNum::from_vec(vec![10]);
-/// let c = BigNum::from_string("10".to_string());
-/// let d = BigNum::from_string_base("1010".to_string(), 2);
+/// let c = BigNum::from_string("10".to_string()).unwrap();
+/// let d = BigNum::from_string_base("1010".to_string(), 2).unwrap();
 ///
 /// // Arithmetic operators
 /// let e = &a + &b;
@@ -29,6 +35,7 @@ use std::cmp::{max, min, Ordering};
 ///
 /// println!("{}", a); // 10
 /// ```
+#[derive(Clone)]
 pub struct BigNum {
     pos: bool,
     val: Vec<u32>,
@@ -123,25 +130,6 @@ impl BigNum {
         }
     }
 
-    /// Clone itself with same value
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::big_number::BigNum;
-    ///
-    /// let a = BigNum::new(1234);
-    /// let b = a.clone();
-    ///
-    /// assert_eq!("1234", b.to_string());
-    /// ```
-    pub fn clone(&self) -> BigNum {
-        BigNum {
-            pos: self.pos,
-            val: self.val.clone(),
-        }
-    }
-
     /// Check if the number is positive
     ///
     /// # Examples
@@ -190,13 +178,13 @@ impl BigNum {
     /// ```
     /// use hyeong::big_number::BigNum;
     ///
-    /// let a = BigNum::from_string("12345678987654321".to_string());
-    /// let b = BigNum::from_string("-98765432123456789".to_string());
+    /// let a = BigNum::from_string("12345678987654321".to_string()).unwrap();
+    /// let b = BigNum::from_string("-98765432123456789".to_string()).unwrap();
     ///
     /// assert_eq!("12345678987654321", a.to_string());
     /// assert_eq!("-98765432123456789", b.to_string());
     /// ```
-    pub fn from_string(s: String) -> BigNum {
+    pub fn from_string(s: String) -> Result<BigNum, Error> {
         BigNum::from_string_base(s, 10)
     }
 
@@ -218,13 +206,17 @@ impl BigNum {
     /// ```
     /// use hyeong::big_number::BigNum;
     ///
-    /// let a = BigNum::from_string_base("A".to_string(), 16);
-    /// let b = BigNum::from_string_base("-1010".to_string(), 2);
+    /// let a = BigNum::from_string_base("A".to_string(), 16).unwrap();
+    /// let b = BigNum::from_string_base("-1010".to_string(), 2).unwrap();
     ///
     /// assert_eq!("10", a.to_string());
     /// assert_eq!("-10", b.to_string());
     /// ```
-    pub fn from_string_base(s: String, _base: usize) -> BigNum {
+    pub fn from_string_base(s: String, _base: usize) -> Result<BigNum, Error> {
+        if _base > 36 || _base < 1 {
+            return Result::Err(Error::BaseSizeError(_base));
+        }
+
         let base = BigNum::new(_base as isize);
         let mut res = BigNum::new(0);
         let mut flip = false;
@@ -239,7 +231,7 @@ impl BigNum {
             } else if 'A' <= c && c <= 'Z' {
                 c as isize - 'A' as isize + 10
             } else {
-                0
+                return Result::Err(Error::ParseError);
             };
             res *= &base;
             res += &BigNum::new(k);
@@ -248,7 +240,7 @@ impl BigNum {
         if flip {
             res.pos = false;
         }
-        res
+        Result::Ok(res)
     }
 
     /// Make string from itself (10 based)
@@ -270,7 +262,7 @@ impl BigNum {
     /// assert_eq!("-4321", b.to_string());
     /// ```
     pub fn to_string(&self) -> String {
-        self.to_string_base(10)
+        self.to_string_base(10).unwrap()
     }
 
     /// Make string from itself
@@ -292,14 +284,18 @@ impl BigNum {
     /// let a = BigNum::new(10);
     /// let b = BigNum::new(-10);
     ///
-    /// assert_eq!("A", a.to_string_base(16));
-    /// assert_eq!("-1010", b.to_string_base(2));
+    /// assert_eq!("A", a.to_string_base(16).unwrap());
+    /// assert_eq!("-1010", b.to_string_base(2).unwrap());
     /// ```
     ///
     /// # TODO
     ///
     /// - [Better Algorithm](https://en.wikipedia.org/wiki/Double_dabble)
-    pub fn to_string_base(&self, _base: usize) -> String {
+    pub fn to_string_base(&self, _base: usize) -> Result<String, Error> {
+        if _base > 36 || _base < 1 {
+            return Result::Err(Error::BaseSizeError(_base));
+        }
+
         let base = BigNum::new(_base as isize);
         let mut res = String::new();
         let mut num = self.clone();
@@ -323,7 +319,7 @@ impl BigNum {
         if !self.pos {
             res.push('-')
         }
-        res.chars().rev().collect()
+        Result::Ok(res.chars().rev().collect())
     }
 
     /// Private function for removing leading zero in data.

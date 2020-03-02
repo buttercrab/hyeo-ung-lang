@@ -22,7 +22,7 @@ use crate::big_number::BigNum;
 ///
 /// assert_eq!("10/3", c.to_string());
 /// ```
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Num {
     up: BigNum,
     down: BigNum,
@@ -122,25 +122,6 @@ impl Num {
         Num {
             up: BigNum::one(),
             down: BigNum::zero(),
-        }
-    }
-
-    /// Clone itself with same value
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::number::Num;
-    ///
-    /// let a = Num::new(10, 3);
-    /// let b = a.clone();
-    ///
-    /// assert_eq!("10/3", b.to_string());
-    /// ```
-    pub fn clone(&self) -> Num {
-        Num {
-            up: self.up.clone(),
-            down: self.down.clone(),
         }
     }
 
