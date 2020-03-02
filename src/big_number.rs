@@ -861,11 +861,11 @@ impl PartialOrd for BigNum {
             if other.pos {
                 BigNum::less_core(&self.val, &other.val)
             } else {
-                true
+                false
             }
         } else {
             if other.pos {
-                false
+                true
             } else {
                 !BigNum::less_core(&other.val, &self.val)
             }

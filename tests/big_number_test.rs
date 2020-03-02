@@ -1,5 +1,7 @@
 #[cfg(test)]
 mod big_number_test {
+    use std::cmp::Ordering;
+
     use hyeong::big_number::{BigNum, Error};
 
     #[test]
@@ -39,6 +41,24 @@ mod big_number_test {
     }
 
     #[test]
+    fn add_test05() {
+        let a = BigNum::new(-1234);
+        let b = BigNum::new(4321);
+        let c = &a + &b;
+
+        assert_eq!(BigNum::new(-1234 + 4321), c);
+    }
+
+    #[test]
+    fn add_test06() {
+        let a = BigNum::new(-1234);
+        let b = BigNum::new(-4321);
+        let c = &a + &b;
+
+        assert_eq!(BigNum::new(-1234 - 4321), c);
+    }
+
+    #[test]
     fn sub_test01() {
         let a = BigNum::new(1234);
         let b = BigNum::new(4321);
@@ -72,6 +92,15 @@ mod big_number_test {
         let c = &a - &b;
 
         assert_eq!(BigNum::from_vec(vec![4294967295, 4294967295]), c);
+    }
+
+    #[test]
+    fn sub_test05() {
+        let a = BigNum::new(-1234);
+        let b = BigNum::new(-4321);
+        let c = &a - &b;
+
+        assert_eq!(BigNum::new(-1234 + 4321), c);
     }
 
     #[test]
@@ -184,6 +213,50 @@ mod big_number_test {
         let b = a.to_string_base(100);
 
         if let Result::Err(Error::BaseSizeError(100)) = b {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn equal_test01() {
+        let a = BigNum::zero();
+        let b = BigNum::zero();
+
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn compare_test01() {
+        let a = BigNum::new(1234);
+        let b = BigNum::new(-4321);
+
+        if let Option::from(Ordering::Greater) = a.partial_cmp(&b) {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn compare_test02() {
+        let a = BigNum::new(-1234);
+        let b = BigNum::new(4321);
+
+        if let Option::from(Ordering::Less) = a.partial_cmp(&b) {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn compare_test03() {
+        let a = BigNum::new(-1234);
+        let b = BigNum::new(-4321);
+
+        if let Option::from(Ordering::Greater) = a.partial_cmp(&b) {
             assert!(true);
         } else {
             assert!(false);
