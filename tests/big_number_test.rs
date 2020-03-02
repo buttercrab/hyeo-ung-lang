@@ -234,8 +234,6 @@ mod big_number_test {
 
         if let Option::from(Ordering::Greater) = a.partial_cmp(&b) {
             assert!(true);
-        } else {
-            assert!(false);
         }
     }
 
@@ -258,8 +256,6 @@ mod big_number_test {
 
         if let Option::from(Ordering::Greater) = a.partial_cmp(&b) {
             assert!(true);
-        } else {
-            assert!(false);
         }
     }
 }
