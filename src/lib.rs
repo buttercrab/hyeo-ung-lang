@@ -6,3 +6,4 @@ pub mod io;
 pub mod compile;
 pub mod interpreter;
 pub mod debug;
+pub mod update;

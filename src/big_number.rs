@@ -84,6 +84,7 @@ impl BigNum {
     ///
     /// assert_eq!("1234", a.to_string());
     /// assert_eq!("4294967296", b.to_string());
+    /// assert!(a.is_pos());
     /// ```
     pub fn from_vec(v: Vec<u32>) -> BigNum {
         let mut res = BigNum {

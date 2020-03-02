@@ -104,6 +104,15 @@ mod big_number_test {
     }
 
     #[test]
+    fn sub_test05() {
+        let a = BigNum::new(-1234);
+        let b = BigNum::new(4321);
+        let c = &a - &b;
+
+        assert_eq!(BigNum::new(-1234 - 4321), c);
+    }
+
+    #[test]
     fn mul_test01() {
         let a = BigNum::new(1234);
         let b = BigNum::new(4321);
@@ -214,8 +223,6 @@ mod big_number_test {
 
         if let Result::Err(Error::BaseSizeError(100)) = b {
             assert!(true);
-        } else {
-            assert!(false);
         }
     }
 
@@ -244,8 +251,6 @@ mod big_number_test {
 
         if let Option::Some(Ordering::Less) = a.partial_cmp(&b) {
             assert!(true);
-        } else {
-            assert!(false);
         }
     }
 
