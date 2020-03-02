@@ -30,6 +30,15 @@ mod big_number_test {
     }
 
     #[test]
+    fn add_test04() {
+        let a = BigNum::from_vec(vec![1]);
+        let b = BigNum::from_vec(vec![4294967295, 4294967295]);
+        let c = &a + &b;
+
+        assert_eq!(BigNum::from_vec(vec![0, 0, 1]), c);
+    }
+
+    #[test]
     fn sub_test01() {
         let a = BigNum::new(1234);
         let b = BigNum::new(4321);
@@ -54,6 +63,15 @@ mod big_number_test {
         let c = &b - &a;
 
         assert_eq!(BigNum::from_string("864197532864197532".to_string()).unwrap(), c);
+    }
+
+    #[test]
+    fn sub_test04() {
+        let a = BigNum::from_vec(vec![0, 0, 1]);
+        let b = BigNum::from_vec(vec![1]);
+        let c = &a - &b;
+
+        assert_eq!(BigNum::from_vec(vec![4294967295, 4294967295]), c);
     }
 
     #[test]
@@ -128,14 +146,22 @@ mod big_number_test {
     fn from_string_test04() {
         let a = BigNum::from_string("1234!".to_string());
 
-        assert_eq!(Result::Err(Error::ParseError), a);
+        if let Result::Err(Error::ParseError) = a {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
     }
 
     #[test]
     fn from_string_test05() {
         let a = BigNum::from_string_base("1234".to_string(), 100);
 
-        assert_eq!(Result::Err(Error::BaseSizeError(100)), a);
+        if let Result::Err(Error::BaseSizeError(100)) = a {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
     }
 
     #[test]
@@ -157,6 +183,10 @@ mod big_number_test {
         let a = BigNum::new(1234);
         let b = a.to_string_base(100);
 
-        assert_eq!(Result::Err(Error::BaseSizeError(100)), a);
+        if let Result::Err(Error::BaseSizeError(100)) = b {
+            assert!(true);
+        } else {
+            assert!(false);
+        }
     }
 }
