@@ -207,7 +207,7 @@ impl Num {
     /// let mut a = Num::new(-10, 3);
     /// a.flip();
     ///
-    /// assert_eq!("3/10", a.to_string());
+    /// assert_eq!("-3/10", a.to_string());
     /// ```
     pub fn flip(&mut self) {
         if !self.is_nan() {
