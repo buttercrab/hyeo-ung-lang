@@ -1,3 +1,4 @@
+#!/bin/bash
 printf "\e[01;36m==> cloning repo to ~/.hyeong\e[0m \n"
 git clone https://github.com/buttercrab/hyeo-ung-lang ~/.hyeong
 printf "\n\e[01;36m==> building hyeong\e[0m \n"
