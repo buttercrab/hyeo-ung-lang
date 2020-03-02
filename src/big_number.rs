@@ -173,6 +173,10 @@ impl BigNum {
     ///
     /// `O(n^2)` where `n := s.len()`
     ///
+    /// # Errors
+    ///
+    /// - `Error::ParseError`: when parse failed
+    ///
     /// # Examples
     ///
     /// ```
@@ -200,6 +204,11 @@ impl BigNum {
     /// # Assertions
     ///
     /// - `0 < _base <= 36`
+    ///
+    /// # Errors
+    ///
+    /// - `Error::BaseSizeError(base)`: when base size is not in range
+    /// - `Error::ParseError`: when parse failed
     ///
     /// # Examples
     ///
@@ -275,6 +284,10 @@ impl BigNum {
     /// # Assertions
     ///
     /// - `0 < _base <= 36`
+    ///
+    /// # Errors
+    ///
+    /// - `Error::BaseSizeError(base)`: when base size is not in range
     ///
     /// # Examples
     ///
