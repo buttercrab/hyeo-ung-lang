@@ -186,8 +186,6 @@ mod big_number_test {
 
         if let Result::Err(Error::ParseError) = a {
             assert!(true);
-        } else {
-            assert!(false);
         }
     }
 
@@ -197,8 +195,6 @@ mod big_number_test {
 
         if let Result::Err(Error::BaseSizeError(100)) = a {
             assert!(true);
-        } else {
-            assert!(false);
         }
     }
 
