@@ -30,12 +30,12 @@ use crate::parse;
 /// # Examples
 ///
 /// ```
-/// use hyeong::parse;
+/// use hyeong::code;
 ///
-/// let a = parse::Area::Val {
+/// let a = code::Area::Val {
 ///     type_: 0,
-///     left: Box::new(parse::Area::new(2)),
-///     right: Box::new(parse::Area::Nil),
+///     left: Box::new(code::Area::new(2)),
+///     right: Box::new(code::Area::Nil),
 /// };
 ///
 /// assert_eq!("[♥]?[_]", format!("{}", a));
@@ -55,9 +55,9 @@ impl Area {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::parse;
+    /// use hyeong::code;
     ///
-    /// let a = parse::Area::new(10);
+    /// let a = code::Area::new(10);
     /// ```
     pub fn new(type_: u8) -> Area {
         Area::Val {
