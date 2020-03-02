@@ -176,10 +176,6 @@ impl Num {
         let g = BigNum::gcd(&self.up, &self.down);
         self.up /= &g;
         self.down /= &g;
-        if !self.down.is_pos() {
-            self.down.minus();
-            self.up.minus();
-        }
     }
 
     /// Make itself change the sign
@@ -208,7 +204,7 @@ impl Num {
     /// ```
     /// use hyeong::number::Num;
     ///
-    /// let mut a = Num::new(10, 3);
+    /// let mut a = Num::new(-10, 3);
     /// a.flip();
     ///
     /// assert_eq!("3/10", a.to_string());

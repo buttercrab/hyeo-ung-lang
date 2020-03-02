@@ -232,7 +232,7 @@ mod big_number_test {
         let a = BigNum::new(1234);
         let b = BigNum::new(-4321);
 
-        if let Option::from(Ordering::Greater) = a.partial_cmp(&b) {
+        if let Option::Some(Ordering::Greater) = a.partial_cmp(&b) {
             assert!(true);
         }
     }
@@ -242,7 +242,7 @@ mod big_number_test {
         let a = BigNum::new(-1234);
         let b = BigNum::new(4321);
 
-        if let Option::from(Ordering::Less) = a.partial_cmp(&b) {
+        if let Option::Some(Ordering::Less) = a.partial_cmp(&b) {
             assert!(true);
         } else {
             assert!(false);
@@ -254,7 +254,7 @@ mod big_number_test {
         let a = BigNum::new(-1234);
         let b = BigNum::new(-4321);
 
-        if let Option::from(Ordering::Greater) = a.partial_cmp(&b) {
+        if let Option::Some(Ordering::Greater) = a.partial_cmp(&b) {
             assert!(true);
         }
     }
