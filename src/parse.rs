@@ -29,7 +29,7 @@ pub fn is_hangul_syllable(c: char) -> bool {
 pub fn parse(code: String) -> Vec<code::UnOptCode> {
     let mut res: Vec<code::UnOptCode> = Vec::new();
 
-    let mut hangul_count = 1usize;
+    let mut hangul_count = 0usize;
     let mut dot_count = 0usize;
     let mut type_ = 0u8;
     let mut loc = (0usize, 0usize);
@@ -86,9 +86,6 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     let mut command = code::UnOptCode::new(type_, loc);
                     command.set_hangul_count(hangul_count);
                     command.set_dot_count(dot_count);
-                    loc = (line_count, i - last_line_started);
-                    hangul_count = 1;
-                    dot_count = 0;
 
                     match qu_leaf {
                         code::Area::Val {
@@ -107,12 +104,16 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
 
                     area = code::Area::Nil;
                     leaf = &mut area;
-
                     qu_area = code::Area::Nil;
                     qu_leaf = &mut qu_area;
 
                     res.push(command);
                 }
+
+                type_ = t as u8;
+                hangul_count = 1;
+                dot_count = 0;
+                loc = (line_count, i - last_line_started);
 
                 if t < 6 {
                     0
@@ -259,6 +260,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
             ref mut right,
         } => {
             *right = Box::new(area);
+            command.set_area(qu_area);
         }
 
         code::Area::Nil => {
