@@ -1,5 +1,3 @@
-use std::num::ParseIntError;
-
 use clap::*;
 
 use hyeong::{code, compile, execute, interpreter, io, update};
@@ -126,7 +124,13 @@ async fn main() {
             Err(e) => io::print_error(e),
         };
 
-        let (state, opt_code) = compile::optimize(un_opt_code, level);
+        source = if level >= 1 {
+            let (state, opt_code) = compile::optimize(un_opt_code, level);
+            compile::build_source(state, &opt_code)
+        } else {
+            let state = code::UnOptState::new();
+            compile::build_source(state, &un_opt_code)
+        }
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         let file = matches.value_of("input").unwrap();
         let code = io::read_file(file);
@@ -147,9 +151,16 @@ async fn main() {
             Err(e) => io::print_error(e),
         };
 
-        let (mut state, opt_code) = compile::optimize(un_opt_code, level);
-        for code in opt_code {
-            execute::execute(&mut state, &code);
+        if level >= 1 {
+            let (mut state, opt_code) = compile::optimize(un_opt_code, level);
+            for code in opt_code {
+                state = execute::execute(state, &code);
+            }
+        } else {
+            let mut state = code::UnOptState::new();
+            for code in un_opt_code {
+                state = execute::execute(state, &code);
+            }
         }
     } else if let Some(ref matches) = matches.subcommand_matches("update") {
         let cur_version = update::get_current_version();

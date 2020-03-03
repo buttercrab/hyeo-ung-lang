@@ -56,7 +56,7 @@ pub fn run() -> ! {
             _ => {
                 let code = parse::parse(input);
                 for c in code.iter() {
-                    execute::execute(&mut state, c);
+                    state = execute::execute(state, c);
                 }
             }
         }

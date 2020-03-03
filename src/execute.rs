@@ -1,3 +1,5 @@
 use crate::code;
 
-pub fn execute(state: &mut impl code::State, code: &impl code::Code) {}
+pub fn execute<T: code::State>(state: T, code: &T::CodeType) -> T {
+    unimplemented!()
+}
