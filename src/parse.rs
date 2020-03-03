@@ -1,4 +1,5 @@
 use crate::code;
+use crate::code::Code;
 
 pub(crate) const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
 const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
@@ -28,17 +29,10 @@ pub fn is_hangul_syllable(c: char) -> bool {
 pub fn parse(code: String) -> Vec<code::UnOptCode> {
     let mut res: Vec<code::UnOptCode> = Vec::new();
 
-    // command.type_:
-    // 0: 형
-    // 1: 항
-    // 2: 핫
-    // 3: 흣
-    // 4: 흡
-    // 5: 흑
-    // 6: 혀
-    // 7: 하
-    // 8: 흐
-    let mut command = code::UnOptCode::new(0);
+    let mut hangul_count = 1usize;
+    let mut dot_count = 0usize;
+    let mut type_ = 0u8;
+    let mut loc = (0usize, 0usize);
 
     // 0: can come: hangul, dot, area
     // 1: can come: hangul (after hangul starts)
@@ -46,7 +40,8 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
     let mut state = 0u8;
     let mut area = code::Area::Nil;
     let mut leaf = &mut area;
-    let mut cmd_leaf = &mut command.area;
+    let mut qu_area = code::Area::Nil;
+    let mut qu_leaf = &mut qu_area;
 
     let mut line_count = 0;
     let mut last_line_started = 0;
@@ -87,33 +82,37 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     }
                 }
 
-                if command.cnt1 != 0 {
-                    match cmd_leaf {
+                if hangul_count != 0 {
+                    let mut command = code::UnOptCode::new(type_, loc);
+                    command.set_hangul_count(hangul_count);
+                    command.set_dot_count(dot_count);
+                    loc = (line_count, i - last_line_started);
+                    hangul_count = 1;
+                    dot_count = 0;
+
+                    match qu_leaf {
                         code::Area::Val {
                             type_: _,
                             left: _,
                             ref mut right,
                         } => {
                             *right = Box::new(area);
+                            command.set_area(qu_area);
                         }
+
                         code::Area::Nil => {
-                            command.area = area;
+                            command.set_area(area);
                         }
                     }
+
                     area = code::Area::Nil;
                     leaf = &mut area;
-                    res.push(command);
-                    command = code::UnOptCode::new(t as u8);
-                } else {
-                    command.type_ = t as u8;
-                }
 
-                command.cnt1 = 1;
-                command.cnt2 = 0;
-                command.area = code::Area::Nil;
-                command.line = line_count + 1;
-                command.loc = i - last_line_started;
-                cmd_leaf = &mut command.area;
+                    qu_area = code::Area::Nil;
+                    qu_leaf = &mut qu_area;
+
+                    res.push(command);
+                }
 
                 if t < 6 {
                     0
@@ -122,11 +121,11 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                 }
             } else if ".…⋯⋮".contains(c) {
                 if state == 0 {
-                    command.cnt2 += if c == '.' { 1 } else { 3 }
+                    dot_count += if c == '.' { 1 } else { 3 };
                 }
                 state
             } else if c == '?' {
-                match cmd_leaf {
+                match qu_leaf {
                     code::Area::Val {
                         type_: _,
                         left: _,
@@ -137,17 +136,19 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                             left: Box::new(area),
                             right: Box::new(code::Area::Nil),
                         });
-                        cmd_leaf = &mut *right;
+                        qu_leaf = &mut *right;
                     }
+
                     code::Area::Nil => {
-                        command.area = code::Area::Val {
+                        qu_area = code::Area::Val {
                             type_: 0,
                             left: Box::new(area),
                             right: Box::new(code::Area::Nil),
                         };
-                        cmd_leaf = &mut command.area;
+                        qu_leaf = &mut qu_area;
                     }
                 }
+
                 area = code::Area::Nil;
                 leaf = &mut area;
                 2
@@ -212,28 +213,28 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
 
             1 => {
                 if is_hangul_syllable(c) {
-                    command.cnt1 += 1;
+                    hangul_count += 1;
                 }
-                match command.type_ {
+                match type_ {
                     6 => if "엉".contains(c) {
-                        command.type_ = 0;
-                        command.cnt2 = 0;
+                        type_ = 0;
+                        dot_count = 0;
                         0
                     } else {
                         1
                     }
 
                     7 => if let Some(t) = "앙앗".find(c) {
-                        command.type_ = (t / 3 + 1) as u8;
-                        command.cnt2 = 0;
+                        type_ = (t / 3 + 1) as u8;
+                        dot_count = 0;
                         0
                     } else {
                         1
                     }
 
                     8 => if let Some(t) = "읏읍윽".find(c) {
-                        command.type_ = (t / 3 + 3) as u8;
-                        command.cnt2 = 0;
+                        type_ = (t / 3 + 3) as u8;
+                        dot_count = 0;
                         0
                     } else {
                         1
@@ -247,7 +248,11 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
         };
     }
 
-    match cmd_leaf {
+    let mut command = code::UnOptCode::new(type_, loc);
+    command.set_hangul_count(hangul_count);
+    command.set_dot_count(dot_count);
+
+    match qu_leaf {
         code::Area::Val {
             type_: _,
             left: _,
@@ -255,10 +260,12 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
         } => {
             *right = Box::new(area);
         }
+
         code::Area::Nil => {
-            command.area = area;
+            command.set_area(area);
         }
     }
+
     res.push(command);
     res
 }

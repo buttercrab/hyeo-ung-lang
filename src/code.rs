@@ -12,16 +12,16 @@ use crate::parse;
 ///
 /// Each value of `type_` that is representing
 ///
-/// - `00: ?`
-/// - `01: !`
-/// - `02: ♥`
-/// - `03: ❤`
-/// - `04: 💕`
-/// - `05: 💖`
-/// - `06: 💗`
-/// - `07: 💘`
-/// - `08: 💙`
-/// - `09: 💚`
+/// - ` 0: ?`
+/// - ` 1: !`
+/// - ` 2: ♥`
+/// - ` 3: ❤`
+/// - ` 4: 💕`
+/// - ` 5: 💖`
+/// - ` 6: 💗`
+/// - ` 7: 💘`
+/// - ` 8: 💙`
+/// - ` 9: 💚`
 /// - `10: 💛`
 /// - `11: 💜`
 /// - `12: 💝`
@@ -130,7 +130,23 @@ impl fmt::Display for Area {
     }
 }
 
-pub trait Code {}
+pub trait Code {
+    fn get_type(&self) -> u8;
+
+    fn get_hangul_count(&self) -> usize;
+
+    fn set_hangul_count(&mut self, count: usize);
+
+    fn get_dot_count(&self) -> usize;
+
+    fn set_dot_count(&mut self, count: usize);
+
+    fn get_area(&self) -> &Area;
+
+    fn set_area(&mut self, area: Area);
+
+    fn get_area_count(&self) -> usize;
+}
 
 pub struct UnOptCode {
     // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
@@ -139,31 +155,31 @@ pub struct UnOptCode {
     // 3: 흣, 흐읏, 흐으읏, 흐으으읏 ...
     // 4: 흡, 흐읍, 흐으읍, 흐으으읍 ...
     // 5: 흑, 흐윽, 흐으윽, 흐으으윽 ...
-    pub(crate) type_: u8,
-    pub(crate) cnt1: u128,
-    pub(crate) cnt2: u128,
-    pub(crate) line: usize,
-    pub(crate) loc: usize,
-    pub(crate) area: Area,
+    type_: u8,
+    cnt1: usize,
+    cnt2: usize,
+    loc: (usize, usize),
+    area: Area,
 }
 
 impl UnOptCode {
-    pub fn new(type_: u8) -> UnOptCode {
+    pub fn new(type_: u8, loc: (usize, usize)) -> Self {
         UnOptCode {
             type_,
-            cnt1: 0,
+            cnt1: 1,
             cnt2: 0,
-            line: 0,
-            loc: 0,
+            loc,
             area: Area::Nil,
         }
     }
 
     pub fn to_string(&self) -> String {
-        format!("{}   {}_{}_{} : {}",
-                (&*format!("{}:{}", self.line, self.loc)).yellow()
+        format!("{} {}_{}_{} : {}",
+                (&*format!("{}:{}", self.loc.0, self.loc.1)).yellow()
                 , parse::COMMANDS[self.type_ as usize], self.cnt1, self.cnt2, self.area)
     }
+
+    pub fn get_location(&self) -> (usize, usize) { self.loc }
 }
 
 impl fmt::Debug for UnOptCode {
@@ -174,8 +190,62 @@ impl fmt::Debug for UnOptCode {
     }
 }
 
-impl Code for UnOptCode {}
+impl Code for UnOptCode {
+    fn get_type(&self) -> u8 { self.type_ }
 
-pub struct OptCode {}
+    fn get_hangul_count(&self) -> usize { self.cnt1 }
 
-impl Code for OptCode {}
+    fn set_hangul_count(&mut self, count: usize) { self.cnt1 = count; }
+
+    fn get_dot_count(&self) -> usize { self.cnt2 }
+
+    fn set_dot_count(&mut self, count: usize) { self.cnt2 = count; }
+
+    fn get_area(&self) -> &Area { &self.area }
+
+    fn set_area(&mut self, area: Area) { self.area = area; }
+
+    fn get_area_count(&self) -> usize { self.cnt1 * self.cnt2 }
+}
+
+pub struct OptCode {
+    type_: u8,
+    cnt1: usize,
+    cnt2: usize,
+    cnt3: usize,
+    area: Area,
+}
+
+impl OptCode {
+    pub fn new(type_: u8) -> Self {
+        OptCode {
+            type_,
+            cnt1: 0,
+            cnt2: 0,
+            cnt3: 0,
+            area: Area::Nil,
+        }
+    }
+}
+
+impl OptCode {
+    pub fn set_area_count(&mut self, count: usize) { self.cnt3 = count; }
+}
+
+impl Code for OptCode {
+    fn get_type(&self) -> u8 { self.type_ }
+
+    fn get_hangul_count(&self) -> usize { self.cnt1 }
+
+    fn set_hangul_count(&mut self, count: usize) { self.cnt1 = count; }
+
+    fn get_dot_count(&self) -> usize { self.cnt2 }
+
+    fn set_dot_count(&mut self, count: usize) { self.cnt2 = count; }
+
+    fn get_area(&self) -> &Area { &self.area }
+
+    fn set_area(&mut self, area: Area) { self.area = area; }
+
+    fn get_area_count(&self) -> usize { self.cnt3 }
+}
