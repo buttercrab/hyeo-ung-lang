@@ -124,13 +124,13 @@ async fn main() {
             Err(e) => io::print_error(e),
         };
 
-        source = if level >= 1 {
+        let source = if level >= 1 {
             let (state, opt_code) = compile::optimize(un_opt_code, level);
             compile::build_source(state, &opt_code)
         } else {
             let state = code::UnOptState::new();
             compile::build_source(state, &un_opt_code)
-        }
+        };
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         let file = matches.value_of("input").unwrap();
         let code = io::read_file(file);
