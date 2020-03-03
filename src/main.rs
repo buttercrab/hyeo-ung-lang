@@ -171,6 +171,6 @@ async fn main() {
             io::print_note("Check repository: https://github.com/buttercrab/hyeo-ung-lang");
         }
     } else {
-        interpreter::Interpreter::new(code::UnOptState {}).run();
+        interpreter::run();
     }
 }

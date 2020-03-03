@@ -1,3 +1,3 @@
 use crate::code;
 
-pub fn execute<T: code::State, U: code::Code>(state: &mut T, code: &U) {}
+pub fn execute(state: &mut impl code::State, code: &impl code::Code) {}

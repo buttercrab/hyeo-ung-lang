@@ -1,9 +1,9 @@
+use std::collections::HashMap;
 use std::fmt;
 
 use colored::Colorize;
 
 use crate::{number, parse};
-use crate::number::Num;
 
 /// Area Part of each code
 /// Since the area has binary operator,
@@ -230,81 +230,107 @@ impl Code for UnOptCode {
 }
 
 pub trait State {
-    fn get_stack(&self, idx: usize) -> &Vec<number::Num>;
+    type CodeType;
 
-    fn push_stack(&mut self, idx: usize, num: number::Num);
+    fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num>;
 
-    fn pop_stack(&mut self, idx: usize) -> number::Num;
+    fn push_stack(&mut self, idx: usize, num: number::Num) {
+        self.get_stack(idx).push(num);
+    }
 
-    fn get_code(&self, loc: usize) -> &dyn Code;
+    fn pop_stack(&mut self, idx: usize) -> number::Num {
+        match self.get_stack(idx).pop() {
+            Some(t) => t,
+            None => number::Num::nan(),
+        }
+    }
 
-    fn push_code(&mut self, loc: usize);
+    fn get_code(&self, loc: usize) -> &Self::CodeType;
+
+    fn push_code(&mut self, code: Self::CodeType);
 
     fn set_point(&mut self, id: usize, loc: usize);
 
-    fn get_point(&self, id: usize) -> usize;
+    fn get_point(&self, id: usize) -> Option<usize>;
 }
 
-pub struct OptState {}
+pub struct OptState {
+    stack: Vec<Vec<number::Num>>,
+    code: Vec<OptCode>,
+    point: HashMap<usize, usize>,
+}
+
+impl OptState {
+    pub fn new() -> OptState {
+        OptState {
+            stack: vec![],
+            code: vec![],
+            point: HashMap::new(),
+        }
+    }
+}
 
 impl State for OptState {
-    fn get_stack(&self, idx: usize) -> &Vec<Num> {
-        unimplemented!()
+    type CodeType = OptCode;
+
+    fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
+        self.stack[idx].as_mut()
     }
 
-    fn push_stack(&mut self, idx: usize, num: Num) {
-        unimplemented!()
+    fn get_code(&self, loc: usize) -> &Self::CodeType {
+        &self.code[loc]
     }
 
-    fn pop_stack(&mut self, idx: usize) -> Num {
-        unimplemented!()
-    }
-
-    fn get_code(&self, loc: usize) -> &dyn Code {
-        unimplemented!()
-    }
-
-    fn push_code(&mut self, loc: usize) {
-        unimplemented!()
+    fn push_code(&mut self, code: Self::CodeType) {
+        self.code.push(code);
     }
 
     fn set_point(&mut self, id: usize, loc: usize) {
-        unimplemented!()
+        self.point.insert(id, loc);
     }
 
-    fn get_point(&self, id: usize) -> usize {
-        unimplemented!()
+    fn get_point(&self, id: usize) -> Option<usize> {
+        self.point.get(&id).map(|&x| x)
     }
 }
 
-pub struct UnOptState {}
+pub struct UnOptState {
+    stack: HashMap<usize, Vec<number::Num>>,
+    code: Vec<UnOptCode>,
+    point: HashMap<usize, usize>,
+}
+
+impl UnOptState {
+    pub fn new() -> UnOptState {
+        UnOptState {
+            stack: HashMap::new(),
+            code: vec![],
+            point: HashMap::new(),
+        }
+    }
+}
 
 impl State for UnOptState {
-    fn get_stack(&self, idx: usize) -> &Vec<Num> {
-        unimplemented!()
+    type CodeType = UnOptCode;
+
+    fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
+        self.stack.entry(idx).or_insert(Vec::new());
+        self.stack.get_mut(&idx).unwrap()
     }
 
-    fn push_stack(&mut self, idx: usize, num: Num) {
-        unimplemented!()
+    fn get_code(&self, loc: usize) -> &Self::CodeType {
+        &self.code[loc]
     }
 
-    fn pop_stack(&mut self, idx: usize) -> Num {
-        unimplemented!()
-    }
-
-    fn get_code(&self, loc: usize) -> &dyn Code {
-        unimplemented!()
-    }
-
-    fn push_code(&mut self, loc: usize) {
-        unimplemented!()
+    fn push_code(&mut self, code: Self::CodeType) {
+        self.code.push(code);
     }
 
     fn set_point(&mut self, id: usize, loc: usize) {
-        unimplemented!()
+        self.point.insert(id, loc);
     }
 
-    fn get_point(&self, id: usize) -> usize {
-        unimplemented!()
+    fn get_point(&self, id: usize) -> Option<usize> {
+        self.point.get(&id).map(|&x| x)
     }
 }
