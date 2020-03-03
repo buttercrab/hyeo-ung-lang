@@ -33,4 +33,20 @@ mod number_test {
             assert!(true);
         }
     }
+
+    #[test]
+    fn add_test01() {
+        let a = Num::nan();
+        let b = Num::one();
+
+        assert_eq!(Num::nan(), &a + &b);
+    }
+
+    #[test]
+    fn mult_test01() {
+        let a = Num::one();
+        let b = Num::nan();
+
+        assert_eq!(Num::nan(), &a * &b);
+    }
 }
