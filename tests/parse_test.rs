@@ -90,4 +90,20 @@ mod parse_test {
         assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"_\"", format!("{:?}", t[0]));
         assert_eq!("type: 2, cnt1: 2, cnt2: 2, area: \"?!__?_?!___\"", format!("{:?}", t[1]));
     }
+
+    #[test]
+    fn multi_command_test02() {
+        let t = parse::parse("형...??!\n하읍앗...".to_string());
+
+        assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"?_?_!__\"", format!("{:?}", t[0]));
+        assert_eq!("type: 2, cnt1: 3, cnt2: 3, area: \"_\"", format!("{:?}", t[1]));
+    }
+
+    #[test]
+    fn multi_command_test03() {
+        let t = parse::parse("형...\n\n형..?!!!".to_string());
+
+        assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"_\"", format!("{:?}", t[0]));
+        assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"?_!_!_!__\"", format!("{:?}", t[1]));
+    }
 }

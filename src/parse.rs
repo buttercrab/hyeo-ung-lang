@@ -257,7 +257,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                         1
                     }
 
-                    _ => 1
+                    _ => unreachable!()
                 }
             }
 
