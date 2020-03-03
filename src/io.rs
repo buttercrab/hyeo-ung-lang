@@ -7,6 +7,7 @@ use colored::Colorize;
 
 use crate::{code, parse};
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     let code = match read_file_base(file) {
         Ok(t) => t,
@@ -16,6 +17,7 @@ pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     parse::parse(code)
 }
 
+#[cfg_attr(tarpaulin, skip)]
 fn read_file_base(file: &str) -> Result<String, io::Error> {
     let mut res = String::new();
     let mut f = File::open(file)?;
@@ -25,6 +27,7 @@ fn read_file_base(file: &str) -> Result<String, io::Error> {
     Ok(res)
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn read_line() -> String {
     let mut res = String::new();
     match io::stdin().read_line(&mut res) {
@@ -33,19 +36,23 @@ pub fn read_line() -> String {
     }
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_error<T: Error>(err: T) -> ! {
     println!("[{}] {:?}", "error".red(), err);
     process::exit(1);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_log(msg: &str) {
     println!("[{}] {}", "log".blue(), msg);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_warn(msg: &str) {
     println!("[{}] {}", "warn".yellow(), msg);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_note(msg: &str) {
     println!("[{}] {}", "note".bright_cyan(), msg);
 }
