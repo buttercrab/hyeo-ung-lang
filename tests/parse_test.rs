@@ -84,6 +84,9 @@ mod parse_test {
     fn area_test03() { basic_test("혀엉...♥?!♡", "type: 0, cnt1: 2, cnt2: 3, area: \"?♥!_♡\""); }
 
     #[test]
+    fn area_test04() { basic_test("혀엉...!♥!", "type: 0, cnt1: 2, cnt2: 3, area: \"!_!♥_\""); }
+
+    #[test]
     fn multi_command_test01() {
         let t = parse::parse("형...하앗..!??!?".to_string());
 

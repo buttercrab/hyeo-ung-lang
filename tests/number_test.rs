@@ -49,4 +49,12 @@ mod number_test {
 
         assert_eq!(Num::nan(), &a * &b);
     }
+
+    #[test]
+    fn flip_test01() {
+        let mut a = Num::new(-10, 3);
+        a.flip();
+
+        assert_eq!(Num::new(-3, 10), a);
+    }
 }
