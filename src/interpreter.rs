@@ -8,6 +8,7 @@ use colored::Colorize;
 use crate::{code, execute, io, parse};
 use crate::io::print_error;
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn run() -> ! {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
