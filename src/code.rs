@@ -2,7 +2,8 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::parse;
+use crate::{number, parse};
+use crate::number::Num;
 
 /// Area Part of each code
 /// Since the area has binary operator,
@@ -135,17 +136,43 @@ pub trait Code {
 
     fn get_hangul_count(&self) -> usize;
 
-    fn set_hangul_count(&mut self, count: usize);
-
     fn get_dot_count(&self) -> usize;
-
-    fn set_dot_count(&mut self, count: usize);
 
     fn get_area(&self) -> &Area;
 
-    fn set_area(&mut self, area: Area);
-
     fn get_area_count(&self) -> usize;
+}
+
+pub struct OptCode {
+    type_: u8,
+    hangul_count: usize,
+    dot_count: usize,
+    area_count: usize,
+    area: Area,
+}
+
+impl OptCode {
+    pub fn new(type_: u8, hangul_count: usize, dot_count: usize, area_count: usize, area: Area) -> OptCode {
+        OptCode {
+            type_,
+            hangul_count,
+            dot_count,
+            area_count,
+            area,
+        }
+    }
+}
+
+impl Code for OptCode {
+    fn get_type(&self) -> u8 { self.type_ }
+
+    fn get_hangul_count(&self) -> usize { self.hangul_count }
+
+    fn get_dot_count(&self) -> usize { self.dot_count }
+
+    fn get_area(&self) -> &Area { &self.area }
+
+    fn get_area_count(&self) -> usize { self.area_count }
 }
 
 pub struct UnOptCode {
@@ -156,27 +183,27 @@ pub struct UnOptCode {
     // 4: 흡, 흐읍, 흐으읍, 흐으으읍 ...
     // 5: 흑, 흐윽, 흐으윽, 흐으으윽 ...
     type_: u8,
-    cnt1: usize,
-    cnt2: usize,
+    hangul_count: usize,
+    dot_count: usize,
     loc: (usize, usize),
     area: Area,
 }
 
 impl UnOptCode {
-    pub fn new(type_: u8, loc: (usize, usize)) -> Self {
+    pub fn new(type_: u8, hangul_count: usize, dot_count: usize, loc: (usize, usize), area: Area) -> UnOptCode {
         UnOptCode {
             type_,
-            cnt1: 1,
-            cnt2: 0,
+            hangul_count,
+            dot_count,
             loc,
-            area: Area::Nil,
+            area,
         }
     }
 
     pub fn to_string(&self) -> String {
         format!("{} {}_{}_{} : {}",
                 (&*format!("{}:{}", self.loc.0, self.loc.1)).yellow()
-                , parse::COMMANDS[self.type_ as usize], self.cnt1, self.cnt2, self.area)
+                , parse::COMMANDS[self.type_ as usize], self.hangul_count, self.dot_count, self.area)
     }
 
     pub fn get_location(&self) -> (usize, usize) { self.loc }
@@ -186,66 +213,98 @@ impl fmt::Debug for UnOptCode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut area = String::new();
         area_to_string_debug(&mut area, &self.area);
-        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {:?}", self.type_, self.cnt1, self.cnt2, area)
+        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {:?}", self.type_, self.hangul_count, self.dot_count, area)
     }
 }
 
 impl Code for UnOptCode {
     fn get_type(&self) -> u8 { self.type_ }
 
-    fn get_hangul_count(&self) -> usize { self.cnt1 }
+    fn get_hangul_count(&self) -> usize { self.hangul_count }
 
-    fn set_hangul_count(&mut self, count: usize) { self.cnt1 = count; }
-
-    fn get_dot_count(&self) -> usize { self.cnt2 }
-
-    fn set_dot_count(&mut self, count: usize) { self.cnt2 = count; }
+    fn get_dot_count(&self) -> usize { self.dot_count }
 
     fn get_area(&self) -> &Area { &self.area }
 
-    fn set_area(&mut self, area: Area) { self.area = area; }
-
-    fn get_area_count(&self) -> usize { self.cnt1 * self.cnt2 }
+    fn get_area_count(&self) -> usize { self.hangul_count * self.dot_count }
 }
 
-pub struct OptCode {
-    type_: u8,
-    cnt1: usize,
-    cnt2: usize,
-    cnt3: usize,
-    area: Area,
+pub trait State {
+    fn get_stack(&self, idx: usize) -> &Vec<number::Num>;
+
+    fn push_stack(&mut self, idx: usize, num: number::Num);
+
+    fn pop_stack(&mut self, idx: usize) -> number::Num;
+
+    fn get_code(&self, loc: usize) -> &dyn Code;
+
+    fn push_code(&mut self, loc: usize);
+
+    fn set_point(&mut self, id: usize, loc: usize);
+
+    fn get_point(&self, id: usize) -> usize;
 }
 
-impl OptCode {
-    pub fn new(type_: u8) -> Self {
-        OptCode {
-            type_,
-            cnt1: 0,
-            cnt2: 0,
-            cnt3: 0,
-            area: Area::Nil,
-        }
+pub struct OptState {}
+
+impl State for OptState {
+    fn get_stack(&self, idx: usize) -> &Vec<Num> {
+        unimplemented!()
+    }
+
+    fn push_stack(&mut self, idx: usize, num: Num) {
+        unimplemented!()
+    }
+
+    fn pop_stack(&mut self, idx: usize) -> Num {
+        unimplemented!()
+    }
+
+    fn get_code(&self, loc: usize) -> &dyn Code {
+        unimplemented!()
+    }
+
+    fn push_code(&mut self, loc: usize) {
+        unimplemented!()
+    }
+
+    fn set_point(&mut self, id: usize, loc: usize) {
+        unimplemented!()
+    }
+
+    fn get_point(&self, id: usize) -> usize {
+        unimplemented!()
     }
 }
 
-impl OptCode {
-    pub fn set_area_count(&mut self, count: usize) { self.cnt3 = count; }
-}
+pub struct UnOptState {}
 
-impl Code for OptCode {
-    fn get_type(&self) -> u8 { self.type_ }
+impl State for UnOptState {
+    fn get_stack(&self, idx: usize) -> &Vec<Num> {
+        unimplemented!()
+    }
 
-    fn get_hangul_count(&self) -> usize { self.cnt1 }
+    fn push_stack(&mut self, idx: usize, num: Num) {
+        unimplemented!()
+    }
 
-    fn set_hangul_count(&mut self, count: usize) { self.cnt1 = count; }
+    fn pop_stack(&mut self, idx: usize) -> Num {
+        unimplemented!()
+    }
 
-    fn get_dot_count(&self) -> usize { self.cnt2 }
+    fn get_code(&self, loc: usize) -> &dyn Code {
+        unimplemented!()
+    }
 
-    fn set_dot_count(&mut self, count: usize) { self.cnt2 = count; }
+    fn push_code(&mut self, loc: usize) {
+        unimplemented!()
+    }
 
-    fn get_area(&self) -> &Area { &self.area }
+    fn set_point(&mut self, id: usize, loc: usize) {
+        unimplemented!()
+    }
 
-    fn set_area(&mut self, area: Area) { self.area = area; }
-
-    fn get_area_count(&self) -> usize { self.cnt3 }
+    fn get_point(&self, id: usize) -> usize {
+        unimplemented!()
+    }
 }

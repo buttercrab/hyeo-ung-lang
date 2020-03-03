@@ -2,7 +2,7 @@ use std::num::ParseIntError;
 
 use clap::*;
 
-use hyeong::{compile, execute, interpreter, io, update};
+use hyeong::{code, compile, execute, interpreter, io, update};
 
 #[cfg_attr(tarpaulin, skip)]
 #[tokio::main]
@@ -171,6 +171,6 @@ async fn main() {
             io::print_note("Check repository: https://github.com/buttercrab/hyeo-ung-lang");
         }
     } else {
-        interpreter::Interpreter::new().run();
+        interpreter::Interpreter::new(code::UnOptState {}).run();
     }
 }

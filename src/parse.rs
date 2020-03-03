@@ -1,5 +1,4 @@
 use crate::code;
-use crate::code::Code;
 
 pub(crate) const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
 const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
@@ -26,12 +25,36 @@ pub fn is_hangul_syllable(c: char) -> bool {
     '\u{AC00}' <= c && c <= '\u{D7A3}'
 }
 
+/// Parse the code to unoptimized code
+/// Since the language itself has no compile error, it never returns error.
+///
+/// # State
+///
+/// This parsing algorithm is made with state.
+/// - `0`: 
+/// - `1`:
+/// - `2`:
+///
+/// # Time Complexity
+///
+/// - `O(n)` where `n := code.len()`
+/// - Iterates only twice: once for main loop, once for checking if the character is valid.
+///
+/// # Example
+///
+/// ```
+/// use hyeong::parse;
+///
+/// let parsed = parse::parse("형...?💖?".to_string());
+///
+/// assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"?_?💖_\"", format!("{:?}", parsed[0]));
+/// ```
 pub fn parse(code: String) -> Vec<code::UnOptCode> {
     let mut res: Vec<code::UnOptCode> = Vec::new();
 
     let mut hangul_count = 0usize;
     let mut dot_count = 0usize;
-    let mut type_ = 0u8;
+    let mut type_ = 10u8;
     let mut loc = (0usize, 0usize);
 
     // 0: can come: hangul, dot, area
@@ -76,32 +99,31 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     continue;
                 }
 
-                if hangul_count != 0 {
-                    let mut command = code::UnOptCode::new(type_, loc);
-                    command.set_hangul_count(hangul_count);
-                    command.set_dot_count(dot_count);
-
-                    match qu_leaf {
-                        code::Area::Val {
-                            type_: _,
-                            left: _,
-                            ref mut right,
-                        } => {
-                            *right = Box::new(area);
-                            command.set_area(qu_area);
-                        }
-
-                        code::Area::Nil => {
-                            command.set_area(area);
-                        }
-                    }
+                if type_ != 10 {
+                    res.push(code::UnOptCode::new(
+                        type_,
+                        hangul_count,
+                        dot_count,
+                        loc,
+                        match qu_leaf {
+                            code::Area::Val {
+                                type_: _,
+                                left: _,
+                                ref mut right,
+                            } => {
+                                *right = Box::new(area);
+                                qu_area
+                            }
+                            code::Area::Nil => {
+                                area
+                            }
+                        },
+                    ));
 
                     area = code::Area::Nil;
                     leaf = &mut area;
                     qu_area = code::Area::Nil;
                     qu_leaf = &mut qu_area;
-
-                    res.push(command);
                 }
 
                 type_ = t as u8;
@@ -243,25 +265,26 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
         };
     }
 
-    let mut command = code::UnOptCode::new(type_, loc);
-    command.set_hangul_count(hangul_count);
-    command.set_dot_count(dot_count);
-
-    match qu_leaf {
-        code::Area::Val {
-            type_: _,
-            left: _,
-            ref mut right,
-        } => {
-            *right = Box::new(area);
-            command.set_area(qu_area);
-        }
-
-        code::Area::Nil => {
-            command.set_area(area);
-        }
+    if type_ != 10 {
+        res.push(code::UnOptCode::new(
+            type_,
+            hangul_count,
+            dot_count,
+            loc,
+            match qu_leaf {
+                code::Area::Val {
+                    type_: _,
+                    left: _,
+                    ref mut right,
+                } => {
+                    *right = Box::new(area);
+                    qu_area
+                }
+                code::Area::Nil => {
+                    area
+                }
+            },
+        ));
     }
-
-    res.push(command);
     res
 }

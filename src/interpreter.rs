@@ -5,17 +5,17 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use colored::Colorize;
 
-use crate::{execute, io, parse};
+use crate::{code, execute, io, parse};
 use crate::io::print_error;
 
-pub struct Interpreter {
-    state: execute::State
+pub struct Interpreter<T: code::State> {
+    state: T,
 }
 
-impl Interpreter {
-    pub fn new() -> Interpreter {
+impl<T: code::State> Interpreter<T> {
+    pub fn new(state: T) -> Interpreter<T> {
         Interpreter {
-            state: execute::State::new()
+            state,
         }
     }
 
