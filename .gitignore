@@ -1,5 +1,5 @@
-/target
 .idea
+.vscode
 
 Cargo.lock
-doc
+target
