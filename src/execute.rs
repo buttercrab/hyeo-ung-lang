@@ -2,7 +2,7 @@ use std::{io, process};
 
 use crate::code;
 use crate::code::Code;
-use crate::io::print_error;
+use crate::io::{print_error, read_line};
 use crate::number::Num;
 
 fn push_stack_wrap<T: code::State>(state: &mut T, idx: usize, num: Num) {
@@ -30,10 +30,7 @@ fn push_stack_wrap<T: code::State>(state: &mut T, idx: usize, num: Num) {
 fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
     match idx {
         0 => {
-            let mut s = String::new();
-            if let Err(e) = io::stdin().read_line(&mut s) {
-                print_error(e);
-            }
+            let mut s = read_line();
             for c in s.chars().rev() {
                 state.push_stack(0, Num::from_num(c as isize));
             }
