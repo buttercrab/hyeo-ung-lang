@@ -59,6 +59,15 @@ mod big_number_test {
     }
 
     #[test]
+    fn add_test07() {
+        let a = BigNum::new(-12343);
+        let b = BigNum::new(-43211);
+        let c = &a + &b;
+
+        assert_eq!(BigNum::new(-12343 - 43211), c);
+    }
+
+    #[test]
     fn sub_test01() {
         let a = BigNum::new(1234);
         let b = BigNum::new(4321);
