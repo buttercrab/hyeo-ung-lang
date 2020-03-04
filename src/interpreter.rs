@@ -38,19 +38,23 @@ pub fn run() -> ! {
         let input = io::read_line();
         running.store(false, Ordering::SeqCst);
 
-        match input.as_str() {
-            "\n" => {
+        if input == "" {
+            process::exit(0);
+        }
+
+        match input.trim() {
+            "" => {
                 continue;
             }
 
-            "help\n" => {
+            "help" => {
                 println!("help  Print this");
                 println!("exit  Exit this interpreter");
                 println!("      You can also exit by typing \"흑.하앙...\"");
                 continue;
             }
 
-            "" | "exit\n" => {
+            "exit" => {
                 process::exit(0);
             }
 
