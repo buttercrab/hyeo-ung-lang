@@ -41,6 +41,7 @@ use crate::{number, parse};
 ///
 /// assert_eq!("[♥]?[_]", format!("{}", a));
 /// ```
+#[derive(Clone)]
 pub enum Area {
     Val {
         type_: u8,
@@ -141,6 +142,8 @@ pub trait Code {
     fn get_area(&self) -> &Area;
 
     fn get_area_count(&self) -> usize;
+
+    fn clone(&self) -> Self;
 }
 
 pub struct OptCode {
@@ -173,6 +176,16 @@ impl Code for OptCode {
     fn get_area(&self) -> &Area { &self.area }
 
     fn get_area_count(&self) -> usize { self.area_count }
+
+    fn clone(&self) -> OptCode {
+        OptCode {
+            type_: self.type_,
+            hangul_count: self.hangul_count,
+            dot_count: self.dot_count,
+            area_count: self.area_count,
+            area: self.area.clone(),
+        }
+    }
 }
 
 pub struct UnOptCode {
@@ -227,10 +240,24 @@ impl Code for UnOptCode {
     fn get_area(&self) -> &Area { &self.area }
 
     fn get_area_count(&self) -> usize { self.hangul_count * self.dot_count }
+
+    fn clone(&self) -> UnOptCode {
+        UnOptCode {
+            type_: self.type_,
+            hangul_count: self.hangul_count,
+            dot_count: self.dot_count,
+            loc: self.loc.clone(),
+            area: self.area.clone(),
+        }
+    }
 }
 
 pub trait State {
-    type CodeType;
+    type CodeType: Code;
+
+    fn current_stack(&self) -> usize;
+
+    fn set_current_stack(&mut self, cur: usize);
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num>;
 
@@ -247,7 +274,7 @@ pub trait State {
 
     fn get_code(&self, loc: usize) -> &Self::CodeType;
 
-    fn push_code(&mut self, code: Self::CodeType);
+    fn push_code(&mut self, code: Self::CodeType) -> usize;
 
     fn set_point(&mut self, id: usize, loc: usize);
 
@@ -258,20 +285,30 @@ pub struct OptState {
     stack: Vec<Vec<number::Num>>,
     code: Vec<OptCode>,
     point: HashMap<usize, usize>,
+    cur: usize,
 }
 
 impl OptState {
-    pub fn new() -> OptState {
+    pub fn new(size: usize) -> OptState {
         OptState {
-            stack: vec![],
+            stack: vec![Vec::new(); size],
             code: vec![],
             point: HashMap::new(),
+            cur: 3,
         }
     }
 }
 
 impl State for OptState {
     type CodeType = OptCode;
+
+    fn current_stack(&self) -> usize {
+        self.cur
+    }
+
+    fn set_current_stack(&mut self, cur: usize) {
+        self.cur = cur;
+    }
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
         self.stack[idx].as_mut()
@@ -281,8 +318,9 @@ impl State for OptState {
         &self.code[loc]
     }
 
-    fn push_code(&mut self, code: Self::CodeType) {
+    fn push_code(&mut self, code: Self::CodeType) -> usize {
         self.code.push(code);
+        self.code.len() - 1
     }
 
     fn set_point(&mut self, id: usize, loc: usize) {
@@ -298,6 +336,7 @@ pub struct UnOptState {
     stack: HashMap<usize, Vec<number::Num>>,
     code: Vec<UnOptCode>,
     point: HashMap<usize, usize>,
+    cur: usize,
 }
 
 impl UnOptState {
@@ -306,12 +345,21 @@ impl UnOptState {
             stack: HashMap::new(),
             code: vec![],
             point: HashMap::new(),
+            cur: 3,
         }
     }
 }
 
 impl State for UnOptState {
     type CodeType = UnOptCode;
+
+    fn current_stack(&self) -> usize {
+        self.cur
+    }
+
+    fn set_current_stack(&mut self, cur: usize) {
+        self.cur = cur;
+    }
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
         self.stack.entry(idx).or_insert(Vec::new());
@@ -322,8 +370,9 @@ impl State for UnOptState {
         &self.code[loc]
     }
 
-    fn push_code(&mut self, code: Self::CodeType) {
+    fn push_code(&mut self, code: Self::CodeType) -> usize {
         self.code.push(code);
+        self.code.len() - 1
     }
 
     fn set_point(&mut self, id: usize, loc: usize) {
