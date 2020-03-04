@@ -125,6 +125,18 @@ impl Num {
         }
     }
 
+    pub fn floor(&self) -> BigNum {
+        if self.down == BigNum::one() {
+            self.up.clone()
+        } else {
+            &self.up / &self.down
+        }
+    }
+
+    pub fn is_pos(&self) -> bool {
+        self.up.is_pos() && !self.is_nan()
+    }
+
     /// Check if the number is NaN
     ///
     /// # Examples

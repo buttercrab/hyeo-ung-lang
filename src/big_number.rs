@@ -176,6 +176,10 @@ impl BigNum {
         self.val == vec![0]
     }
 
+    pub fn to_int(&self) -> u32 {
+        self.val[0]
+    }
+
     /// Make new `BigNum` from string (10 based)
     /// It won't make error when the format is not right.
     /// But it would make unexpected number.

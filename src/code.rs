@@ -314,6 +314,23 @@ impl State for OptState {
         self.stack[idx].as_mut()
     }
 
+    fn push_stack(&mut self, idx: usize, num: number::Num) {
+        if idx < self.stack.len() {
+            self.get_stack(idx).push(num);
+        }
+    }
+
+    fn pop_stack(&mut self, idx: usize) -> number::Num {
+        if idx < self.stack.len() {
+            match self.get_stack(idx).pop() {
+                Some(t) => t,
+                None => number::Num::nan(),
+            }
+        } else {
+            number::Num::nan()
+        }
+    }
+
     fn get_code(&self, loc: usize) -> &Self::CodeType {
         &self.code[loc]
     }
