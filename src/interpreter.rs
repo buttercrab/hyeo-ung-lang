@@ -17,7 +17,8 @@ pub fn run() -> ! {
     ctrlc::set_handler(move || {
         if r.load(Ordering::SeqCst) {
             r.store(false, Ordering::SeqCst);
-            print!("\ntype \"흑.하앙...\" or \"exit\" to exit\n> ");
+            print!("\ntype \"흑.하앙...\" or \"exit\" to exit\n");
+            print!("{} ", ">".bright_blue());
             if let Result::Err(e) = stdout().flush() {
                 print_error(e);
             }
