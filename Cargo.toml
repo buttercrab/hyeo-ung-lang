@@ -9,6 +9,6 @@ edition = "2018"
 [dependencies]
 clap = { git = "https://github.com/clap-rs/clap/" }
 colored = "1.9"
-ctrlc = { version = "3.0", features = ["termination"] }
+ctrlc = { version = "3.1", features = ["termination"] }
 reqwest = { version = "0.10", features = ["json"] }
 tokio = { version = "0.2", features = ["full"] }
