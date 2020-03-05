@@ -1,4 +1,4 @@
-use std::io::{stderr, stdout, Write};
+use std::io::{stdout, Write};
 use std::process;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -7,6 +7,36 @@ use colored::Colorize;
 
 use crate::{code, execute, io, parse};
 use crate::io::print_error;
+
+#[cfg_attr(tarpaulin, skip)]
+struct CustomWriter {
+    buffer: Vec<u8>,
+}
+
+#[cfg_attr(tarpaulin, skip)]
+impl Write for CustomWriter {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.buffer.append(&mut buf.to_vec());
+        Result::Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Result::Ok(())
+    }
+}
+
+#[cfg_attr(tarpaulin, skip)]
+impl CustomWriter {
+    fn new() -> CustomWriter {
+        CustomWriter {
+            buffer: Vec::new(),
+        }
+    }
+
+    fn to_string(&self) -> String {
+        String::from_utf8(self.buffer.clone()).unwrap()
+    }
+}
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn run() -> ! {
@@ -42,6 +72,9 @@ pub fn run() -> ! {
             process::exit(0);
         }
 
+        let mut out = CustomWriter::new();
+        let mut err = CustomWriter::new();
+
         match input.trim() {
             "" => {
                 continue;
@@ -61,9 +94,20 @@ pub fn run() -> ! {
             _ => {
                 let code = parse::parse(input);
                 for c in code.iter() {
-                    state = execute::execute(&mut stdout(), &mut stderr(), state, c);
+                    state = execute::execute(&mut out, &mut err, state, c);
                 }
             }
+        }
+
+        let out_str = out.to_string();
+        let err_str = err.to_string();
+
+        if !out_str.is_empty() {
+            println!("[{}] {}", "stdout".bold(), out_str);
+        }
+
+        if !err_str.is_empty() {
+            println!("[{}] {}", "stderr".bold().bright_red(), err_str);
         }
     }
 }
