@@ -1,8 +1,9 @@
 use std::io::{stderr, stdout};
+use std::num::ParseIntError;
 
 use clap::*;
 
-use hyeong::{code, compile, execute, interpreter, io, update};
+use hyeong::{code, compile, debug, execute, interpreter, io, update};
 
 #[cfg_attr(tarpaulin, skip)]
 #[tokio::main]
@@ -140,8 +141,15 @@ async fn main() {
             println!("{}:{}", file, c.to_string())
         }
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
-        // debug
         let code = io::read_file(matches.value_of("input").unwrap());
+        let from = match matches.value_of("from") {
+            Some(value) => match value.parse::<usize>() {
+                Ok(value) => value,
+                Err(e) => io::print_error(e),
+            }
+            None => 0,
+        };
+        debug::run(code, from);
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
         let un_opt_code = io::read_file(matches.value_of("input").unwrap());
         let level_str = match matches.value_of("optimize") {
