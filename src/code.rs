@@ -311,7 +311,9 @@ pub trait State {
 
     fn set_point(&mut self, id: u128, loc: usize);
 
-    fn get_point(&self, id: u128) -> Option<usize>;
+    fn get_point(&mut self, id: u128, cur_loc: usize) -> Option<usize>;
+
+    fn get_latest_loc(&self) -> Option<usize>;
 }
 
 pub struct OptState {
@@ -319,6 +321,7 @@ pub struct OptState {
     code: Vec<OptCode>,
     point: HashMap<u128, usize>,
     cur: usize,
+    latest: Option<usize>,
 }
 
 impl OptState {
@@ -328,6 +331,7 @@ impl OptState {
             code: vec![],
             point: HashMap::new(),
             cur: 3,
+            latest: None,
         }
     }
 }
@@ -377,8 +381,13 @@ impl State for OptState {
         self.point.insert(id, loc);
     }
 
-    fn get_point(&self, id: u128) -> Option<usize> {
+    fn get_point(&mut self, id: u128, cur_loc: usize) -> Option<usize> {
+        self.latest = Option::Some(cur_loc);
         self.point.get(&id).map(|&x| x)
+    }
+
+    fn get_latest_loc(&self) -> Option<usize> {
+        self.latest
     }
 }
 
@@ -387,6 +396,7 @@ pub struct UnOptState {
     code: Vec<UnOptCode>,
     point: HashMap<u128, usize>,
     cur: usize,
+    latest: Option<usize>,
 }
 
 impl UnOptState {
@@ -396,6 +406,7 @@ impl UnOptState {
             code: vec![],
             point: HashMap::new(),
             cur: 3,
+            latest: None,
         }
     }
 }
@@ -429,7 +440,12 @@ impl State for UnOptState {
         self.point.insert(id, loc);
     }
 
-    fn get_point(&self, id: u128) -> Option<usize> {
+    fn get_point(&mut self, id: u128, cur_loc: usize) -> Option<usize> {
+        self.latest = Option::Some(cur_loc);
         self.point.get(&id).map(|&x| x)
+    }
+
+    fn get_latest_loc(&self) -> Option<usize> {
+        self.latest
     }
 }
