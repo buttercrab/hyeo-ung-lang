@@ -128,9 +128,9 @@ impl Num {
     /// Floor function for `Num`
     /// Works for positive values.
     ///
-    /// # Assertion
+    /// # Assertions
     ///
-    /// `self` is not NaN
+    /// - `self` is not NaN
     ///
     /// # Examples
     ///
