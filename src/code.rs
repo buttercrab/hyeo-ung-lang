@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fmt;
 
@@ -66,6 +67,38 @@ impl Area {
             type_,
             left: Box::new(Area::Nil),
             right: Box::new(Area::Nil),
+        }
+    }
+}
+
+pub fn calc(area: &Area, area_value: usize, state: &mut impl State) -> u8 {
+    let mut area = area;
+    let cur = state.current_stack();
+
+    loop {
+        match area {
+            Area::Val {
+                type_, left, right
+            } => {
+                if *type_ == 0 {
+                    let v = state.pop_stack(cur);
+                    area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
+                        Some(Ordering::Less) => left,
+                        _ => right,
+                    }
+                } else if *type_ == 1 {
+                    let v = state.pop_stack(cur);
+                    area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
+                        Some(Ordering::Equal) => left,
+                        _ => right,
+                    }
+                } else {
+                    break *type_;
+                }
+            }
+            Area::Nil => {
+                break 0;
+            }
         }
     }
 }
@@ -276,15 +309,15 @@ pub trait State {
 
     fn push_code(&mut self, code: Self::CodeType) -> usize;
 
-    fn set_point(&mut self, id: usize, loc: usize);
+    fn set_point(&mut self, id: u128, loc: usize);
 
-    fn get_point(&self, id: usize) -> Option<usize>;
+    fn get_point(&self, id: u128) -> Option<usize>;
 }
 
 pub struct OptState {
     stack: Vec<Vec<number::Num>>,
     code: Vec<OptCode>,
-    point: HashMap<usize, usize>,
+    point: HashMap<u128, usize>,
     cur: usize,
 }
 
@@ -340,11 +373,11 @@ impl State for OptState {
         self.code.len() - 1
     }
 
-    fn set_point(&mut self, id: usize, loc: usize) {
+    fn set_point(&mut self, id: u128, loc: usize) {
         self.point.insert(id, loc);
     }
 
-    fn get_point(&self, id: usize) -> Option<usize> {
+    fn get_point(&self, id: u128) -> Option<usize> {
         self.point.get(&id).map(|&x| x)
     }
 }
@@ -352,7 +385,7 @@ impl State for OptState {
 pub struct UnOptState {
     stack: HashMap<usize, Vec<number::Num>>,
     code: Vec<UnOptCode>,
-    point: HashMap<usize, usize>,
+    point: HashMap<u128, usize>,
     cur: usize,
 }
 
@@ -392,11 +425,11 @@ impl State for UnOptState {
         self.code.len() - 1
     }
 
-    fn set_point(&mut self, id: usize, loc: usize) {
+    fn set_point(&mut self, id: u128, loc: usize) {
         self.point.insert(id, loc);
     }
 
-    fn get_point(&self, id: usize) -> Option<usize> {
+    fn get_point(&self, id: u128) -> Option<usize> {
         self.point.get(&id).map(|&x| x)
     }
 }
