@@ -31,9 +31,63 @@ pub fn is_hangul_syllable(c: char) -> bool {
 /// # State
 ///
 /// This parsing algorithm is made with state.
-/// - `0`: 
-/// - `1`:
-/// - `2`:
+/// - `0`: before command starts: hangul, dot, area can come
+/// - `1`: when hangul part starts: hangul can come
+/// - `2`: when area part starts: hangul, area can come
+///
+/// # Terms
+///
+/// - starting character: `혀`, `하` or `흐`
+/// - ending character: `엉`, `앙`, `앗`, `읏`, `읍` or `윽`
+/// - area character: `?`, `!`, `♥`, `❤`, `💕`, `💖`, `💗`, `💘`, `💙`, `💚`, `💛`, `💜`, `💝` or `♡`
+/// - heart character: `♥`, `❤`, `💕`, `💖`, `💗`, `💘`, `💙`, `💚`, `💛`, `💜`, `💝` or `♡`
+/// - hangul part, dot part, area part:
+///   ```text
+///   혀어어어어어어어어어어엉 .............. 💙?💕?♥!💝!!💘
+///   <- hangul part -> <- dot part -> <- area part ->
+///   ```
+///
+/// # Algorithm
+///
+/// ## Preprocessing
+///
+/// First, we have to preprocess the code to check if each character is valid.
+/// In greedy method, if the corresponing character(`엉` for `혀`, `앙` or `앗` for `하`, etc.)
+/// is not present after each starting character,
+///
+/// ## Main Algorithm
+///
+/// ### 0 State
+///
+/// In 0 state, we can have different scenarios.
+///
+/// 1. Before starting the whole command.
+///    - goto 1 state when starting character appears.
+/// 2. After finishing hangul part.
+///    - count dot
+/// 3. Before starting the area part. (Similar to 2)
+///    - goto 2 state when area character appears.
+///
+/// ### 1 State
+///
+/// In 1 state, just count hangul syllables until ending character appears.
+/// Then goto state 0(1)
+///
+/// ### 2 State
+///
+/// In 2 state, there are two binary operators: `?` and `!`
+/// So, we will create two [binary tree](../code/enum.Area.html)s for each operators.
+///
+/// - `?` operator
+///   1. if tree is empty, put `?` as root
+///   2. if most right node is heart character, change to to `?` and put it to the left.
+///   3. if most right node is `?`, add to the right.
+/// - `!` operator
+///   1. same as above.
+/// - heart character
+///   1. if tree is empty, put in
+///   2. if most right node is heart character, ignore.
+///   3. if most right node is operator, add to the right.
 ///
 /// # Time Complexity
 ///
@@ -57,9 +111,6 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
     let mut type_ = 10u8;
     let mut loc = (0usize, 0usize);
 
-    // 0: can come: hangul, dot, area
-    // 1: can come: hangul (after hangul starts)
-    // 2: can come: hangul, area (after area starts)
     let mut state = 0u8;
     let mut area = code::Area::Nil;
     let mut leaf = &mut area;
@@ -228,7 +279,8 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                 continue;
             }
 
-            1 => {
+            // 1
+            _ => {
                 if is_hangul_syllable(c) {
                     hangul_count += 1;
                 }
@@ -249,19 +301,16 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                         1
                     }
 
-                    8 => if let Some(t) = "읏읍윽".find(c) {
+                    // 8
+                    _ => if let Some(t) = "읏읍윽".find(c) {
                         type_ = (t / 3 + 3) as u8;
                         dot_count = 0;
                         0
                     } else {
                         1
                     }
-
-                    _ => unreachable!()
                 }
             }
-
-            _ => unreachable!()
         };
     }
 
