@@ -9,16 +9,16 @@ fn push_stack_wrap<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E,
     match idx {
         1 => {
             if num.is_pos() {
-                out.write_all(format!("{}", num.floor().to_int() as u8 as char).as_ref());
+                io::write(out, &*format!("{}", num.floor().to_int() as u8 as char));
             } else {
-                out.write_all(format!("{}", -&num).as_ref());
+                io::write(out, &*format!("{}", -&num));
             }
         }
         2 => {
             if num.is_pos() {
-                err.write_all(format!("{}", num.floor().to_int() as u8 as char).as_ref());
+                io::write(err, &*format!("{}", num.floor().to_int() as u8 as char));
             } else {
-                err.write_all(format!("{}", -&num).as_ref());
+                io::write(err, &*format!("{}", -&num));
             }
         }
         _ => {

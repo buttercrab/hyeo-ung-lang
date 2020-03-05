@@ -1,7 +1,7 @@
 use std::{io, process};
 use std::error::Error;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 
 use colored::Colorize;
 
@@ -55,4 +55,11 @@ pub fn print_warn(msg: &str) {
 #[cfg_attr(tarpaulin, skip)]
 pub fn print_note(msg: &str) {
     println!("[{}] {}", "note".bright_cyan(), msg);
+}
+
+#[cfg_attr(tarpaulin, skip)]
+pub fn write<W: Write>(w: &mut W, content: &str) {
+    if let Err(e) = w.write_all(content.as_bytes()) {
+        print_error(e);
+    }
 }

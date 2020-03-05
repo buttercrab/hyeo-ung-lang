@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod execute_test {
-    use std::io::{Error, Result, Write};
+    use std::io::{Result, Write};
 
     use hyeong::{execute, parse};
     use hyeong::code::UnOptState;
