@@ -27,7 +27,7 @@ pub fn run() -> ! {
     }).expect("Error setting Ctrl-C handler");
 
     println!("Hyeo-ung programming language");
-    println!("type help for help");
+    println!("type help for help!");
 
     loop {
         print!("{} ", ">".bright_blue());
