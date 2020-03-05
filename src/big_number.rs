@@ -1,6 +1,23 @@
 use std::{error, fmt, ops};
 use std::cmp::{max, min, Ordering};
 
+/// Error class for `BigNum`
+/// Used in `BigNum::from_string()`, `BigNum::from_string_base()`, `BigNum::to_string_base()`.
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::big_number::BigNum;
+/// use hyeong::big_number::Error;
+///
+/// let a = BigNum::new(1234);
+///
+/// assert!(if let Result::Err(Error::ParseError) = BigNum::from_string("random string".to_string()) {
+///     true
+/// } else {
+///     false
+/// });
+/// ```
 #[derive(Debug)]
 pub enum Error {
     ParseError,
@@ -8,6 +25,16 @@ pub enum Error {
 }
 
 impl fmt::Display for Error {
+    /// Formats to String
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::big_number::Error;
+    ///
+    /// assert_eq!("Parse Error", format!("{}", Error::ParseError));
+    /// assert_eq!("Base Size Error: size = 100", format!("{}", Error::BaseSizeError(100)));
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::ParseError => write!(f, "Parse Error"),
@@ -176,6 +203,21 @@ impl BigNum {
         self.val == vec![0]
     }
 
+    /// Returns to `u32` type
+    ///
+    /// # Assertions
+    ///
+    /// - the value is same when the value is under `u32::max_value()`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::big_number::BigNum;
+    ///
+    /// let a = BigNum::new(1234);
+    ///
+    /// assert_eq!(1234, a.to_int());
+    /// ```
     pub fn to_int(&self) -> u32 {
         self.val[0]
     }
