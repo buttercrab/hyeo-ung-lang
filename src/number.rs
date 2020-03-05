@@ -125,6 +125,22 @@ impl Num {
         }
     }
 
+    /// Floor function for `Num`
+    /// Works for positive values.
+    ///
+    /// # Assertion
+    ///
+    /// `self` is not NaN
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::number::Num;
+    ///
+    /// let a = Num::new(7, 3);
+    ///
+    /// assert_eq!("2", a.floor().to_string());
+    /// ```
     pub fn floor(&self) -> BigNum {
         if self.down == BigNum::one() {
             self.up.clone()
@@ -133,6 +149,17 @@ impl Num {
         }
     }
 
+    /// Check if the number is positive
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::number::Num;
+    ///
+    /// let a = Num::from_num(10);
+    ///
+    /// assert_eq!(true, a.is_pos());
+    /// ```
     pub fn is_pos(&self) -> bool {
         self.up.is_pos() && !self.is_nan()
     }
