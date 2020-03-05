@@ -42,7 +42,7 @@ pub fn run() -> ! {
             process::exit(0);
         }
 
-        match input.trim_matches(|c: char| c.is_whitespace() || c == '\r') {
+        match input.trim() {
             "" => {
                 continue;
             }
