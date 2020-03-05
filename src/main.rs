@@ -1,3 +1,5 @@
+use std::io::{stderr, stdout};
+
 use clap::*;
 
 use hyeong::{code, compile, execute, interpreter, io, update};
@@ -154,12 +156,12 @@ async fn main() {
         if level >= 1 {
             let (mut state, opt_code) = compile::optimize(un_opt_code, level);
             for code in opt_code {
-                state = execute::execute(state, &code);
+                state = execute::execute(&mut stdout(), &mut stderr(), state, &code);
             }
         } else {
             let mut state = code::UnOptState::new();
             for code in un_opt_code {
-                state = execute::execute(state, &code);
+                state = execute::execute(&mut stdout(), &mut stderr(), state, &code);
             }
         }
     } else if let Some(ref matches) = matches.subcommand_matches("update") {

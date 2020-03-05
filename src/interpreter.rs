@@ -1,4 +1,4 @@
-use std::io::{stdout, Write};
+use std::io::{stderr, stdout, Write};
 use std::process;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -61,7 +61,7 @@ pub fn run() -> ! {
             _ => {
                 let code = parse::parse(input);
                 for c in code.iter() {
-                    state = execute::execute(state, c);
+                    state = execute::execute(&mut stdout(), &mut stderr(), state, c);
                 }
             }
         }

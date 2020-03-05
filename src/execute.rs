@@ -1,23 +1,24 @@
+use std::io::Write;
 use std::process;
 
 use crate::{code, io};
 use crate::code::Code;
 use crate::number::Num;
 
-fn push_stack_wrap<T: code::State>(state: &mut T, idx: usize, num: Num) {
+fn push_stack_wrap<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, state: &mut T, idx: usize, num: Num) {
     match idx {
         1 => {
             if num.is_pos() {
-                print!("{}", num.floor().to_int() as u8 as char);
+                out.write_all(format!("{}", num.floor().to_int() as u8 as char).as_ref());
             } else {
-                print!("{}", -&num);
+                out.write_all(format!("{}", -&num).as_ref());
             }
         }
         2 => {
             if num.is_pos() {
-                eprint!("{}", num.floor().to_int() as u8 as char);
+                err.write_all(format!("{}", num.floor().to_int() as u8 as char).as_ref());
             } else {
-                eprint!("{}", -&num);
+                err.write_all(format!("{}", -&num).as_ref());
             }
         }
         _ => {
@@ -47,7 +48,7 @@ fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
     }
 }
 
-pub fn execute<T: code::State>(mut state: T, code: &T::CodeType) -> T {
+pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut state: T, code: &T::CodeType) -> T {
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
 
@@ -58,8 +59,7 @@ pub fn execute<T: code::State>(mut state: T, code: &T::CodeType) -> T {
         match code.get_type() {
             0 => {
                 push_stack_wrap(
-                    &mut state,
-                    cur,
+                    out, err, &mut state, cur,
                     &Num::from_num(code.get_hangul_count() as isize)
                         * &Num::from_num(code.get_dot_count() as isize),
                 );
@@ -69,14 +69,14 @@ pub fn execute<T: code::State>(mut state: T, code: &T::CodeType) -> T {
                 for _ in 0..code.get_hangul_count() {
                     n += &pop_stack_wrap(&mut state, cur);
                 }
-                push_stack_wrap(&mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
             2 => {
                 let mut n = Num::one();
                 for _ in 0..code.get_hangul_count() {
                     n *= &pop_stack_wrap(&mut state, cur);
                 }
-                push_stack_wrap(&mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
             3 => {
                 let mut n = Num::zero();
@@ -89,10 +89,10 @@ pub fn execute<T: code::State>(mut state: T, code: &T::CodeType) -> T {
                 for mut x in v {
                     x.minus();
                     n += &x;
-                    push_stack_wrap(&mut state, cur, x);
+                    push_stack_wrap(out, err, &mut state, cur, x);
                 }
 
-                push_stack_wrap(&mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
             4 => {
                 let mut n = Num::one();
@@ -105,10 +105,10 @@ pub fn execute<T: code::State>(mut state: T, code: &T::CodeType) -> T {
                 for mut x in v {
                     x.flip();
                     n *= &x;
-                    push_stack_wrap(&mut state, cur, x);
+                    push_stack_wrap(out, err, &mut state, cur, x);
                 }
 
-                push_stack_wrap(&mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
             5 => {
                 let n = state.pop_stack(cur);
