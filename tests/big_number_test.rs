@@ -275,4 +275,10 @@ mod big_number_test {
         let a = BigNum::new(1234);
         assert_eq!(1234,a.to_int());
     }
+
+    #[test]
+    fn to_int_test02() {
+        let a = BigNum::new(4294967296);
+        assert_eq!(0,a.to_int());
+    }
 }
