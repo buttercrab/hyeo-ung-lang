@@ -1,5 +1,4 @@
 use std::io::{stderr, stdout};
-use std::num::ParseIntError;
 
 use clap::*;
 

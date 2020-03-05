@@ -110,6 +110,7 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
 
                 push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
+            // 5
             _ => {
                 let n = state.pop_stack(cur_stack);
                 for _ in 0..code.get_hangul_count() {
@@ -124,11 +125,13 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
 
         if area_type != 0 {
             if area_type != 13 {
-                let id = ((cur_loc as u128) << 4) + area_type as u128;
+                let id = ((code.get_area_count() as u128) << 4) + area_type as u128;
                 match state.get_point(id, cur_loc) {
                     Some(value) => {
-                        cur_loc = value;
-                        continue;
+                        if cur_loc != value {
+                            cur_loc = value;
+                            continue;
+                        }
                     },
                     None => state.set_point(id, cur_loc),
                 }

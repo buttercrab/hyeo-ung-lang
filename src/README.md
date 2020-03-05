@@ -10,7 +10,7 @@
 | `code.rs`        |✅     |      |     |
 | `compile.rs`     |      |      |     |
 | `debug.rs`       |      |      |     |
-| `execute.rs`     |      |      |     |
+| `execute.rs`     |✅     |      |     |
 | `interpreter.rs` |✅     |      |     |
 | `io.rs`          |✅     |      |     |
 | `lib.rs`         |✅     |❌     |❌    |

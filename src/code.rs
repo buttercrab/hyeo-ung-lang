@@ -295,7 +295,10 @@ pub trait State {
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num>;
 
     fn push_stack(&mut self, idx: usize, num: number::Num) {
-        self.get_stack(idx).push(num);
+        let st = self.get_stack(idx);
+        if !st.is_empty() || !num.is_nan() {
+            st.push(num);
+        }
     }
 
     fn pop_stack(&mut self, idx: usize) -> number::Num {
