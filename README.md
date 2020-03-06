@@ -22,7 +22,7 @@
   + `$ hyeong`
 - [x] Code runner
   + `$ hyeong run FILE`
-- [x] Compiler
+- [ ] Compiler
   + `$ hyeong build FILE --flags...`
 - [ ] Optimization
 - [ ] Debugger
@@ -63,6 +63,8 @@
   + optimized & unoptimized code runner
 - Interpreter:
   + interactive code runner
+- Optimizer:
+  + level 1 optimize
   
 ---
 
