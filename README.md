@@ -59,6 +59,10 @@
   + Arithmetic operators, `to_string` and `from_string` method
 - Compiler:
   + parser: O(n) algorithm **iterates whole code exactly twice**
+- Code Runner:
+  + optimized & unoptimized code runner
+- Interpreter:
+  + interactive code runner
   
 ---
 
