@@ -56,7 +56,7 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
 
     while cur_loc < length {
         let code = (*state.get_code(cur_loc)).clone();
-        let cur_stack = state.current_stack();
+        let mut cur_stack = state.current_stack();
 
         match code.get_type() {
             0 => {
@@ -123,7 +123,8 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
             }
         }
 
-        let area_type = code::calc(code.get_area(), code.get_area_count(), &mut state);
+        cur_stack = state.current_stack();
+        let area_type = code::calc(code.get_area(), code.get_area_count(), || pop_stack_wrap(&mut state, cur_stack));
 
         if area_type != 0 {
             if area_type != 13 {

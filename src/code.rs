@@ -1,12 +1,10 @@
-use std::{fmt, process};
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::error::Error;
+use std::fmt;
 
 use colored::Colorize;
 
 use crate::{number, parse};
-use crate::io::print_error;
 use crate::number::Num;
 
 /// Area Part of each code
@@ -74,9 +72,8 @@ impl Area {
     }
 }
 
-pub fn calc(area: &Area, area_value: usize, state: &mut impl State) -> u8 {
+pub fn calc<T: FnMut() -> Num>(area: &Area, area_value: usize, mut pop: T) -> u8 {
     let mut area = area;
-    let cur = state.current_stack();
 
     loop {
         match area {
@@ -84,13 +81,13 @@ pub fn calc(area: &Area, area_value: usize, state: &mut impl State) -> u8 {
                 type_, left, right
             } => {
                 if *type_ == 0 {
-                    let v = state.pop_stack(cur);
+                    let v = pop();
                     area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
                         Some(Ordering::Less) => left,
                         _ => right,
                     }
                 } else if *type_ == 1 {
-                    let v = state.pop_stack(cur);
+                    let v = pop();
                     area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
                         Some(Ordering::Equal) => left,
                         _ => right,

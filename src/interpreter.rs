@@ -1,6 +1,5 @@
 use std::io::{stdout, Write};
 use std::process;
-use std::string::FromUtf8Error;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
