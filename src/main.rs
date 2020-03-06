@@ -1,7 +1,6 @@
-use std::io::{stderr, stdout, Write};
+use std::io::{stderr, stdout};
 
 use clap::*;
-use colored::Colorize;
 
 use hyeong::{code, compile, debug, execute, interpreter, io, update};
 

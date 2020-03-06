@@ -1,10 +1,9 @@
-use crate::code::Area;
 use std::{error, fmt};
+use std::collections::HashMap;
 
 use crate::code;
 use crate::code::Code;
 use crate::io::print_error;
-use std::collections::HashMap;
 
 pub enum Error {
     LevelError(usize),
@@ -43,7 +42,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         let mut max: usize = 1;
 
         for un_opt_code in &code {
-            let mut cnt = area_map.entry(un_opt_code.get_area_count()).or_insert(0);
+            let cnt = area_map.entry(un_opt_code.get_area_count()).or_insert(0);
             if *cnt == 0 {
                 *cnt = max;
                 max += 1;
