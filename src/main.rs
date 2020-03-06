@@ -115,7 +115,8 @@ async fn main() {
 
     if let Some(ref matches) = matches.subcommand_matches("build") {
         // build
-        let un_opt_code = io::read_file(matches.value_of("input").unwrap());
+        let file = matches.value_of("input").unwrap();
+        let un_opt_code = io::read_file(file);
         let level_str = match matches.value_of("optimize") {
             Some(level) => level,
             None => "2",
@@ -136,18 +137,21 @@ async fn main() {
             println!("{}:{}", file, c.to_string())
         }
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
-        let code = io::read_file(matches.value_of("input").unwrap());
+        let file = matches.value_of("input").unwrap();
+        let code = io::read_file(file);
         let from = match matches.value_of("from") {
             Some(value) => io::handle_error(value.parse::<usize>()),
             None => 0,
         };
         debug::run(code, from);
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
-        let un_opt_code = io::read_file(matches.value_of("input").unwrap());
+        let file = matches.value_of("input").unwrap();
+        let un_opt_code = io::read_file(file);
         let level_str = match matches.value_of("optimize") {
             Some(level) => level,
             None => "2",
         };
+
         let level = io::handle_error(level_str.parse::<usize>());
         let mut stdout = stdout();
         let mut stderr = stderr();

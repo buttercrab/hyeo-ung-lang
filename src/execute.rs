@@ -62,6 +62,8 @@ pub fn execute<T: code::State, O: Write, E: Write>(
     mut state: T,
     code: &T::CodeType,
 ) -> T {
+    io::print_log("running code");
+
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
 

@@ -36,6 +36,8 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         print_error(Error::LevelError(level))
     }
 
+    io::print_log(&*format!("optimizing to level {}", level));
+
     if level >= 1 {
         let mut dot_map: HashMap<usize, usize> = HashMap::new();
         let mut max: usize = 4;

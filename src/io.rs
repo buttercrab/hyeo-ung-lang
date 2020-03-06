@@ -28,20 +28,15 @@ impl CustomWriter {
     }
 
     pub fn to_string(&self) -> String {
-        match String::from_utf8(self.buffer.clone()) {
-            Ok(value) => value,
-            Err(e) => print_error(e),
-        }
+        handle_error(String::from_utf8(self.buffer.clone()))
     }
 }
 
 pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
-    let code = match read_file_base(file) {
-        Ok(t) => t,
-        Err(e) => print_error(e),
-    };
-
-    parse::parse(code)
+    print_log(&*format!("parsing {}", file));
+    let res = parse::parse(handle_error(read_file_base(file)));
+    print_log(&*format!("  total {} commands", res.len()));
+    res
 }
 
 fn read_file_base(file: &str) -> Result<String, std::io::Error> {
@@ -74,7 +69,7 @@ pub fn print_error(err: impl Error) -> ! {
 }
 
 pub fn print_log(msg: &str) {
-    println!("[{}] {}", "log".blue(), msg);
+    println!("{} {}", "====> ".blue(), msg);
 }
 
 pub fn print_warn(msg: &str) {
