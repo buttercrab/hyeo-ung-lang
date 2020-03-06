@@ -1,10 +1,13 @@
+use std::{fmt, process};
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::fmt;
+use std::error::Error;
 
 use colored::Colorize;
 
 use crate::{number, parse};
+use crate::io::print_error;
+use crate::number::Num;
 
 /// Area Part of each code
 /// Since the area has binary operator,
@@ -427,7 +430,10 @@ impl State for UnOptState {
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
         self.stack.entry(idx).or_insert(Vec::new());
-        self.stack.get_mut(&idx).unwrap()
+        match self.stack.get_mut(&idx) {
+            Some(value) => value,
+            None => process::exit(1),
+        }
     }
 
     fn get_code(&self, loc: usize) -> &Self::CodeType {

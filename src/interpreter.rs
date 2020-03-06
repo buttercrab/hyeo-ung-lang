@@ -1,12 +1,12 @@
 use std::io::{stdout, Write};
 use std::process;
+use std::string::FromUtf8Error;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use colored::Colorize;
 
 use crate::{code, execute, io, parse};
-use crate::io::print_error;
 
 #[cfg_attr(tarpaulin, skip)]
 struct CustomWriter {
@@ -34,7 +34,10 @@ impl CustomWriter {
     }
 
     fn to_string(&self) -> String {
-        String::from_utf8(self.buffer.clone()).unwrap()
+        match String::from_utf8(self.buffer.clone()) {
+            Ok(value) => value,
+            Err(e) => io::print_error(e),
+        }
     }
 }
 
@@ -50,7 +53,7 @@ pub fn run() -> ! {
             print!("\ntype \"흑.하앙...\" or \"exit\" to exit\n");
             print!("{} ", ">".bright_blue());
             if let Result::Err(e) = stdout().flush() {
-                print_error(e);
+                io::print_error(e);
             }
             r.store(true, Ordering::SeqCst);
         }
@@ -62,7 +65,7 @@ pub fn run() -> ! {
     loop {
         print!("{} ", ">".bright_blue());
         if let Result::Err(e) = stdout().flush() {
-            print_error(e);
+            io::print_error(e);
         }
         running.store(true, Ordering::SeqCst);
         let input = io::read_line();
