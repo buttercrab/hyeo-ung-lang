@@ -1,42 +1,11 @@
 use std::io::{stdout, Write};
 use std::process;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use colored::Colorize;
 
 use crate::{code, execute, io, parse};
-
-#[cfg_attr(tarpaulin, skip)]
-struct CustomWriter {
-    buffer: Vec<u8>,
-}
-
-#[cfg_attr(tarpaulin, skip)]
-impl Write for CustomWriter {
-    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.buffer.append(&mut buf.to_vec());
-        Result::Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> std::io::Result<()> {
-        Result::Ok(())
-    }
-}
-
-#[cfg_attr(tarpaulin, skip)]
-impl CustomWriter {
-    fn new() -> CustomWriter {
-        CustomWriter { buffer: Vec::new() }
-    }
-
-    fn to_string(&self) -> String {
-        match String::from_utf8(self.buffer.clone()) {
-            Ok(value) => value,
-            Err(e) => io::print_error(e),
-        }
-    }
-}
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn run() -> ! {
@@ -73,8 +42,8 @@ pub fn run() -> ! {
             process::exit(0);
         }
 
-        let mut out = CustomWriter::new();
-        let mut err = CustomWriter::new();
+        let mut out = io::CustomWriter::new();
+        let mut err = io::CustomWriter::new();
 
         match input.trim() {
             "" => {

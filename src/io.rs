@@ -8,6 +8,37 @@ use colored::Colorize;
 use crate::{code, parse};
 
 #[cfg_attr(tarpaulin, skip)]
+pub struct CustomWriter {
+    buffer: Vec<u8>,
+}
+
+#[cfg_attr(tarpaulin, skip)]
+impl Write for CustomWriter {
+    fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
+        self.buffer.append(&mut buf.to_vec());
+        Result::Ok(buf.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Result::Ok(())
+    }
+}
+
+#[cfg_attr(tarpaulin, skip)]
+impl CustomWriter {
+    pub fn new() -> CustomWriter {
+        CustomWriter { buffer: Vec::new() }
+    }
+
+    pub fn to_string(&self) -> String {
+        match String::from_utf8(self.buffer.clone()) {
+            Ok(value) => value,
+            Err(e) => print_error(e),
+        }
+    }
+}
+
+#[cfg_attr(tarpaulin, skip)]
 pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     let code = match read_file_base(file) {
         Ok(t) => t,
