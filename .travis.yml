@@ -8,8 +8,6 @@ matrix:
     - os: linux
       rust:
         nightly
-  allow_failures:
-    - rust: nightly
 
 script:
   - export CARGO_INCREMENTAL=0
