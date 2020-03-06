@@ -70,6 +70,7 @@ pub fn execute<T: code::State, O: Write, E: Write>(
             io::write(out, &*format!("{}", num.floor().to_int() as u8 as char));
         }
         io::handle_error(out.flush());
+        state.get_stack(1).clear();
     }
 
     if !state.get_stack(2).is_empty() {
@@ -77,6 +78,7 @@ pub fn execute<T: code::State, O: Write, E: Write>(
             io::write(err, &*format!("{}", num.floor().to_int() as u8 as char));
         }
         io::handle_error(err.flush());
+        state.get_stack(1).clear();
     }
 
     while cur_loc < length {
