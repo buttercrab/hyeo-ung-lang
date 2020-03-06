@@ -1,7 +1,9 @@
 use crate::code;
 
 pub(crate) const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
-const HEARTS: &'static [char] = &['♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡'];
+const HEARTS: &'static [char] = &[
+    '♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡',
+];
 
 /// Check if the character is hangul
 ///
@@ -143,140 +145,144 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
         }
 
         state = match state {
-            0 | 2 => if let Some(mut t) = "형항핫흣흡흑혀하흐".find(c) {
-                t /= 3;
+            0 | 2 => {
+                if let Some(mut t) = "형항핫흣흡흑혀하흐".find(c) {
+                    t /= 3;
 
-                if t >= 6 && max_pos[t - 6] <= i {
-                    continue;
-                }
+                    if t >= 6 && max_pos[t - 6] <= i {
+                        continue;
+                    }
 
-                if type_ != 10 {
-                    res.push(code::UnOptCode::new(
-                        type_,
-                        hangul_count,
-                        dot_count,
-                        loc,
-                        match qu_leaf {
-                            code::Area::Val {
-                                type_: _,
-                                left: _,
-                                ref mut right,
-                            } => {
-                                *right = Box::new(area);
-                                qu_area
-                            }
-                            code::Area::Nil => {
-                                area
-                            }
-                        },
-                    ));
+                    if type_ != 10 {
+                        res.push(code::UnOptCode::new(
+                            type_,
+                            hangul_count,
+                            dot_count,
+                            loc,
+                            match qu_leaf {
+                                code::Area::Val {
+                                    type_: _,
+                                    left: _,
+                                    ref mut right,
+                                } => {
+                                    *right = Box::new(area);
+                                    qu_area
+                                }
+                                code::Area::Nil => area,
+                            },
+                        ));
+
+                        area = code::Area::Nil;
+                        leaf = &mut area;
+                        qu_area = code::Area::Nil;
+                        qu_leaf = &mut qu_area;
+                    }
+
+                    type_ = t as u8;
+                    hangul_count = 1;
+                    dot_count = 0;
+                    loc = (line_count, i - last_line_started);
+
+                    if t < 6 {
+                        0
+                    } else {
+                        1
+                    }
+                } else if ".…⋯⋮".contains(c) {
+                    if state == 0 {
+                        dot_count += if c == '.' { 1 } else { 3 };
+                    }
+                    state
+                } else if c == '?' {
+                    match qu_leaf {
+                        code::Area::Val {
+                            type_: _,
+                            left: _,
+                            ref mut right,
+                        } => {
+                            *right = Box::new(code::Area::Val {
+                                type_: 0,
+                                left: Box::new(area),
+                                right: Box::new(code::Area::Nil),
+                            });
+                            qu_leaf = &mut *right;
+                        }
+
+                        code::Area::Nil => {
+                            qu_area = code::Area::Val {
+                                type_: 0,
+                                left: Box::new(area),
+                                right: Box::new(code::Area::Nil),
+                            };
+                            qu_leaf = &mut qu_area;
+                        }
+                    }
 
                     area = code::Area::Nil;
                     leaf = &mut area;
-                    qu_area = code::Area::Nil;
-                    qu_leaf = &mut qu_area;
-                }
-
-                type_ = t as u8;
-                hangul_count = 1;
-                dot_count = 0;
-                loc = (line_count, i - last_line_started);
-
-                if t < 6 {
-                    0
-                } else {
-                    1
-                }
-            } else if ".…⋯⋮".contains(c) {
-                if state == 0 {
-                    dot_count += if c == '.' { 1 } else { 3 };
-                }
-                state
-            } else if c == '?' {
-                match qu_leaf {
-                    code::Area::Val {
-                        type_: _,
-                        left: _,
-                        ref mut right,
-                    } => {
-                        *right = Box::new(code::Area::Val {
-                            type_: 0,
-                            left: Box::new(area),
-                            right: Box::new(code::Area::Nil),
-                        });
-                        qu_leaf = &mut *right;
-                    }
-
-                    code::Area::Nil => {
-                        qu_area = code::Area::Val {
-                            type_: 0,
-                            left: Box::new(area),
-                            right: Box::new(code::Area::Nil),
-                        };
-                        qu_leaf = &mut qu_area;
-                    }
-                }
-
-                area = code::Area::Nil;
-                leaf = &mut area;
-                2
-            } else if c == '!' {
-                match leaf {
-                    code::Area::Val {
-                        ref type_,
-                        left: _,
-                        ref mut right,
-                    } => if *type_ <= 1 {
-                        *right = match right.as_ref() {
-                            code::Area::Val {
-                                type_: t,
-                                left: _,
-                                right: _,
-                            } => Box::new(code::Area::Val {
-                                type_: 1,
-                                left: Box::new(code::Area::new(*t)),
-                                right: Box::new(code::Area::Nil),
-                            }),
-                            code::Area::Nil => Box::new(code::Area::new(1)),
-                        };
-                        leaf = &mut *right;
-                    } else {
-                        area = code::Area::Val {
-                            type_: 1,
-                            left: Box::new(code::Area::new(*type_)),
-                            right: Box::new(code::Area::Nil),
-                        };
-                        leaf = &mut area;
-                    },
-                    code::Area::Nil => {
-                        area = code::Area::new(1);
-                        leaf = &mut area;
-                    }
-                }
-                2
-            } else if let Some(mut t) = HEARTS.iter().position(|&x| x == c) {
-                t += 2;
-                match leaf {
-                    code::Area::Val {
-                        ref type_,
-                        left: _,
-                        ref mut right,
-                    } => if *type_ <= 1 {
-                        match right.as_ref() {
-                            code::Area::Nil => {
-                                *right = Box::new(code::Area::new(t as u8));
+                    2
+                } else if c == '!' {
+                    match leaf {
+                        code::Area::Val {
+                            ref type_,
+                            left: _,
+                            ref mut right,
+                        } => {
+                            if *type_ <= 1 {
+                                *right = match right.as_ref() {
+                                    code::Area::Val {
+                                        type_: t,
+                                        left: _,
+                                        right: _,
+                                    } => Box::new(code::Area::Val {
+                                        type_: 1,
+                                        left: Box::new(code::Area::new(*t)),
+                                        right: Box::new(code::Area::Nil),
+                                    }),
+                                    code::Area::Nil => Box::new(code::Area::new(1)),
+                                };
+                                leaf = &mut *right;
+                            } else {
+                                area = code::Area::Val {
+                                    type_: 1,
+                                    left: Box::new(code::Area::new(*type_)),
+                                    right: Box::new(code::Area::Nil),
+                                };
+                                leaf = &mut area;
                             }
-                            _ => {}
                         }
-                    },
-                    code::Area::Nil => {
-                        area = code::Area::new(t as u8);
-                        leaf = &mut area;
+                        code::Area::Nil => {
+                            area = code::Area::new(1);
+                            leaf = &mut area;
+                        }
                     }
+                    2
+                } else if let Some(mut t) = HEARTS.iter().position(|&x| x == c) {
+                    t += 2;
+                    match leaf {
+                        code::Area::Val {
+                            ref type_,
+                            left: _,
+                            ref mut right,
+                        } => {
+                            if *type_ <= 1 {
+                                match right.as_ref() {
+                                    code::Area::Nil => {
+                                        *right = Box::new(code::Area::new(t as u8));
+                                    }
+                                    _ => {}
+                                }
+                            }
+                        }
+                        code::Area::Nil => {
+                            area = code::Area::new(t as u8);
+                            leaf = &mut area;
+                        }
+                    }
+                    2
+                } else {
+                    continue;
                 }
-                2
-            } else {
-                continue;
             }
 
             // 1
@@ -285,29 +291,35 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     hangul_count += 1;
                 }
                 match type_ {
-                    6 => if "엉".contains(c) {
-                        type_ = 0;
-                        dot_count = 0;
-                        0
-                    } else {
-                        1
+                    6 => {
+                        if "엉".contains(c) {
+                            type_ = 0;
+                            dot_count = 0;
+                            0
+                        } else {
+                            1
+                        }
                     }
 
-                    7 => if let Some(t) = "앙앗".find(c) {
-                        type_ = (t / 3 + 1) as u8;
-                        dot_count = 0;
-                        0
-                    } else {
-                        1
+                    7 => {
+                        if let Some(t) = "앙앗".find(c) {
+                            type_ = (t / 3 + 1) as u8;
+                            dot_count = 0;
+                            0
+                        } else {
+                            1
+                        }
                     }
 
                     // 8
-                    _ => if let Some(t) = "읏읍윽".find(c) {
-                        type_ = (t / 3 + 3) as u8;
-                        dot_count = 0;
-                        0
-                    } else {
-                        1
+                    _ => {
+                        if let Some(t) = "읏읍윽".find(c) {
+                            type_ = (t / 3 + 3) as u8;
+                            dot_count = 0;
+                            0
+                        } else {
+                            1
+                        }
                     }
                 }
             }
@@ -329,9 +341,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     *right = Box::new(area);
                     qu_area
                 }
-                code::Area::Nil => {
-                    area
-                }
+                code::Area::Nil => area,
             },
         ));
     }

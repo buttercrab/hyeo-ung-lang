@@ -38,7 +38,11 @@ const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 fn parse_version(version: &str) -> Result {
     let f = || {
         let v = version.split(".").collect::<Vec<&str>>();
-        result::Result::Ok((v[0].parse::<u16>()?, v[1].parse::<u16>()?, v[2].parse::<u16>()?))
+        result::Result::Ok((
+            v[0].parse::<u16>()?,
+            v[1].parse::<u16>()?,
+            v[2].parse::<u16>()?,
+        ))
     };
     f().map_err(|_: num::ParseIntError| Error::ParseError)
 }
@@ -53,9 +57,11 @@ pub async fn get_latest_version() -> Result {
             reqwest::get("https://api.github.com/repos/buttercrab/hyeo-ung-lang/releases/latest")
                 .await?
                 .json::<HashMap<String, String>>()
-                .await?
+                .await?,
         )
-    }.await.map_err(|_| Error::BadRequest)?;
+    }
+    .await
+    .map_err(|_| Error::BadRequest)?;
 
     match res.get(&*String::from("tag_name")) {
         Some(ref version) => parse_version(&version.as_str()[1..]),

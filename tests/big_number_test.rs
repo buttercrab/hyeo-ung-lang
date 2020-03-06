@@ -28,7 +28,10 @@ mod big_number_test {
         let b = BigNum::from_string("987654321987654321".to_string()).unwrap();
         let c = &a + &b;
 
-        assert_eq!(BigNum::from_string("1111111111111111110".to_string()).unwrap(), c);
+        assert_eq!(
+            BigNum::from_string("1111111111111111110".to_string()).unwrap(),
+            c
+        );
     }
 
     #[test]
@@ -91,7 +94,10 @@ mod big_number_test {
         let b = BigNum::from_string("987654321987654321".to_string()).unwrap();
         let c = &b - &a;
 
-        assert_eq!(BigNum::from_string("864197532864197532".to_string()).unwrap(), c);
+        assert_eq!(
+            BigNum::from_string("864197532864197532".to_string()).unwrap(),
+            c
+        );
     }
 
     #[test]
@@ -141,11 +147,19 @@ mod big_number_test {
 
     #[test]
     fn mul_test03() {
-        let a = BigNum::from_string("238147328478237427348273487283478237482374".to_string()).unwrap();
+        let a =
+            BigNum::from_string("238147328478237427348273487283478237482374".to_string()).unwrap();
         let b = BigNum::from_string("238478237492847735678364128937128937943".to_string()).unwrap();
         let c = &a * &b;
 
-        assert_eq!(BigNum::from_string("56792955159120326139782764143873306061725717545674087612268430742682680802316682".to_string()).unwrap(), c);
+        assert_eq!(
+            BigNum::from_string(
+                "56792955159120326139782764143873306061725717545674087612268430742682680802316682"
+                    .to_string()
+            )
+            .unwrap(),
+            c
+        );
     }
 
     #[test]

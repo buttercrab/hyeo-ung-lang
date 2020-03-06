@@ -146,7 +146,7 @@ async fn main() {
             Some(value) => match value.parse::<usize>() {
                 Ok(value) => value,
                 Err(e) => io::print_error(e),
-            }
+            },
             None => 0,
         };
         debug::run(code, from);
@@ -176,16 +176,17 @@ async fn main() {
         }
     } else if let Some(ref matches) = matches.subcommand_matches("update") {
         let cur_version = update::get_current_version();
-        let version = match update::get_update_version(
-            if let Some(t) = matches.value_of("version") {
+        let version =
+            match update::get_update_version(if let Some(t) = matches.value_of("version") {
                 t
             } else {
                 "latest"
-            }
-        ).await {
-            Ok(version) => version,
-            Err(e) => io::print_error(e),
-        };
+            })
+            .await
+            {
+                Ok(version) => version,
+                Err(e) => io::print_error(e),
+            };
 
         if cur_version != version {
             // update

@@ -1,5 +1,5 @@
-use std::{error, fmt, ops};
 use std::cmp::{max, min, Ordering};
+use std::{error, fmt, ops};
 
 /// Error class for `BigNum`
 /// Used in `BigNum::from_string()`, `BigNum::from_string_base()`, `BigNum::to_string_base()`.
@@ -125,10 +125,7 @@ impl BigNum {
     /// assert!(a.is_pos());
     /// ```
     pub fn from_vec(v: Vec<u32>) -> BigNum {
-        let mut res = BigNum {
-            pos: true,
-            val: v,
-        };
+        let mut res = BigNum { pos: true, val: v };
         res.shrink_to_fit();
         res
     }
@@ -427,11 +424,7 @@ impl BigNum {
             v[i] = t as u32;
         }
 
-        let t = if lhs.len() < rhs.len() {
-            rhs
-        } else {
-            lhs
-        };
+        let t = if lhs.len() < rhs.len() { rhs } else { lhs };
 
         for i in min(lhs.len(), rhs.len())..t.len() {
             let mut s = (t[i] as u64) + (v[i] as u64);

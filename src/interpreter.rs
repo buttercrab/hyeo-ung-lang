@@ -1,7 +1,7 @@
 use std::io::{stdout, Write};
 use std::process;
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
 use colored::Colorize;
 
@@ -27,9 +27,7 @@ impl Write for CustomWriter {
 #[cfg_attr(tarpaulin, skip)]
 impl CustomWriter {
     fn new() -> CustomWriter {
-        CustomWriter {
-            buffer: Vec::new(),
-        }
+        CustomWriter { buffer: Vec::new() }
     }
 
     fn to_string(&self) -> String {
@@ -56,7 +54,8 @@ pub fn run() -> ! {
             }
             r.store(true, Ordering::SeqCst);
         }
-    }).expect("Error setting Ctrl-C handler");
+    })
+    .expect("Error setting Ctrl-C handler");
 
     println!("Hyeo-ung programming language");
     println!("type help for help!");

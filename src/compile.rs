@@ -7,13 +7,13 @@ use crate::io::print_error;
 use std::collections::HashMap;
 
 pub enum Error {
-    LevelError(usize)
+    LevelError(usize),
 }
 
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level)
+            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level),
         }
     }
 }
@@ -21,7 +21,7 @@ impl fmt::Debug for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level)
+            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level),
         }
     }
 }
@@ -30,7 +30,7 @@ impl error::Error for Error {}
 
 pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Vec<code::OptCode>) {
     let mut size = 0usize;
-    let mut opt_code : Vec<code::OptCode> = Vec::new();
+    let mut opt_code: Vec<code::OptCode> = Vec::new();
 
     if level >= 3 {
         print_error(Error::LevelError(level))
@@ -38,9 +38,9 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
 
     if level >= 1 {
         // optimization level 1
-        let mut area_map : HashMap<usize,usize> = HashMap::new();
-        let mut dot_map : HashMap<usize,usize> = HashMap::new();
-        let mut max : usize = 1; 
+        let mut area_map: HashMap<usize, usize> = HashMap::new();
+        let mut dot_map: HashMap<usize, usize> = HashMap::new();
+        let mut max: usize = 1;
 
         for un_opt_code in &code {
             let mut cnt = area_map.entry(un_opt_code.get_area_count()).or_insert(0);
@@ -77,24 +77,23 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
                 if un_opt_code.get_dot_count() > 3 {
                     opt_dot_count = *dot_map.get(&(un_opt_code.get_dot_count())).unwrap();
                 }
-            } 
-            
+            }
+
             opt_code.push(code::OptCode::new(
                 opt_type_,
                 opt_hangul_count,
                 opt_dot_count,
                 opt_area_count,
-                opt_area
+                opt_area,
             ));
         }
 
-        size = max ;
+        size = max;
     }
 
     let mut state = code::OptState::new(size);
     if level >= 2 {
         // optimization level 2
-        
     }
 
     (state, opt_code)
