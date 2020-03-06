@@ -430,10 +430,7 @@ impl State for UnOptState {
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
         self.stack.entry(idx).or_insert(Vec::new());
-        match self.stack.get_mut(&idx) {
-            Some(value) => value,
-            None => process::exit(1),
-        }
+        self.stack.get_mut(&idx).unwrap()
     }
 
     fn get_code(&self, loc: usize) -> &Self::CodeType {
