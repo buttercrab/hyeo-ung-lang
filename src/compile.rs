@@ -96,13 +96,11 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             .as_bytes()
             .iter()
             .map(|&x| Num::from_num(x as isize))
-            .rev()
             .collect::<Vec<Num>>();
         let mut err_vec = err_str
             .as_bytes()
             .iter()
             .map(|&x| Num::from_num(x as isize))
-            .rev()
             .collect::<Vec<Num>>();
 
         state.get_stack(1).append(&mut out_vec);
