@@ -30,9 +30,11 @@ fn push_stack_wrap<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E,
 fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
     match idx {
         0 => {
-            let s = io::read_line();
-            for c in s.chars().rev() {
-                state.push_stack(0, Num::from_num(c as isize));
+            if state.get_stack(0).is_empty() {
+                let s = io::read_line();
+                for c in s.chars().rev() {
+                    state.push_stack(0, Num::from_num(c as isize));
+                }
             }
             state.pop_stack(0)
         }
