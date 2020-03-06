@@ -4,6 +4,7 @@ use clap::*;
 
 use hyeong::{code, compile, debug, execute, interpreter, io, update};
 
+#[tokio::main]
 async fn main() {
     let matches = App::new("hyeong")
         .version("0.1.0")
