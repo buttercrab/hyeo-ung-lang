@@ -15,6 +15,14 @@ impl fmt::Debug for Error {
     }
 }
 
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level)
+        }
+    }
+}
+
 impl error::Error for Error {}
 
 pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Vec<code::OptCode>) {
