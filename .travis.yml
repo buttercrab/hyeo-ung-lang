@@ -6,7 +6,12 @@ before_install:
 matrix:
   include:
     - os: linux
-      rust: nightly
+      rust:
+        - stable
+        - beta
+        - nightly
+  allow_failures:
+    - rust: nightly
 
 script:
   - export CARGO_INCREMENTAL=0
