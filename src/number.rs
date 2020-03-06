@@ -1,6 +1,6 @@
-use std::{fmt, ops};
 use std::cmp::Ordering;
 use std::mem::swap;
+use std::{fmt, ops};
 
 use crate::big_number::BigNum;
 

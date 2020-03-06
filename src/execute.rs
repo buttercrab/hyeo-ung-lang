@@ -1,11 +1,17 @@
 use std::io::Write;
 use std::process;
 
-use crate::{code, io};
 use crate::code::Code;
 use crate::number::Num;
+use crate::{code, io};
 
-fn push_stack_wrap<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, state: &mut T, idx: usize, num: Num) {
+fn push_stack_wrap<T: code::State, O: Write, E: Write>(
+    out: &mut O,
+    err: &mut E,
+    state: &mut T,
+    idx: usize,
+    num: Num,
+) {
     match idx {
         1 => {
             if num.is_pos() {
@@ -46,13 +52,16 @@ fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
         2 => {
             process::exit(1);
         }
-        _ => {
-            state.pop_stack(idx)
-        }
+        _ => state.pop_stack(idx),
     }
 }
 
-pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut state: T, code: &T::CodeType) -> T {
+pub fn execute<T: code::State, O: Write, E: Write>(
+    out: &mut O,
+    err: &mut E,
+    mut state: T,
+    code: &T::CodeType,
+) -> T {
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
 
@@ -63,7 +72,10 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
         match code.get_type() {
             0 => {
                 push_stack_wrap(
-                    out, err, &mut state, cur_stack,
+                    out,
+                    err,
+                    &mut state,
+                    cur_stack,
                     &Num::from_num(code.get_hangul_count() as isize)
                         * &Num::from_num(code.get_dot_count() as isize),
                 );
@@ -126,7 +138,9 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
         }
 
         cur_stack = state.current_stack();
-        let area_type = code::calc(code.get_area(), code.get_area_count(), || pop_stack_wrap(&mut state, cur_stack));
+        let area_type = code::calc(code.get_area(), code.get_area_count(), || {
+            pop_stack_wrap(&mut state, cur_stack)
+        });
 
         if area_type != 0 {
             if area_type != 13 {
@@ -137,7 +151,7 @@ pub fn execute<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E, mut
                             cur_loc = value;
                             continue;
                         }
-                    },
+                    }
                     None => state.set_point(id, cur_loc),
                 }
             } else {

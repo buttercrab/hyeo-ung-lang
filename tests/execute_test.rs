@@ -2,8 +2,8 @@
 mod execute_test {
     use std::io::{Result, Write};
 
-    use hyeong::{execute, parse};
     use hyeong::code::UnOptState;
+    use hyeong::{execute, parse};
 
     struct CustomWriter {
         buffer: Vec<u8>,
@@ -22,9 +22,7 @@ mod execute_test {
 
     impl CustomWriter {
         fn new() -> CustomWriter {
-            CustomWriter {
-                buffer: Vec::new(),
-            }
+            CustomWriter { buffer: Vec::new() }
         }
     }
 
@@ -63,6 +61,10 @@ mod execute_test {
 
     #[test]
     fn execute_test05() {
-        assert!(helper_function("형 흣........💕 흣.... 형. 하앙... 흣. 흑... 흐읏....!💕", "12345678", ""));
+        assert!(helper_function(
+            "형 흣........💕 흣.... 형. 하앙... 흣. 흑... 흐읏....!💕",
+            "12345678",
+            ""
+        ));
     }
 }

@@ -4,8 +4,8 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::{number, parse};
 use crate::number::Num;
+use crate::{number, parse};
 
 /// Area Part of each code
 /// Since the area has binary operator,
@@ -77,9 +77,7 @@ pub fn calc<T: FnMut() -> Num>(area: &Area, area_value: usize, mut pop: T) -> u8
 
     loop {
         match area {
-            Area::Val {
-                type_, left, right
-            } => {
+            Area::Val { type_, left, right } => {
                 if *type_ == 0 {
                     let v = pop();
                     area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
@@ -108,7 +106,7 @@ fn area_to_string_debug(s: &mut String, area: &Area) {
         Area::Val {
             ref type_,
             ref left,
-            ref right
+            ref right,
         } => {
             let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
             s.push(c);
@@ -136,7 +134,7 @@ fn area_to_string_display(s: &mut String, area: &Area) {
         Area::Val {
             ref type_,
             ref left,
-            ref right
+            ref right,
         } => {
             let c = "?!♥❤💕💖💗💘💙💚💛💜💝♡".chars().collect::<Vec<char>>()[*type_ as usize];
             if *type_ <= 1 {
@@ -188,7 +186,13 @@ pub struct OptCode {
 }
 
 impl OptCode {
-    pub fn new(type_: u8, hangul_count: usize, dot_count: usize, area_count: usize, area: Area) -> OptCode {
+    pub fn new(
+        type_: u8,
+        hangul_count: usize,
+        dot_count: usize,
+        area_count: usize,
+        area: Area,
+    ) -> OptCode {
         OptCode {
             type_,
             hangul_count,
@@ -200,15 +204,25 @@ impl OptCode {
 }
 
 impl Code for OptCode {
-    fn get_type(&self) -> u8 { self.type_ }
+    fn get_type(&self) -> u8 {
+        self.type_
+    }
 
-    fn get_hangul_count(&self) -> usize { self.hangul_count }
+    fn get_hangul_count(&self) -> usize {
+        self.hangul_count
+    }
 
-    fn get_dot_count(&self) -> usize { self.dot_count }
+    fn get_dot_count(&self) -> usize {
+        self.dot_count
+    }
 
-    fn get_area(&self) -> &Area { &self.area }
+    fn get_area(&self) -> &Area {
+        &self.area
+    }
 
-    fn get_area_count(&self) -> usize { self.area_count }
+    fn get_area_count(&self) -> usize {
+        self.area_count
+    }
 
     fn clone(&self) -> OptCode {
         OptCode {
@@ -236,7 +250,13 @@ pub struct UnOptCode {
 }
 
 impl UnOptCode {
-    pub fn new(type_: u8, hangul_count: usize, dot_count: usize, loc: (usize, usize), area: Area) -> UnOptCode {
+    pub fn new(
+        type_: u8,
+        hangul_count: usize,
+        dot_count: usize,
+        loc: (usize, usize),
+        area: Area,
+    ) -> UnOptCode {
         UnOptCode {
             type_,
             hangul_count,
@@ -247,32 +267,53 @@ impl UnOptCode {
     }
 
     pub fn to_string(&self) -> String {
-        format!("{} {}_{}_{} : {}",
-                (&*format!("{}:{}", self.loc.0, self.loc.1)).yellow()
-                , parse::COMMANDS[self.type_ as usize], self.hangul_count, self.dot_count, self.area)
+        format!(
+            "{} {}_{}_{} : {}",
+            (&*format!("{}:{}", self.loc.0, self.loc.1)).yellow(),
+            parse::COMMANDS[self.type_ as usize],
+            self.hangul_count,
+            self.dot_count,
+            self.area
+        )
     }
 
-    pub fn get_location(&self) -> (usize, usize) { self.loc }
+    pub fn get_location(&self) -> (usize, usize) {
+        self.loc
+    }
 }
 
 impl fmt::Debug for UnOptCode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut area = String::new();
         area_to_string_debug(&mut area, &self.area);
-        write!(f, "type: {}, cnt1: {}, cnt2: {}, area: {:?}", self.type_, self.hangul_count, self.dot_count, area)
+        write!(
+            f,
+            "type: {}, cnt1: {}, cnt2: {}, area: {:?}",
+            self.type_, self.hangul_count, self.dot_count, area
+        )
     }
 }
 
 impl Code for UnOptCode {
-    fn get_type(&self) -> u8 { self.type_ }
+    fn get_type(&self) -> u8 {
+        self.type_
+    }
 
-    fn get_hangul_count(&self) -> usize { self.hangul_count }
+    fn get_hangul_count(&self) -> usize {
+        self.hangul_count
+    }
 
-    fn get_dot_count(&self) -> usize { self.dot_count }
+    fn get_dot_count(&self) -> usize {
+        self.dot_count
+    }
 
-    fn get_area(&self) -> &Area { &self.area }
+    fn get_area(&self) -> &Area {
+        &self.area
+    }
 
-    fn get_area_count(&self) -> usize { self.hangul_count * self.dot_count }
+    fn get_area_count(&self) -> usize {
+        self.hangul_count * self.dot_count
+    }
 
     fn clone(&self) -> UnOptCode {
         UnOptCode {
