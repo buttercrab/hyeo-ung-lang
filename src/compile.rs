@@ -1,10 +1,10 @@
-use crate::big_number::BigNum;
-use crate::code::Code;
+use std::{error, fmt};
+use std::collections::HashMap;
+
+use crate::{code, execute, io};
+use crate::code::{Code, State};
 use crate::io::print_error;
 use crate::number::Num;
-use crate::{code, execute, io};
-use std::collections::HashMap;
-use std::{error, fmt};
 
 pub enum Error {
     LevelError(usize),
@@ -37,8 +37,6 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     }
 
     if level >= 1 {
-        // optimization level 1
-        let mut area_map: HashMap<usize, usize> = HashMap::new();
         let mut dot_map: HashMap<usize, usize> = HashMap::new();
         let mut max: usize = 4;
 
@@ -85,7 +83,6 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     let mut state = code::OptState::new(size);
 
     if level >= 2 {
-        // optimization level 2
         let mut out = io::CustomWriter::new();
         let mut err = io::CustomWriter::new();
 
@@ -95,16 +92,21 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
 
         let out_str: String = out.to_string();
         let err_str: String = err.to_string();
-        let out_vec = out_str
+        let mut out_vec = out_str
             .as_bytes()
             .iter()
             .map(|&x| Num::from_num(x as isize))
+            .rev()
             .collect::<Vec<Num>>();
-        let err_vec = err_str
+        let mut err_vec = err_str
             .as_bytes()
             .iter()
             .map(|&x| Num::from_num(x as isize))
+            .rev()
             .collect::<Vec<Num>>();
+
+        state.get_stack(1).append(&mut out_vec);
+        state.get_stack(2).append(&mut err_vec);
     }
 
     (state, opt_code_vec)

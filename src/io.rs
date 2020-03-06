@@ -61,6 +61,13 @@ pub fn read_line() -> String {
     }
 }
 
+pub fn handle_error<T>(res: Result<T, impl Error>) -> T {
+    match res {
+        Ok(value) => value,
+        Err(e) => print_error(e),
+    }
+}
+
 pub fn print_error(err: impl Error) -> ! {
     println!("[{}] {:?}", "error".red(), err);
     process::exit(1);

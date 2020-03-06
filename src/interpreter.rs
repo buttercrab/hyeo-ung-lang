@@ -17,9 +17,7 @@ pub fn run() -> ! {
             r.store(false, Ordering::SeqCst);
             print!("\ntype \"흑.하앙...\" or \"exit\" to exit\n");
             print!("{} ", ">".bright_blue());
-            if let Result::Err(e) = stdout().flush() {
-                io::print_error(e);
-            }
+            io::handle_error(stdout().flush());
             r.store(true, Ordering::SeqCst);
         }
     })
@@ -30,9 +28,7 @@ pub fn run() -> ! {
 
     loop {
         print!("{} ", ">".bright_blue());
-        if let Result::Err(e) = stdout().flush() {
-            io::print_error(e);
-        }
+        io::handle_error(stdout().flush());
         running.store(true, Ordering::SeqCst);
         let input = io::read_line();
         running.store(false, Ordering::SeqCst);

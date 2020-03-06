@@ -120,10 +120,7 @@ async fn main() {
             Some(level) => level,
             None => "2",
         };
-        let level = match level_str.parse::<usize>() {
-            Ok(level) => level,
-            Err(e) => io::print_error(e),
-        };
+        let level = io::handle_error(level_str.parse::<usize>());
 
         let source = if level >= 1 {
             let (state, opt_code) = compile::optimize(un_opt_code, level);
@@ -141,10 +138,7 @@ async fn main() {
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
         let code = io::read_file(matches.value_of("input").unwrap());
         let from = match matches.value_of("from") {
-            Some(value) => match value.parse::<usize>() {
-                Ok(value) => value,
-                Err(e) => io::print_error(e),
-            },
+            Some(value) => io::handle_error(value.parse::<usize>()),
             None => 0,
         };
         debug::run(code, from);
@@ -154,10 +148,7 @@ async fn main() {
             Some(level) => level,
             None => "2",
         };
-        let level = match level_str.parse::<usize>() {
-            Ok(level) => level,
-            Err(e) => io::print_error(e),
-        };
+        let level = io::handle_error(level_str.parse::<usize>());
         let mut stdout = stdout();
         let mut stderr = stderr();
 
@@ -174,17 +165,14 @@ async fn main() {
         }
     } else if let Some(ref matches) = matches.subcommand_matches("update") {
         let cur_version = update::get_current_version();
-        let version =
-            match update::get_update_version(if let Some(t) = matches.value_of("version") {
+        let version = io::handle_error(
+            update::get_update_version(if let Some(t) = matches.value_of("version") {
                 t
             } else {
                 "latest"
             })
-            .await
-            {
-                Ok(version) => version,
-                Err(e) => io::print_error(e),
-            };
+                .await,
+        );
 
         if cur_version != version {
             // update

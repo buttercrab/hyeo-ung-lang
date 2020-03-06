@@ -1,9 +1,9 @@
 use std::io::Write;
 use std::process;
 
+use crate::{code, io};
 use crate::code::Code;
 use crate::number::Num;
-use crate::{code, io};
 
 fn push_stack_wrap<T: code::State, O: Write, E: Write>(
     out: &mut O,
@@ -19,7 +19,7 @@ fn push_stack_wrap<T: code::State, O: Write, E: Write>(
             } else {
                 io::write(out, &*format!("{}", -&num));
             }
-            out.flush();
+            io::handle_error(out.flush());
         }
         2 => {
             if num.is_pos() {
@@ -27,7 +27,7 @@ fn push_stack_wrap<T: code::State, O: Write, E: Write>(
             } else {
                 io::write(err, &*format!("{}", -&num));
             }
-            err.flush();
+            io::handle_error(err.flush());
         }
         _ => {
             state.push_stack(idx, num);

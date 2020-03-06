@@ -4,8 +4,8 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::number::Num;
 use crate::{number, parse};
+use crate::number::Num;
 
 /// Area Part of each code
 /// Since the area has binary operator,
@@ -467,8 +467,7 @@ impl State for UnOptState {
     }
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<number::Num> {
-        self.stack.entry(idx).or_insert(Vec::new());
-        self.stack.get_mut(&idx).unwrap()
+        self.stack.entry(idx).or_insert(Vec::new())
     }
 
     fn get_code(&self, loc: usize) -> &Self::CodeType {
