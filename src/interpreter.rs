@@ -1,13 +1,12 @@
 use std::io::{stdout, Write};
 use std::process;
-use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use colored::Colorize;
 
 use crate::{code, execute, io, parse};
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn run() -> ! {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();

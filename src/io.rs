@@ -7,12 +7,10 @@ use colored::Colorize;
 
 use crate::{code, parse};
 
-#[cfg_attr(tarpaulin, skip)]
 pub struct CustomWriter {
     buffer: Vec<u8>,
 }
 
-#[cfg_attr(tarpaulin, skip)]
 impl Write for CustomWriter {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         self.buffer.append(&mut buf.to_vec());
@@ -24,7 +22,6 @@ impl Write for CustomWriter {
     }
 }
 
-#[cfg_attr(tarpaulin, skip)]
 impl CustomWriter {
     pub fn new() -> CustomWriter {
         CustomWriter { buffer: Vec::new() }
@@ -38,7 +35,6 @@ impl CustomWriter {
     }
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     let code = match read_file_base(file) {
         Ok(t) => t,
@@ -48,7 +44,6 @@ pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     parse::parse(code)
 }
 
-#[cfg_attr(tarpaulin, skip)]
 fn read_file_base(file: &str) -> Result<String, std::io::Error> {
     let mut res = String::new();
     let mut f = File::open(file)?;
@@ -58,7 +53,6 @@ fn read_file_base(file: &str) -> Result<String, std::io::Error> {
     Ok(res)
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn read_line() -> String {
     let mut res = String::new();
     match std::io::stdin().read_line(&mut res) {
@@ -67,28 +61,23 @@ pub fn read_line() -> String {
     }
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn print_error(err: impl Error) -> ! {
     println!("[{}] {:?}", "error".red(), err);
     process::exit(1);
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn print_log(msg: &str) {
     println!("[{}] {}", "log".blue(), msg);
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn print_warn(msg: &str) {
     println!("[{}] {}", "warn".yellow(), msg);
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn print_note(msg: &str) {
     println!("[{}] {}", "note".bright_cyan(), msg);
 }
 
-#[cfg_attr(tarpaulin, skip)]
 pub fn write<W: Write>(w: &mut W, content: &str) {
     if let Err(e) = w.write_all(content.as_bytes()) {
         print_error(e);
