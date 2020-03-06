@@ -1,10 +1,10 @@
-use std::{error, fmt};
 use std::collections::HashMap;
+use std::{error, fmt};
 
-use crate::{code, execute, io};
 use crate::code::{Code, State};
 use crate::io::print_error;
 use crate::number::Num;
+use crate::{code, execute, io};
 
 pub enum Error {
     LevelError(usize),

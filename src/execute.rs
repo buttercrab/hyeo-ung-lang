@@ -1,9 +1,9 @@
 use std::io::Write;
 use std::process;
 
-use crate::{code, io};
 use crate::code::Code;
 use crate::number::Num;
+use crate::{code, io};
 
 fn push_stack_wrap<T: code::State, O: Write, E: Write>(
     out: &mut O,
@@ -62,8 +62,6 @@ pub fn execute<T: code::State, O: Write, E: Write>(
     mut state: T,
     code: &T::CodeType,
 ) -> T {
-    io::print_log("running code");
-
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
 

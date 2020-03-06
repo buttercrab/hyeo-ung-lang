@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod execute_test {
-    use hyeong::{execute, io, parse};
     use hyeong::code::UnOptState;
+    use hyeong::{execute, io, parse};
 
     fn helper_function(code: &str, stdout: &str, stderr: &str) -> bool {
         let parsed = parse::parse(code.to_string());

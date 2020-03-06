@@ -158,11 +158,13 @@ async fn main() {
 
         if level >= 1 {
             let (mut state, opt_code) = compile::optimize(un_opt_code, level);
+            io::print_log("running code");
             for code in opt_code {
                 state = execute::execute(&mut stdout, &mut stderr, state, &code);
             }
         } else {
             let mut state = code::UnOptState::new();
+            io::print_log("running code");
             for code in un_opt_code {
                 state = execute::execute(&mut stdout, &mut stderr, state, &code);
             }
@@ -175,7 +177,7 @@ async fn main() {
             } else {
                 "latest"
             })
-                .await,
+            .await,
         );
 
         if cur_version != version {

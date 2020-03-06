@@ -4,8 +4,8 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::{number, parse};
 use crate::number::Num;
+use crate::{number, parse};
 
 /// Area Part of each code
 /// Since the area has binary operator,
