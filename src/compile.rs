@@ -87,6 +87,8 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
                 opt_area
             ));
         }
+
+        size = max ;
     }
 
     let mut state = code::OptState::new(size);
