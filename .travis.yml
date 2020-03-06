@@ -1,31 +1,19 @@
 language: rust
-sudo: required
-dist: trusty
-addons:
-  apt:
-    packages:
-      - libssl-dev
-cache: cargo
-rust:
-  - stable
-  - beta
-  - nightly
-matrix:
-  allow_failures:
-    - rust: nightly
 
-before_cache: |
-  if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then
-    cargo install cargo-tarpaulin
-  fi
+before_install:
+  - curl -L https://github.com/mozilla/grcov/releases/latest/download/grcov-linux-x86_64.tar.bz2 | tar jxf -
+
+matrix:
+  include:
+    - os: linux
+      rust: nightly
 
 script:
-  - cargo clean
-  - cargo build
-  - cargo test
-
-after_success: |
-  if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then
-    cargo tarpaulin --out Xml --run-types Tests --run-types Doctests --release --all-features --force-clean
-    bash <(curl -s https://codecov.io/bash)
-  fi
+  - export CARGO_INCREMENTAL=0
+  - export RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Cinline-threshold=0 -Clink-dead-code -Coverflow-checks=off -Zno-landing-pads"
+  - cargo build --verbose $CARGO_OPTIONS
+  - cargo test --verbose $CARGO_OPTIONS
+  - |
+    zip -0 ccov.zip `find . \( -name "YOUR_PROJECT_NAME*.gc*" \) -print`;
+    ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
+    bash <(curl -s https://codecov.io/bash) -f lcov.info;
