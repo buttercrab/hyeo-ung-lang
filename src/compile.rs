@@ -1,9 +1,10 @@
-use std::{error, fmt};
-use std::collections::HashMap;
-
-use crate::code;
+use crate::big_number::BigNum;
 use crate::code::Code;
 use crate::io::print_error;
+use crate::number::Num;
+use crate::{code, execute, io};
+use std::collections::HashMap;
+use std::{error, fmt};
 
 pub enum Error {
     LevelError(usize),
@@ -29,7 +30,7 @@ impl error::Error for Error {}
 
 pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Vec<code::OptCode>) {
     let mut size = 0usize;
-    let mut opt_code: Vec<code::OptCode> = Vec::new();
+    let mut opt_code_vec: Vec<code::OptCode> = Vec::new();
 
     if level >= 3 {
         print_error(Error::LevelError(level))
@@ -39,17 +40,8 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         // optimization level 1
         let mut area_map: HashMap<usize, usize> = HashMap::new();
         let mut dot_map: HashMap<usize, usize> = HashMap::new();
-        let mut max: usize = 1;
+        let mut max: usize = 4;
 
-        for un_opt_code in &code {
-            let cnt = area_map.entry(un_opt_code.get_area_count()).or_insert(0);
-            if *cnt == 0 {
-                *cnt = max;
-                max += 1;
-            }
-        }
-
-        max = 4;
         for un_opt_code in &code {
             if un_opt_code.get_type() == 0 {
                 continue;
@@ -69,7 +61,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             let opt_type_ = un_opt_code.get_type();
             let opt_hangul_count = un_opt_code.get_hangul_count();
             let mut opt_dot_count = un_opt_code.get_dot_count();
-            let opt_area_count = *area_map.get(&(un_opt_code.get_area_count())).unwrap();
+            let opt_area_count = un_opt_code.get_area_count();
             let opt_area = un_opt_code.get_area().clone();
 
             if opt_type_ != 0 {
@@ -78,7 +70,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
                 }
             }
 
-            opt_code.push(code::OptCode::new(
+            opt_code_vec.push(code::OptCode::new(
                 opt_type_,
                 opt_hangul_count,
                 opt_dot_count,
@@ -91,11 +83,31 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     }
 
     let mut state = code::OptState::new(size);
+
     if level >= 2 {
         // optimization level 2
+        let mut out = io::CustomWriter::new();
+        let mut err = io::CustomWriter::new();
+
+        for opt_code in &opt_code_vec {
+            state = execute::execute(&mut out, &mut err, state, &opt_code);
+        }
+
+        let out_str: String = out.to_string();
+        let err_str: String = err.to_string();
+        let out_vec = out_str
+            .as_bytes()
+            .iter()
+            .map(|&x| Num::from_num(x as isize))
+            .collect::<Vec<Num>>();
+        let err_vec = err_str
+            .as_bytes()
+            .iter()
+            .map(|&x| Num::from_num(x as isize))
+            .collect::<Vec<Num>>();
     }
 
-    (state, opt_code)
+    (state, opt_code_vec)
 }
 
 pub fn build_source<T: code::State>(state: T, code: &Vec<T::CodeType>) -> String {
