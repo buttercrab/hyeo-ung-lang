@@ -1,7 +1,7 @@
-use std::{io, process};
 use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Write};
+use std::process;
 
 use colored::Colorize;
 
@@ -18,7 +18,7 @@ pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
 }
 
 #[cfg_attr(tarpaulin, skip)]
-fn read_file_base(file: &str) -> Result<String, io::Error> {
+fn read_file_base(file: &str) -> Result<String, std::io::Error> {
     let mut res = String::new();
     let mut f = File::open(file)?;
 
@@ -30,7 +30,7 @@ fn read_file_base(file: &str) -> Result<String, io::Error> {
 #[cfg_attr(tarpaulin, skip)]
 pub fn read_line() -> String {
     let mut res = String::new();
-    match io::stdin().read_line(&mut res) {
+    match std::io::stdin().read_line(&mut res) {
         Ok(_) => res,
         Err(e) => print_error(e),
     }

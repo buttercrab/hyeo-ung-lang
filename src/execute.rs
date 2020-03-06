@@ -13,6 +13,7 @@ fn push_stack_wrap<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E,
             } else {
                 io::write(out, &*format!("{}", -&num));
             }
+            out.flush();
         }
         2 => {
             if num.is_pos() {
@@ -20,6 +21,7 @@ fn push_stack_wrap<T: code::State, O: Write, E: Write>(out: &mut O, err: &mut E,
             } else {
                 io::write(err, &*format!("{}", -&num));
             }
+            err.flush();
         }
         _ => {
             state.push_stack(idx, num);
