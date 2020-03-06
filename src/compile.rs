@@ -42,8 +42,8 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         let mut dot_map : HashMap<usize,usize> = HashMap::new();
         let mut max : usize = 1; 
 
-        for unopt_code in &code {
-            let mut cnt = area_map.entry(unopt_code.get_area_count()).or_insert(0);
+        for un_opt_code in &code {
+            let mut cnt = area_map.entry(un_opt_code.get_area_count()).or_insert(0);
             if *cnt == 0 {
                 *cnt = max;
                 max += 1;
@@ -51,31 +51,31 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         }
 
         max = 4;
-        for unopt_code in &code {
-            if unopt_code.get_type() == 0 {
+        for un_opt_code in &code {
+            if un_opt_code.get_type() == 0 {
                 continue;
             }
-            if unopt_code.get_dot_count() <= 3 {
+            if un_opt_code.get_dot_count() <= 3 {
                 continue;
             }
 
-            let cnt = dot_map.entry(unopt_code.get_dot_count()).or_insert(0);
+            let cnt = dot_map.entry(un_opt_code.get_dot_count()).or_insert(0);
             if *cnt == 0 {
                 *cnt = max;
                 max += 1;
             }
         }
 
-        for unopt_code in &code {
-            let opt_type_ = unopt_code.get_type();
-            let opt_hangul_count = unopt_code.get_hangul_count();
-            let mut opt_dot_count = unopt_code.get_dot_count();
-            let opt_area_count = *area_map.get(&(unopt_code.get_area_count())).unwrap();
-            let opt_area = unopt_code.get_area().clone();
+        for un_opt_code in &code {
+            let opt_type_ = un_opt_code.get_type();
+            let opt_hangul_count = un_opt_code.get_hangul_count();
+            let mut opt_dot_count = un_opt_code.get_dot_count();
+            let opt_area_count = *area_map.get(&(un_opt_code.get_area_count())).unwrap();
+            let opt_area = un_opt_code.get_area().clone();
 
             if opt_type_ != 0 {
-                if unopt_code.get_dot_count() > 3 {
-                    opt_dot_count = *dot_map.get(&(unopt_code.get_dot_count())).unwrap();
+                if un_opt_code.get_dot_count() > 3 {
+                    opt_dot_count = *dot_map.get(&(un_opt_code.get_dot_count())).unwrap();
                 }
             } 
             
