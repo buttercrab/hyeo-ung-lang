@@ -20,7 +20,7 @@
 - [x] Big Number
 - [x] Interpreter
   + `$ hyeong`
-- [ ] Code runner
+- [x] Code runner
   + `$ hyeong run FILE`
 - [x] Compiler
   + `$ hyeong build FILE --flags...`
