@@ -26,7 +26,7 @@ async fn main() {
                         .takes_value(true)
                         .short('O')
                         .long("optimize")
-                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
+                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize")
                         .default_value("2")
                 )
                 .arg(
@@ -43,7 +43,8 @@ async fn main() {
                         .takes_value(true)
                         .short('W')
                         .long("warn")
-                        .help("warning level (0/none: no warning, 1/all: all warning [default]")
+                        .help("warning level (0/none: no warning, 1/all: all warning")
+                        .default_value("all")
                 )
         )
         .subcommand(
@@ -73,7 +74,7 @@ async fn main() {
                         .takes_value(true)
                         .short('f')
                         .long("from")
-                        .help("place to start debugging from (0 by default)")
+                        .help("place to start debugging from")
                         .default_value("0")
                 )
         )
@@ -93,7 +94,7 @@ async fn main() {
                         .takes_value(true)
                         .short('O')
                         .long("optimize")
-                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
+                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)")
                         .default_value("2")
                 )
                 .arg(
@@ -103,6 +104,7 @@ async fn main() {
                         .short('W')
                         .long("warn")
                         .help("warning level (0/none: no warning, 1/all: all warning [default]")
+                        .default_value("all")
                 )
         )
         .subcommand(
