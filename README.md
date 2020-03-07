@@ -65,6 +65,7 @@
   + interactive code runner
 - Optimizer:
   + level 1 optimize
+  + level 2 optimize (experimental)
   
 ---
 
