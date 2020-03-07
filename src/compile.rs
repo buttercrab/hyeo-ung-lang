@@ -93,7 +93,7 @@ fn opt_execute<T: code::State>(
                 if cur_stack <= 2 {
                     return false;
                 }
-                let n = state.pop_stack(cur_stack);
+                let n = pop_stack_wrap(state, cur_stack);
                 for _ in 0..code.get_hangul_count() {
                     push_stack_wrap(out, err, state, code.get_dot_count(), n.clone());
                 }

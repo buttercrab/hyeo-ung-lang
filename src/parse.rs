@@ -121,6 +121,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
 
     let mut line_count = 0;
     let mut last_line_started = 0;
+    let mut raw_command = String::new();
 
     let mut max_pos = [0usize, 0usize, 0usize];
     for (i, c) in code.chars().enumerate() {
@@ -170,6 +171,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                                 }
                                 code::Area::Nil => area,
                             },
+                            raw_command,
                         ));
 
                         area = code::Area::Nil;
@@ -182,6 +184,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     hangul_count = 1;
                     dot_count = 0;
                     loc = (line_count + 1, i - last_line_started);
+                    raw_command = c.to_string();
 
                     if t < 6 {
                         0
@@ -191,6 +194,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                 } else if ".…⋯⋮".contains(c) {
                     if state == 0 {
                         dot_count += if c == '.' { 1 } else { 3 };
+                        raw_command.push(c);
                     }
                     state
                 } else if c == '?' {
@@ -220,6 +224,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
 
                     area = code::Area::Nil;
                     leaf = &mut area;
+                    raw_command.push(c);
                     2
                 } else if c == '!' {
                     match leaf {
@@ -256,6 +261,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                             leaf = &mut area;
                         }
                     }
+                    raw_command.push(c);
                     2
                 } else if let Some(mut t) = HEARTS.iter().position(|&x| x == c) {
                     t += 2;
@@ -279,6 +285,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                             leaf = &mut area;
                         }
                     }
+                    raw_command.push(c);
                     2
                 } else {
                     continue;
@@ -289,6 +296,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
             _ => {
                 if is_hangul_syllable(c) {
                     hangul_count += 1;
+                    raw_command.push(c);
                 }
                 match type_ {
                     6 => {
@@ -343,6 +351,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                 }
                 code::Area::Nil => area,
             },
+            raw_command,
         ));
     }
     res

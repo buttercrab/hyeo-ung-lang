@@ -58,7 +58,10 @@ fn check_file(file: &str) -> bool {
 pub fn read_line() -> String {
     let mut res = String::new();
     match std::io::stdin().read_line(&mut res) {
-        Ok(_) => res,
+        Ok(_) => {
+            res.pop();
+            res
+        },
         Err(e) => print_error(e),
     }
 }

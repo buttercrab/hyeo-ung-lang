@@ -259,6 +259,7 @@ pub struct UnOptCode {
     dot_count: usize,
     loc: (usize, usize),
     area: Area,
+    code: String,
 }
 
 impl UnOptCode {
@@ -268,6 +269,7 @@ impl UnOptCode {
         dot_count: usize,
         loc: (usize, usize),
         area: Area,
+        code: String,
     ) -> UnOptCode {
         UnOptCode {
             type_,
@@ -275,6 +277,7 @@ impl UnOptCode {
             dot_count,
             loc,
             area,
+            code,
         }
     }
 
@@ -291,6 +294,10 @@ impl UnOptCode {
 
     pub fn get_location(&self) -> (usize, usize) {
         self.loc
+    }
+
+    pub fn get_raw(&self) -> String {
+        self.code.clone()
     }
 }
 
@@ -334,6 +341,7 @@ impl Code for UnOptCode {
             dot_count: self.dot_count,
             loc: self.loc.clone(),
             area: self.area.clone(),
+            code: self.code.clone(),
         }
     }
 }
@@ -502,5 +510,15 @@ impl State for UnOptState {
 
     fn get_latest_loc(&self) -> Option<usize> {
         self.latest
+    }
+}
+
+impl fmt::Debug for UnOptState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mut s = format!("current stack: {}\n", self.cur);
+        for (k, v) in &self.stack {
+            s.push_str(&*format!("stack {}: {:?}\n", k, v));
+        }
+        write!(f, "{}", s)
     }
 }

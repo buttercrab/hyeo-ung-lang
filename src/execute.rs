@@ -128,7 +128,7 @@ pub fn execute<T: code::State>(
             }
             // 5
             _ => {
-                let n = state.pop_stack(cur_stack);
+                let n = pop_stack_wrap(&mut state, cur_stack);
                 for _ in 0..code.get_hangul_count() {
                     push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone());
                 }
