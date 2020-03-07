@@ -23,8 +23,8 @@ pub fn run() -> ! {
     })
     .expect("Error setting Ctrl-C handler");
 
-    println!("Hyeo-ung programming language");
-    println!("type help for help!");
+    println!("Hyeo-ung Programming Language");
+    println!("type help for help");
 
     loop {
         print!("{} ", ">".bright_blue());
@@ -45,10 +45,15 @@ pub fn run() -> ! {
                 continue;
             }
 
+            "clear" => {
+                state = code::UnOptState::new();
+            }
+
             "help" => {
-                println!("help  Print this");
-                println!("exit  Exit this interpreter");
-                println!("      You can also exit by typing \"흑.하앙...\"");
+                println!("clear  Clears the state");
+                println!("exit   Exit this interpreter");
+                println!("       You can also exit by typing \"흑.하앙...\"");
+                println!("help   Print this");
                 continue;
             }
 
