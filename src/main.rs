@@ -103,7 +103,7 @@ async fn main() {
                         .takes_value(true)
                         .short('W')
                         .long("warn")
-                        .help("warning level (0/none: no warning, 1/all: all warning [default]")
+                        .help("warning level (0/none: no warning, 1/all: all warning")
                         .default_value("all")
                 )
         )
