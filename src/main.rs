@@ -18,7 +18,7 @@ async fn main() {
                         .value_name("input_file")
                         .takes_value(true)
                         .required(true)
-                        .help("input file to compile")
+                        .help("input file to compile"),
                 )
                 .arg(
                     Arg::with_name("optimize")
@@ -27,7 +27,7 @@ async fn main() {
                         .short('O')
                         .long("optimize")
                         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize")
-                        .default_value("2")
+                        .default_value("2"),
                 )
                 .arg(
                     Arg::with_name("output")
@@ -35,7 +35,7 @@ async fn main() {
                         .takes_value(true)
                         .short('o')
                         .long("output")
-                        .help("binary output file (filename by default)")
+                        .help("binary output file (filename by default)"),
                 )
                 .arg(
                     Arg::with_name("warning")
@@ -44,8 +44,8 @@ async fn main() {
                         .short('W')
                         .long("warn")
                         .help("warning level (0/none: no warning, 1/all: all warning")
-                        .default_value("all")
-                )
+                        .default_value("all"),
+                ),
         )
         .subcommand(
             App::new("check")
@@ -55,8 +55,8 @@ async fn main() {
                         .value_name("input_file")
                         .takes_value(true)
                         .required(true)
-                        .help("input file to check")
-                )
+                        .help("input file to check"),
+                ),
         )
         .subcommand(
             App::new("debug")
@@ -66,7 +66,7 @@ async fn main() {
                         .value_name("input_file")
                         .takes_value(true)
                         .required(true)
-                        .help("input file to debug")
+                        .help("input file to debug"),
                 )
                 .arg(
                     Arg::with_name("from")
@@ -75,8 +75,8 @@ async fn main() {
                         .short('f')
                         .long("from")
                         .help("place to start debugging from")
-                        .default_value("0")
-                )
+                        .default_value("0"),
+                ),
         )
         .subcommand(
             App::new("run")
@@ -86,7 +86,7 @@ async fn main() {
                         .value_name("input_file")
                         .takes_value(true)
                         .required(true)
-                        .help("input file to run")
+                        .help("input file to run"),
                 )
                 .arg(
                     Arg::with_name("optimize")
@@ -94,8 +94,10 @@ async fn main() {
                         .takes_value(true)
                         .short('O')
                         .long("optimize")
-                        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)")
-                        .default_value("2")
+                        .help(
+                            "optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)",
+                        )
+                        .default_value("2"),
                 )
                 .arg(
                     Arg::with_name("warning")
@@ -104,18 +106,16 @@ async fn main() {
                         .short('W')
                         .long("warn")
                         .help("warning level (0/none: no warning, 1/all: all warning")
-                        .default_value("all")
-                )
+                        .default_value("all"),
+                ),
         )
         .subcommand(
-            App::new("update")
-                .about("Update this tool")
-                .arg(
-                    Arg::with_name("version")
-                        .value_name("version")
-                        .takes_value(true)
-                        .help("update to specific version (latest by default)")
-                )
+            App::new("update").about("Update this tool").arg(
+                Arg::with_name("version")
+                    .value_name("version")
+                    .takes_value(true)
+                    .help("update to specific version (latest by default)"),
+            ),
         )
         .get_matches();
 
