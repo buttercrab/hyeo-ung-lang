@@ -111,7 +111,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
     let mut hangul_count = 0usize;
     let mut dot_count = 0usize;
     let mut type_ = 10u8;
-    let mut loc = (0usize, 0usize);
+    let mut loc = (1usize, 0usize);
 
     let mut state = 0u8;
     let mut area = code::Area::Nil;
@@ -181,7 +181,7 @@ pub fn parse(code: String) -> Vec<code::UnOptCode> {
                     type_ = t as u8;
                     hangul_count = 1;
                     dot_count = 0;
-                    loc = (line_count, i - last_line_started);
+                    loc = (line_count + 1, i - last_line_started);
 
                     if t < 6 {
                         0
