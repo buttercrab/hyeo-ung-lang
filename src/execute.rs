@@ -130,9 +130,9 @@ pub fn execute<T: code::State>(
             _ => {
                 let n = state.pop_stack(cur_stack);
                 for _ in 0..code.get_hangul_count() {
-                    state.push_stack(code.get_dot_count(), n.clone());
+                    push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone());
                 }
-                state.push_stack(cur_stack, n);
+                push_stack_wrap(out, err, &mut state, cur_stack, n);
                 state.set_current_stack(code.get_dot_count());
             }
         }
