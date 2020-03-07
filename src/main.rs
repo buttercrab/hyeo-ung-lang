@@ -27,7 +27,7 @@ async fn main() {
                         .short('O')
                         .long("optimize")
                         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize")
-                        .default_value("2"),
+                        .default_value("1"),
                 )
                 .arg(
                     Arg::with_name("output")
@@ -97,7 +97,7 @@ async fn main() {
                         .help(
                             "optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)",
                         )
-                        .default_value("2"),
+                        .default_value("1"),
                 )
                 .arg(
                     Arg::with_name("warning")
