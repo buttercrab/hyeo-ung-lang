@@ -61,13 +61,31 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     let mut state = code::OptState::new(size);
 
     if level >= 2 {
+        let mut opt_state = code::OptState::new(size);
+        let mut temp_vec: Vec<code::OptCode> = Vec::new();
         let mut out = io::CustomWriter::new();
         let mut err = io::CustomWriter::new();
-
+        let mut t_out = io::CustomWriter::new();
+        let mut t_err = io::CustomWriter::new();
+        let mut chk = true;
+        
         for opt_code in &opt_code_vec {
-            state = execute::execute(&mut out, &mut err, state, &opt_code);
-        }
+            if !chk {
+                temp_vec.push(opt_code.clone());
+                continue;
+            } 
 
+            let tup = execute::opt_execute(&mut t_out, &mut t_err, opt_state, &opt_code);
+            opt_state = tup.0;
+
+            if tup.1 {
+                state = execute::execute(&mut out, &mut err, state, &opt_code);
+            } else {
+                chk = false;
+                temp_vec.push(opt_code.clone());
+            }
+        }
+        opt_code_vec = temp_vec;
         let out_str: String = out.to_string();
         let err_str: String = err.to_string();
         let mut out_vec = out_str
