@@ -38,7 +38,7 @@ pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
     }
     print_log(&*format!("parsing {}", file));
     let res = parse::parse(handle_error(read_file_base(file)));
-    print_log(&*format!("  total {} commands", res.len()));
+    print_log(&*format!("└> total {} commands", res.len()));
     res
 }
 
