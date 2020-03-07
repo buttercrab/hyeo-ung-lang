@@ -1,7 +1,8 @@
-use std::io::{stderr, stdout};
+use std::io::{stderr, stdout, Write};
 
 use clap::*;
 
+use hyeong::code::State;
 use hyeong::{code, compile, debug, execute, interpreter, io, update};
 
 #[tokio::main]
@@ -26,6 +27,7 @@ async fn main() {
                         .short('O')
                         .long("optimize")
                         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
+                        .default_value("2")
                 )
                 .arg(
                     Arg::with_name("output")
@@ -72,6 +74,7 @@ async fn main() {
                         .short('f')
                         .long("from")
                         .help("place to start debugging from (0 by default)")
+                        .default_value("0")
                 )
         )
         .subcommand(
@@ -91,6 +94,7 @@ async fn main() {
                         .short('O')
                         .long("optimize")
                         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize [default])")
+                        .default_value("2")
                 )
                 .arg(
                     Arg::with_name("warning")
@@ -117,17 +121,16 @@ async fn main() {
         // build
         let file = matches.value_of("input").unwrap();
         let un_opt_code = io::read_file(file);
-        let level_str = match matches.value_of("optimize") {
-            Some(level) => level,
-            None => "2",
-        };
+        let level_str = matches.value_of("optimize").unwrap();
         let level = io::handle_error(level_str.parse::<usize>());
 
         let source = if level >= 1 {
             let (state, opt_code) = compile::optimize(un_opt_code, level);
+            io::print_log("compiling to rust");
             compile::build_source(state, &opt_code)
         } else {
             let state = code::UnOptState::new();
+            io::print_log("compiling to rust");
             compile::build_source(state, &un_opt_code)
         };
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
@@ -139,18 +142,12 @@ async fn main() {
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
         let file = matches.value_of("input").unwrap();
         let code = io::read_file(file);
-        let from = match matches.value_of("from") {
-            Some(value) => io::handle_error(value.parse::<usize>()),
-            None => 0,
-        };
+        let from = io::handle_error(matches.value_of("from").unwrap().parse::<usize>());
         debug::run(code, from);
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
         let file = matches.value_of("input").unwrap();
         let un_opt_code = io::read_file(file);
-        let level_str = match matches.value_of("optimize") {
-            Some(level) => level,
-            None => "2",
-        };
+        let level_str = matches.value_of("optimize").unwrap();
 
         let level = io::handle_error(level_str.parse::<usize>());
         let mut stdout = stdout();
@@ -159,6 +156,28 @@ async fn main() {
         if level >= 1 {
             let (mut state, opt_code) = compile::optimize(un_opt_code, level);
             io::print_log("running code");
+
+            if !state.get_stack(1).is_empty() {
+                for num in state.get_stack(1).iter() {
+                    io::write(
+                        &mut stdout,
+                        &*format!("{}", num.floor().to_int() as u8 as char),
+                    );
+                }
+                io::handle_error(stdout.flush());
+                state.get_stack(1).clear();
+            }
+
+            if !state.get_stack(2).is_empty() {
+                for num in state.get_stack(2).iter() {
+                    io::write(
+                        &mut stderr,
+                        &*format!("{}", num.floor().to_int() as u8 as char),
+                    );
+                }
+                io::handle_error(stderr.flush());
+                state.get_stack(1).clear();
+            }
             for code in opt_code {
                 state = execute::execute(&mut stdout, &mut stderr, state, &code);
             }

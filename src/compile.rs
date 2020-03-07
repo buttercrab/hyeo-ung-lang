@@ -1,39 +1,15 @@
 use std::collections::HashMap;
-use std::{error, fmt};
 
 use crate::code::{Code, State};
-use crate::io::print_error;
 use crate::number::Num;
 use crate::{code, execute, io};
-
-pub enum Error {
-    LevelError(usize),
-}
-
-impl fmt::Debug for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level),
-        }
-    }
-}
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::LevelError(level) => write!(f, "optimize level {} is not supported", level),
-        }
-    }
-}
-
-impl error::Error for Error {}
 
 pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Vec<code::OptCode>) {
     let mut size = 0usize;
     let mut opt_code_vec: Vec<code::OptCode> = Vec::new();
 
     if level >= 3 {
-        print_error(Error::LevelError(level))
+        io::print_error_string(&*format!("optimize level {} is not supported", level));
     }
 
     io::print_log(&*format!("optimizing to level {}", level));

@@ -65,22 +65,6 @@ pub fn execute<T: code::State, O: Write, E: Write>(
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
 
-    if !state.get_stack(1).is_empty() {
-        for num in state.get_stack(1).iter() {
-            io::write(out, &*format!("{}", num.floor().to_int() as u8 as char));
-        }
-        io::handle_error(out.flush());
-        state.get_stack(1).clear();
-    }
-
-    if !state.get_stack(2).is_empty() {
-        for num in state.get_stack(2).iter() {
-            io::write(err, &*format!("{}", num.floor().to_int() as u8 as char));
-        }
-        io::handle_error(err.flush());
-        state.get_stack(1).clear();
-    }
-
     while cur_loc < length {
         let code = (*state.get_code(cur_loc)).clone();
         let mut cur_stack = state.current_stack();

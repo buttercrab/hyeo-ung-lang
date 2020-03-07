@@ -33,6 +33,9 @@ impl CustomWriter {
 }
 
 pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
+    if !check_file(file) {
+        print_error_string("only file with .hyeong supported");
+    }
     print_log(&*format!("parsing {}", file));
     let res = parse::parse(handle_error(read_file_base(file)));
     print_log(&*format!("  total {} commands", res.len()));
@@ -46,6 +49,10 @@ fn read_file_base(file: &str) -> Result<String, std::io::Error> {
     f.read_to_string(&mut res)?;
 
     Ok(res)
+}
+
+fn check_file(file: &str) -> bool {
+    file.rsplit(".").next() == Some("hyeong")
 }
 
 pub fn read_line() -> String {
@@ -65,6 +72,11 @@ pub fn handle_error<T>(res: Result<T, impl Error>) -> T {
 
 pub fn print_error(err: impl Error) -> ! {
     println!("[{}] {:?}", "error".red(), err);
+    process::exit(1);
+}
+
+pub fn print_error_string(err: &str) -> ! {
+    println!("[{}] {}", "error".red(), err);
     process::exit(1);
 }
 
