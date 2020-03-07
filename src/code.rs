@@ -72,7 +72,7 @@ impl Area {
     }
 }
 
-pub fn calc<T: FnMut() -> Num>(area: &Area, area_value: usize, mut pop: T) -> u8 {
+pub fn calc<T: FnMut() -> Option<Num>>(area: &Area, area_value: usize, mut pop: T) -> Option<u8> {
     let mut area = area;
 
     loop {
@@ -80,22 +80,32 @@ pub fn calc<T: FnMut() -> Num>(area: &Area, area_value: usize, mut pop: T) -> u8
             Area::Val { type_, left, right } => {
                 if *type_ == 0 {
                     let v = pop();
-                    area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
+                    area = match match v {
+                        Some(value) => value,
+                        None => return Option::None,
+                    }
+                    .partial_cmp(&number::Num::from_num(area_value as isize))
+                    {
                         Some(Ordering::Less) => left,
                         _ => right,
                     }
                 } else if *type_ == 1 {
                     let v = pop();
-                    area = match v.partial_cmp(&number::Num::from_num(area_value as isize)) {
+                    area = match match v {
+                        Some(value) => value,
+                        None => return Option::None,
+                    }
+                    .partial_cmp(&number::Num::from_num(area_value as isize))
+                    {
                         Some(Ordering::Equal) => left,
                         _ => right,
                     }
                 } else {
-                    break *type_;
+                    break Option::Some(*type_);
                 }
             }
             Area::Nil => {
-                break 0;
+                break Option::Some(0);
             }
         }
     }
@@ -177,6 +187,7 @@ pub trait Code {
     fn clone(&self) -> Self;
 }
 
+#[derive(Clone)]
 pub struct OptCode {
     type_: u8,
     hangul_count: usize,
@@ -235,6 +246,7 @@ impl Code for OptCode {
     }
 }
 
+#[derive(Clone)]
 pub struct UnOptCode {
     // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
     // 1: 항, 하앙, 하아앙, 하아아앙 ...

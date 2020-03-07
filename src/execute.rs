@@ -139,8 +139,9 @@ pub fn execute<T: code::State>(
 
         cur_stack = state.current_stack();
         let area_type = code::calc(code.get_area(), code.get_area_count(), || {
-            pop_stack_wrap(&mut state, cur_stack)
-        });
+            Option::Some(pop_stack_wrap(&mut state, cur_stack))
+        })
+        .unwrap();
 
         if area_type != 0 {
             if area_type != 13 {
