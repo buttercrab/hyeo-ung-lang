@@ -516,8 +516,10 @@ impl State for UnOptState {
 impl fmt::Debug for UnOptState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = format!("current stack: {}\n", self.cur);
-        for (k, v) in &self.stack {
-            s.push_str(&*format!("stack {}: {:?}\n", k, v));
+        let mut v = self.stack.iter().collect::<Vec<_>>();
+        v.sort_by(|x, y| x.0.cmp(&y.0));
+        for (a, b) in v {
+            s.push_str(&*format!("stack {}: {:?}\n", a, b));
         }
         write!(f, "{}", s)
     }

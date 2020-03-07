@@ -582,7 +582,9 @@ impl BigNum {
     /// assert_eq!("4321", b.to_string());
     /// ```
     pub fn minus(&mut self) {
-        self.pos = !self.pos;
+        if !self.is_zero() {
+            self.pos = !self.pos;
+        }
     }
 
     /// Adds two number and make new `BigNum` as result
@@ -818,7 +820,11 @@ impl BigNum {
     /// ```
     pub fn neg(v: &BigNum) -> BigNum {
         BigNum {
-            pos: !v.pos,
+            pos: if !v.is_zero() {
+                !v.pos
+            } else {
+                v.pos
+            },
             val: v.val.clone(),
         }
     }

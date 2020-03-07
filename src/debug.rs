@@ -3,7 +3,7 @@ use colored::Colorize;
 use std::io::{stdout, Write};
 use crate::{io, code, execute};
 use std::sync::Arc;
-use crate::code::UnOptCode;
+use crate::code::{UnOptCode, State};
 use std::process;
 
 pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
@@ -24,7 +24,13 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
     io::print_log("running in debug mode");
 
-    for c in code {
+    for c in &code {
+        state.push_code(c.clone());
+    }
+
+    let mut cur_loc = 0usize;
+    while cur_loc < code.len() {
+        let c = &code[cur_loc];
         loop {
             print!("{} ", ">".bright_red());
             io::handle_error(stdout().flush());
@@ -43,7 +49,9 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                     let mut out = io::CustomWriter::new();
                     let mut err = io::CustomWriter::new();
 
-                    state = execute::execute(&mut out, &mut err, state, &c);
+                    let (new_state, new_loc) = execute::execute_one(&mut out, &mut err, state, cur_loc);
+                    state = new_state;
+                    cur_loc = new_loc;
 
                     let out_str = out.to_string();
                     let err_str = err.to_string();
