@@ -24,8 +24,8 @@
   + `$ hyeong run FILE`
 - [ ] Compiler
   + `$ hyeong build FILE --flags...`
-- [ ] Optimization
-- [ ] Debugger
+- [x] Optimization
+- [x] Debugger
   + `$ hyeong debug FILE --flag...`
 - [ ] String to Hyeo-ung Code Generator
   + `$ hyeong string "Hello, World!"`
@@ -66,6 +66,8 @@
 - Optimizer:
   + level 1 optimize
   + level 2 optimize (experimental)
+- Debugger:
+  + line by line (with going back feature)
   
 ---
 
