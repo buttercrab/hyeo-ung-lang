@@ -21,7 +21,6 @@ where
     let mut exec_count = 0;
 
     while cur_loc < length {
-        exec_count += 1;
         if exec_count >= 100 {
             return (state_clone, false);
         }
@@ -131,6 +130,7 @@ where
                     Some(value) => {
                         if cur_loc != value {
                             cur_loc = value;
+                            exec_count += 1;
                             continue;
                         }
                     }
@@ -139,6 +139,7 @@ where
             } else {
                 if let Some(loc) = state.get_latest_loc() {
                     cur_loc = loc;
+                    exec_count += 1;
                     continue;
                 }
             }
