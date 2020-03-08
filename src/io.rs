@@ -80,6 +80,14 @@ pub fn print_error_string(err: &str) -> ! {
     process::exit(1);
 }
 
+pub fn print_error_no_exit(err: impl Error) {
+    println!("[{}] {:?}", "error".red(), err);
+}
+
+pub fn print_error_str_no_exit(err: &str) {
+    println!("[{}] {}", "error".red(), err);
+}
+
 pub fn print_log(msg: &str) {
     println!("{} {}", "====> ".blue(), msg);
 }

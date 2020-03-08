@@ -5,7 +5,6 @@ use crate::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::number::Num;
 use crate::{code, io};
 use std::io::Write;
-use std::process::exit;
 
 fn opt_execute<T: code::State + Clone>(
     out: &mut impl Write,
@@ -19,6 +18,7 @@ fn opt_execute<T: code::State + Clone>(
     let mut exec_count = 0;
 
     while cur_loc < length {
+        exec_count += 1;
         if exec_count >= 100 {
             return (state_clone, false);
         }

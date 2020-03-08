@@ -81,7 +81,13 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 match parsed[0] {
                     "next" | "n" => {
-                        println!("{}", c.get_raw().bright_blue());
+                        println!(
+                            "{}:{}|{} {}",
+                            c.get_location().0,
+                            c.get_location().1,
+                            cur_loc,
+                            c.get_raw().bright_blue()
+                        );
 
                         let (new_state, new_loc) =
                             execute::execute_one(&mut out, &mut err, state, cur_loc);
@@ -112,10 +118,35 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                         cur_loc = new_loc;
 
                         is_running = true;
+                        break;
                     }
 
                     "state" | "s" => {
                         print!("{:?}", state);
+                    }
+
+                    "break" | "b" => {
+                        if parsed.len() < 2 {
+                            let mut v = break_points.iter().collect::<Vec<_>>();
+                            v.sort();
+                            for i in v {
+                                println!("{}: {}", i, code[*i].get_raw());
+                            }
+                            continue;
+                        }
+                        let num = match parsed[1].parse::<usize>() {
+                            Ok(t) => t,
+                            Err(e) => {
+                                io::print_error_no_exit(e);
+                                continue;
+                            }
+                        };
+                        if num > code.len() {
+                            io::print_error_str_no_exit("number exceeds the range");
+                            continue;
+                        }
+
+                        break_points.insert(num);
                     }
 
                     "help" => {
