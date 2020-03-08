@@ -219,7 +219,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
                         opt_area_count,
                         opt_area,
                     ));
-                } 
+                }
             } else {
                 opt_code_vec.push(code::OptCode::new(
                     opt_type_,
