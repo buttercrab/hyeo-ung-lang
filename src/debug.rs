@@ -29,7 +29,6 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
         state.push_code(c.clone());
     }
 
-    let mut cur_loc = 0usize;
     let mut is_running = false;
     let mut break_points = HashSet::new();
     break_points.insert(from);
@@ -37,10 +36,12 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let mut out = io::CustomWriter::new();
     let mut err = io::CustomWriter::new();
 
-    while cur_loc < code.len() {
-        let c = &code[cur_loc];
+    let mut state_stack = vec![(0, state)];
+
+    while state_stack.last().unwrap().0 < code.len() {
+        let c = &code[state_stack.last().unwrap().0];
         if is_running {
-            if break_points.contains(&cur_loc) {
+            if break_points.contains(&state_stack.last().unwrap().0) {
                 let out_str = out.to_string();
                 let err_str = err.to_string();
 
@@ -57,9 +58,13 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 is_running = false;
             } else {
-                let (new_state, new_loc) = execute::execute_one(&mut out, &mut err, state, cur_loc);
-                state = new_state;
-                cur_loc = new_loc;
+                let (new_state, new_loc) = execute::execute_one(
+                    &mut out,
+                    &mut err,
+                    state_stack.last().unwrap().1.clone(),
+                    state_stack.last().unwrap().0,
+                );
+                state_stack.push((new_loc, new_state));
             }
         } else {
             loop {
@@ -85,14 +90,17 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                             "{}:{}|{} {}",
                             c.get_location().0,
                             c.get_location().1,
-                            cur_loc,
+                            state_stack.last().unwrap().0,
                             c.get_raw().bright_blue()
                         );
 
-                        let (new_state, new_loc) =
-                            execute::execute_one(&mut out, &mut err, state, cur_loc);
-                        state = new_state;
-                        cur_loc = new_loc;
+                        let (new_state, new_loc) = execute::execute_one(
+                            &mut out,
+                            &mut err,
+                            state_stack.last().unwrap().1.clone(),
+                            state_stack.last().unwrap().0,
+                        );
+                        state_stack.push((new_loc, new_state));
 
                         let out_str = out.to_string();
                         let err_str = err.to_string();
@@ -111,18 +119,30 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                         break;
                     }
 
+                    "previous" | "p" => {
+                        if state_stack.len() > 1 {
+                            state_stack.pop();
+                            io::print_log("moved back");
+                        } else {
+                            io::print_error_str_no_exit("cannot go back");
+                        }
+                    }
+
                     "run" | "r" => {
-                        let (new_state, new_loc) =
-                            execute::execute_one(&mut out, &mut err, state, cur_loc);
-                        state = new_state;
-                        cur_loc = new_loc;
+                        let (new_state, new_loc) = execute::execute_one(
+                            &mut out,
+                            &mut err,
+                            state_stack.last().unwrap().1.clone(),
+                            state_stack.last().unwrap().0,
+                        );
+                        state_stack.push((new_loc, new_state));
 
                         is_running = true;
                         break;
                     }
 
                     "state" | "s" => {
-                        print!("{:?}", state);
+                        print!("{:?}", state_stack.last().unwrap().1);
                     }
 
                     "break" | "b" => {
@@ -146,7 +166,13 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                             continue;
                         }
 
-                        break_points.insert(num);
+                        if !break_points.contains(&num) {
+                            break_points.insert(num);
+                            io::print_log(&*format!("set breakpoint on line {}", num));
+                        } else {
+                            break_points.remove(&num);
+                            io::print_log(&*format!("unset breakpoint on line {}", num));
+                        }
                     }
 
                     "help" => {
