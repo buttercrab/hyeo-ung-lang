@@ -12,6 +12,7 @@ if [ ! -d "$HOME/.hyeong/hyeong-build/" ]; then
 fi
 cp ~/.hyeong/hyeong/src/number.rs ~/.hyeong/hyeong-build/src/
 cp ~/.hyeong/hyeong/src/big_number.rs ~/.hyeong/hyeong-build/src/
+printf "pub mod big_number;\npub mod number;" > ~/.hyeong/hyeong-build/src/lib.rs
 
 printf "\n\e[01;36m==> test build for building hyeong code\e[0m \n"
 cargo build --manifest-path="$HOME"/.hyeong/hyeong-build/Cargo.toml --release
