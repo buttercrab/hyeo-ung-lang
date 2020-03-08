@@ -56,7 +56,12 @@ pub fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
     }
 }
 
-pub fn execute_one<T: code::State>(out: &mut impl Write, err: &mut impl Write, mut state: T, cur_loc: usize) -> (T, usize) {
+pub fn execute_one<T: code::State>(
+    out: &mut impl Write,
+    err: &mut impl Write,
+    mut state: T,
+    cur_loc: usize,
+) -> (T, usize) {
     let code = (*state.get_code(cur_loc)).clone();
     let mut cur_stack = state.current_stack();
 
@@ -132,7 +137,7 @@ pub fn execute_one<T: code::State>(out: &mut impl Write, err: &mut impl Write, m
     let area_type = code::calc(code.get_area(), code.get_area_count(), || {
         Option::Some(pop_stack_wrap(&mut state, cur_stack))
     })
-        .unwrap();
+    .unwrap();
 
     if area_type != 0 {
         if area_type != 13 {

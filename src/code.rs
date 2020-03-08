@@ -380,6 +380,7 @@ pub trait State {
     fn get_latest_loc(&self) -> Option<usize>;
 }
 
+#[derive(Clone)]
 pub struct OptState {
     stack: Vec<Vec<number::Num>>,
     code: Vec<OptCode>,
@@ -455,6 +456,7 @@ impl State for OptState {
     }
 }
 
+#[derive(Clone)]
 pub struct UnOptState {
     stack: HashMap<usize, Vec<number::Num>>,
     code: Vec<UnOptCode>,

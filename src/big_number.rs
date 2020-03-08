@@ -820,11 +820,7 @@ impl BigNum {
     /// ```
     pub fn neg(v: &BigNum) -> BigNum {
         BigNum {
-            pos: if !v.is_zero() {
-                !v.pos
-            } else {
-                v.pos
-            },
+            pos: if !v.is_zero() { !v.pos } else { v.pos },
             val: v.val.clone(),
         }
     }
