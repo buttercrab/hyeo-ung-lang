@@ -6,12 +6,15 @@ use crate::number::Num;
 use crate::{code, io};
 use std::io::Write;
 
-fn opt_execute<T: code::State + Clone>(
+fn opt_execute<T>(
     out: &mut impl Write,
     err: &mut impl Write,
     mut state: T,
     code: &T::CodeType,
-) -> (T, bool) {
+) -> (T, bool)
+where
+    T: code::State + Clone,
+{
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
     let state_clone = state.clone();

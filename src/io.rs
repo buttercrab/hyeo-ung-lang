@@ -115,7 +115,10 @@ pub fn print_note(msg: &str) {
     println!("[{}] {}", "note".bright_cyan(), msg);
 }
 
-pub fn write<W: Write>(w: &mut W, content: &str) {
+pub fn write<W>(w: &mut W, content: &str)
+where
+    W: Write,
+{
     if let Err(e) = w.write_all(content.as_bytes()) {
         print_error(e);
     }

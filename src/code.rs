@@ -72,7 +72,10 @@ impl Area {
     }
 }
 
-pub fn calc<T: FnMut() -> Option<Num>>(area: &Area, area_value: usize, mut pop: T) -> Option<u8> {
+pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Option<u8>
+where
+    T: FnMut() -> Option<Num>,
+{
     let mut area = area;
 
     loop {

@@ -5,13 +5,15 @@ use crate::code::Code;
 use crate::number::Num;
 use crate::{code, io};
 
-pub fn push_stack_wrap<T: code::State>(
+pub fn push_stack_wrap<T>(
     out: &mut impl Write,
     err: &mut impl Write,
     state: &mut T,
     idx: usize,
     num: Num,
-) {
+) where
+    T: code::State,
+{
     match idx {
         1 => {
             if num.is_pos() {
@@ -35,12 +37,15 @@ pub fn push_stack_wrap<T: code::State>(
     }
 }
 
-pub fn pop_stack_wrap<T: code::State>(
+pub fn pop_stack_wrap<T>(
     out: &mut impl Write,
     err: &mut impl Write,
     state: &mut T,
     idx: usize,
-) -> Num {
+) -> Num
+where
+    T: code::State,
+{
     match idx {
         0 => {
             if state.get_stack(0).is_empty() {
@@ -65,12 +70,15 @@ pub fn pop_stack_wrap<T: code::State>(
     }
 }
 
-pub fn execute_one<T: code::State>(
+pub fn execute_one<T>(
     out: &mut impl Write,
     err: &mut impl Write,
     mut state: T,
     cur_loc: usize,
-) -> (T, usize) {
+) -> (T, usize)
+where
+    T: code::State,
+{
     let code = (*state.get_code(cur_loc)).clone();
     let mut cur_stack = state.current_stack();
 
@@ -169,12 +177,10 @@ pub fn execute_one<T: code::State>(
     (state, cur_loc + 1)
 }
 
-pub fn execute<T: code::State>(
-    out: &mut impl Write,
-    err: &mut impl Write,
-    mut state: T,
-    code: &T::CodeType,
-) -> T {
+pub fn execute<T>(out: &mut impl Write, err: &mut impl Write, mut state: T, code: &T::CodeType) -> T
+where
+    T: code::State,
+{
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
 
