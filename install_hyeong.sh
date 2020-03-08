@@ -1,6 +1,6 @@
 #!/bin/bash
 
-printf "\e[01;36m==> cloning repo to ~/.hyeong/hyeong\e[0m \n"
+printf "\e[01;36m==> cloning repos to ~/.hyeong\e[0m \n"
 git clone https://github.com/buttercrab/hyeo-ung-lang ~/.hyeong/hyeong || (cd ~/.hyeong/hyeong && git pull)
 
 printf "\n\e[01;36m==> building hyeong\e[0m \n"
