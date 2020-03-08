@@ -80,10 +80,6 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 let parsed = input.trim().split(" ").collect::<Vec<_>>();
 
-                if parsed.is_empty() {
-                    continue;
-                }
-
                 match parsed[0] {
                     "next" | "n" => {
                         println!(
@@ -185,6 +181,10 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                     "exit" => {
                         process::exit(0);
+                    }
+
+                    "" => {
+                        continue;
                     }
 
                     t => {
