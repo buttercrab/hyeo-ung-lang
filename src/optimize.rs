@@ -163,6 +163,9 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     if level >= 1 {
         let mut dot_map: HashMap<usize, usize> = HashMap::new();
         let mut max: usize = 4;
+        let mut chk = vec![false; 100];
+        let mut num: usize = 4;
+        let mut pos = vec![0usize; 100];
 
         for un_opt_code in &code {
             if un_opt_code.get_type() == 0 {
@@ -175,7 +178,21 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             let cnt = dot_map.entry(un_opt_code.get_dot_count()).or_insert(0);
             if *cnt == 0 {
                 *cnt = max;
+                chk[max] = true;
                 max += 1;
+            } else{
+                chk[*cnt] = true;
+            }
+        }
+
+        for i in 0..max {
+            if i <= 3 {
+                chk[i] = true;
+                continue;
+            }
+            if chk[i] {
+                pos[i] = num;
+                num += 1;
             }
         }
 
@@ -185,23 +202,32 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             let mut opt_dot_count = un_opt_code.get_dot_count();
             let opt_area_count = un_opt_code.get_area_count();
             let opt_area = un_opt_code.get_area().clone();
+            let mut temp = 0;
 
-            if opt_type_ != 0 {
-                if un_opt_code.get_dot_count() > 3 {
-                    opt_dot_count = *dot_map.get(&(un_opt_code.get_dot_count())).unwrap();
-                }
+            if opt_type_ != 0 && un_opt_code.get_dot_count() > 3 {
+                temp = *dot_map.get(&(un_opt_code.get_dot_count())).unwrap();
+                if chk[temp] {
+                    opt_dot_count = pos[temp];
+                    opt_code_vec.push(code::OptCode::new(
+                        opt_type_,
+                        opt_hangul_count,
+                        opt_dot_count,
+                        opt_area_count,
+                        opt_area,
+                    ));
+                } 
+            } else {
+                opt_code_vec.push(code::OptCode::new(
+                    opt_type_,
+                    opt_hangul_count,
+                    opt_dot_count,
+                    opt_area_count,
+                    opt_area,
+                ));
             }
-
-            opt_code_vec.push(code::OptCode::new(
-                opt_type_,
-                opt_hangul_count,
-                opt_dot_count,
-                opt_area_count,
-                opt_area,
-            ));
         }
 
-        size = max;
+        size = num;
     }
 
     let mut state = code::OptState::new(size);
