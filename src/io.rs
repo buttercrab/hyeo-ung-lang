@@ -7,24 +7,39 @@ use colored::Colorize;
 
 use crate::{code, parse};
 
-pub struct CustomWriter {
+pub struct CustomWriter<T>
+where
+    T: Fn(&Vec<u8>) -> std::io::Result<()>,
+{
     buffer: Vec<u8>,
+    print_func: T,
 }
 
-impl Write for CustomWriter {
+impl<T> Write for CustomWriter<T>
+where
+    T: Fn(&Vec<u8>) -> std::io::Result<()>,
+{
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         self.buffer.append(&mut buf.to_vec());
         Result::Ok(buf.len())
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        Result::Ok(())
+        let res = (self.print_func)(&self.buffer);
+        self.buffer = Vec::new();
+        res
     }
 }
 
-impl CustomWriter {
-    pub fn new() -> CustomWriter {
-        CustomWriter { buffer: Vec::new() }
+impl<T> CustomWriter<T>
+where
+    T: Fn(&Vec<u8>) -> std::io::Result<()>,
+{
+    pub fn new(func: T) -> CustomWriter<T> {
+        CustomWriter {
+            buffer: Vec::new(),
+            print_func: func,
+        }
     }
 
     pub fn to_string(&self) -> String {

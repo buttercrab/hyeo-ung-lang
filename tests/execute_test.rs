@@ -5,8 +5,8 @@ mod execute_test {
 
     fn helper_function(code: &str, stdout: &str, stderr: &str) -> bool {
         let parsed = parse::parse(code.to_string());
-        let mut out = io::CustomWriter::new();
-        let mut err = io::CustomWriter::new();
+        let mut out = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
 
         for c in parsed {

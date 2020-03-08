@@ -3,7 +3,7 @@ use std::io::{stderr, stdout, Write};
 use clap::*;
 
 use hyeong::code::State;
-use hyeong::{code, build, debug, execute, interpreter, io, update, optimize};
+use hyeong::{build, code, debug, execute, interpreter, io, optimize, update};
 
 #[tokio::main]
 async fn main() {

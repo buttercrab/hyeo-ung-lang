@@ -33,37 +33,41 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let mut break_points = HashSet::new();
     break_points.insert(from);
 
-    let mut out = io::CustomWriter::new();
-    let mut err = io::CustomWriter::new();
+    let mut out = io::CustomWriter::new(|x| {
+        let out_str = io::handle_error(String::from_utf8(x.clone()));
 
-    let mut state_stack = vec![(0, state)];
+        if !out_str.is_empty() {
+            println!("[{}] {}", "stdout".bold(), out_str);
+        }
 
-    while state_stack.last().unwrap().0 < code.len() {
+        Result::Ok(())
+    });
+
+    let mut err = io::CustomWriter::new(|x| {
+        let err_str = io::handle_error(String::from_utf8(x.clone()));
+
+        if !err_str.is_empty() {
+            println!("[{}] {}", "stderr".bold().bright_red(), err_str);
+        }
+
+        Result::Ok(())
+    });
+
+    let mut state_stack = vec![(state, 0)];
+
+    while state_stack.last().unwrap().1 < code.len() {
         if is_running {
-            if break_points.contains(&state_stack.last().unwrap().0) {
-                let out_str = out.to_string();
-                let err_str = err.to_string();
-
-                if !out_str.is_empty() {
-                    println!("[{}] {}", "stdout".bold(), out_str);
-                }
-
-                if !err_str.is_empty() {
-                    println!("[{}] {}", "stderr".bold().bright_red(), err_str);
-                }
-
-                out = io::CustomWriter::new();
-                err = io::CustomWriter::new();
-
+            if break_points.contains(&state_stack.last().unwrap().1) {
+                out.flush().unwrap();
+                err.flush().unwrap();
                 is_running = false;
             } else {
-                let (new_state, new_loc) = execute::execute_one(
+                state_stack.push(execute::execute_one(
                     &mut out,
                     &mut err,
-                    state_stack.last().unwrap().1.clone(),
-                    state_stack.last().unwrap().0,
-                );
-                state_stack.push((new_loc, new_state));
+                    state_stack.last().unwrap().0.clone(),
+                    state_stack.last().unwrap().1,
+                ));
             }
         } else {
             loop {
@@ -81,37 +85,25 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 match parsed[0] {
                     "next" | "n" => {
-                        let c = &code[state_stack.last().unwrap().0];
+                        let c = &code[state_stack.last().unwrap().1];
 
                         println!(
                             "{}:{}|{} {}",
                             c.get_location().0,
                             c.get_location().1,
-                            state_stack.last().unwrap().0,
+                            state_stack.last().unwrap().1,
                             c.get_raw().bright_blue()
                         );
 
-                        let (new_state, new_loc) = execute::execute_one(
+                        state_stack.push(execute::execute_one(
                             &mut out,
                             &mut err,
-                            state_stack.last().unwrap().1.clone(),
-                            state_stack.last().unwrap().0,
-                        );
-                        state_stack.push((new_loc, new_state));
+                            state_stack.last().unwrap().0.clone(),
+                            state_stack.last().unwrap().1,
+                        ));
 
-                        let out_str = out.to_string();
-                        let err_str = err.to_string();
-
-                        if !out_str.is_empty() {
-                            println!("[{}] {}", "stdout".bold(), out_str);
-                        }
-
-                        if !err_str.is_empty() {
-                            println!("[{}] {}", "stderr".bold().bright_red(), err_str);
-                        }
-
-                        out = io::CustomWriter::new();
-                        err = io::CustomWriter::new();
+                        out.flush().unwrap();
+                        err.flush().unwrap();
 
                         break;
                     }
@@ -126,20 +118,19 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                     }
 
                     "run" | "r" => {
-                        let (new_state, new_loc) = execute::execute_one(
+                        state_stack.push(execute::execute_one(
                             &mut out,
                             &mut err,
-                            state_stack.last().unwrap().1.clone(),
-                            state_stack.last().unwrap().0,
-                        );
-                        state_stack.push((new_loc, new_state));
+                            state_stack.last().unwrap().0.clone(),
+                            state_stack.last().unwrap().1,
+                        ));
 
                         is_running = true;
                         break;
                     }
 
                     "state" | "s" => {
-                        print!("{:?}", state_stack.last().unwrap().1);
+                        print!("{:?}", state_stack.last().unwrap().0);
                     }
 
                     "break" | "b" => {
@@ -200,16 +191,8 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
         }
     }
 
-    let out_str = out.to_string();
-    let err_str = err.to_string();
-
-    if !out_str.is_empty() {
-        println!("[{}] {}", "stdout".bold(), out_str);
-    }
-
-    if !err_str.is_empty() {
-        println!("[{}] {}", "stderr".bold().bright_red(), err_str);
-    }
+    out.flush().unwrap();
+    err.flush().unwrap();
 
     process::exit(0);
 }

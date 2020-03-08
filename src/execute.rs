@@ -35,7 +35,12 @@ pub fn push_stack_wrap<T: code::State>(
     }
 }
 
-pub fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
+pub fn pop_stack_wrap<T: code::State>(
+    out: &mut impl Write,
+    err: &mut impl Write,
+    state: &mut T,
+    idx: usize,
+) -> Num {
     match idx {
         0 => {
             if state.get_stack(0).is_empty() {
@@ -47,9 +52,13 @@ pub fn pop_stack_wrap<T: code::State>(state: &mut T, idx: usize) -> Num {
             state.pop_stack(0)
         }
         1 => {
+            out.flush().unwrap();
+            err.flush().unwrap();
             process::exit(0);
         }
         2 => {
+            out.flush().unwrap();
+            err.flush().unwrap();
             process::exit(1);
         }
         _ => state.pop_stack(idx),
@@ -79,14 +88,14 @@ pub fn execute_one<T: code::State>(
         1 => {
             let mut n = Num::zero();
             for _ in 0..code.get_hangul_count() {
-                n += &pop_stack_wrap(&mut state, cur_stack);
+                n += &pop_stack_wrap(out, err, &mut state, cur_stack);
             }
             push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
         }
         2 => {
             let mut n = Num::one();
             for _ in 0..code.get_hangul_count() {
-                n *= &pop_stack_wrap(&mut state, cur_stack);
+                n *= &pop_stack_wrap(out, err, &mut state, cur_stack);
             }
             push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
         }
@@ -95,7 +104,7 @@ pub fn execute_one<T: code::State>(
             let mut v = Vec::with_capacity(code.get_hangul_count());
 
             for _ in 0..code.get_hangul_count() {
-                v.push(pop_stack_wrap(&mut state, cur_stack));
+                v.push(pop_stack_wrap(out, err, &mut state, cur_stack));
             }
 
             for mut x in v {
@@ -111,7 +120,7 @@ pub fn execute_one<T: code::State>(
             let mut v = Vec::with_capacity(code.get_hangul_count());
 
             for _ in 0..code.get_hangul_count() {
-                v.push(pop_stack_wrap(&mut state, cur_stack));
+                v.push(pop_stack_wrap(out, err, &mut state, cur_stack));
             }
 
             for mut x in v {
@@ -124,7 +133,7 @@ pub fn execute_one<T: code::State>(
         }
         // 5
         _ => {
-            let n = pop_stack_wrap(&mut state, cur_stack);
+            let n = pop_stack_wrap(out, err, &mut state, cur_stack);
             for _ in 0..code.get_hangul_count() {
                 push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone());
             }
@@ -135,7 +144,7 @@ pub fn execute_one<T: code::State>(
 
     cur_stack = state.current_stack();
     let area_type = code::calc(code.get_area(), code.get_area_count(), || {
-        Option::Some(pop_stack_wrap(&mut state, cur_stack))
+        Option::Some(pop_stack_wrap(out, err, &mut state, cur_stack))
     })
     .unwrap();
 

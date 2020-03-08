@@ -1,6 +1,6 @@
 pub mod big_number;
-pub mod code;
 pub mod build;
+pub mod code;
 pub mod debug;
 pub mod execute;
 pub mod interpreter;
