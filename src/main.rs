@@ -178,7 +178,7 @@ async fn main() {
                     );
                 }
                 io::handle_error(stderr.flush());
-                state.get_stack(1).clear();
+                state.get_stack(2).clear();
             }
             for code in opt_code {
                 state = execute::execute(&mut stdout, &mut stderr, state, &code);
