@@ -21,7 +21,6 @@ pub fn push_stack_wrap<T>(
             } else {
                 io::write(out, &*format!("{}", -&num));
             }
-            io::handle_error(out.flush());
         }
         2 => {
             if num.is_pos() {
@@ -29,7 +28,6 @@ pub fn push_stack_wrap<T>(
             } else {
                 io::write(err, &*format!("{}", -&num));
             }
-            io::handle_error(err.flush());
         }
         _ => {
             state.push_stack(idx, num);
