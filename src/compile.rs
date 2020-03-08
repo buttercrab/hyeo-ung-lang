@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::code::{Code, State};
 use crate::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::number::Num;
-use crate::{code, io};
+use crate::{code, io, execute};
 use std::io::Write;
 
 fn opt_execute<T: code::State>(
@@ -195,6 +195,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     }
 
     let mut state = code::OptState::new(size);
+    let mut opt_state = code::OptState::new(size);
 
     if level >= 2 {
         let mut out = io::CustomWriter::new();
@@ -202,10 +203,11 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
 
         let mut idx = 0;
         for (i, opt_code) in opt_code_vec.iter().enumerate() {
-            if !opt_execute(&mut out, &mut err, &mut state, opt_code) {
+            if !opt_execute(&mut out, &mut err, &mut opt_state, opt_code) {
                 idx = i;
                 break;
             }
+            state = execute::execute(&mut out, &mut err, state, opt_code);
         }
         opt_code_vec = opt_code_vec[idx..].to_vec();
 
