@@ -135,5 +135,5 @@ pub fn save_to_file(file: &str, content: String) {
 }
 
 pub fn get_build_path() -> String {
-    env::var("HOME").unwrap() + "./hyeong/hyeong-build"
+    env::var("HOME").unwrap() + "/.hyeong/hyeong-build"
 }
