@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::process;
+use std::{process, env};
 
 use colored::Colorize;
 
@@ -122,4 +122,18 @@ where
     if let Err(e) = w.write_all(content.as_bytes()) {
         print_error(e);
     }
+}
+
+fn save_file_base(file: &str, content: String) -> Result<(), std::io::Error> {
+    let mut file = File::open(file)?;
+    file.write(content.as_bytes())?;
+    Result::Ok(())
+}
+
+pub fn save_to_file(file: &str, content: String) {
+    handle_error(save_file_base(file, content));
+}
+
+pub fn get_build_path() -> String {
+    env::var("HOME").unwrap() + "./hyeong/hyeong-build"
 }

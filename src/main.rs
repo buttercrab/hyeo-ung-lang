@@ -114,7 +114,8 @@ async fn main() {
                 Arg::with_name("version")
                     .value_name("version")
                     .takes_value(true)
-                    .help("update to specific version (latest by default)"),
+                    .help("update to specific version (latest by default)")
+                    .default_value("latest"),
             ),
         )
         .get_matches();
@@ -134,6 +135,7 @@ async fn main() {
             io::print_log("compiling to rust");
             build::build_source(state, &un_opt_code)
         };
+        io::save_to_file(&*(io::get_build_path() + "/src/main.rs"), source);
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         let file = matches.value_of("input").unwrap();
         let code = io::read_file(file);
@@ -192,12 +194,7 @@ async fn main() {
     } else if let Some(ref matches) = matches.subcommand_matches("update") {
         let cur_version = update::get_current_version();
         let version = io::handle_error(
-            update::get_update_version(if let Some(t) = matches.value_of("version") {
-                t
-            } else {
-                "latest"
-            })
-            .await,
+            update::get_update_version(matches.value_of("version").unwrap()).await,
         );
 
         if cur_version != version {
