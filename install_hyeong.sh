@@ -7,7 +7,7 @@ printf "\n\e[01;36m==> building hyeong\e[0m \n"
 cargo build --manifest-path="$HOME"/.hyeong/hyeong/Cargo.toml --release
 
 printf "\n\e[01;36m==> making directory for building hyeong code\e[0m \n"
-if [ -d "$HOME/.hyeong/hyeong-build/" ]; then
+if [ ! -d "$HOME/.hyeong/hyeong-build/" ]; then
   cd ~/.hyeong && cargo new hyeong-build
 fi
 cp ~/.hyeong/hyeong/src/number.rs ~/.hyeong/hyeong-build/src/
