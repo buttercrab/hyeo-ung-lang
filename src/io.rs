@@ -125,7 +125,7 @@ where
 }
 
 fn save_file_base(file: &str, content: String) -> Result<(), std::io::Error> {
-    let mut file = File::open(file)?;
+    let mut file = File::create(file)?;
     file.write(content.as_bytes())?;
     Result::Ok(())
 }
