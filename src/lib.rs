@@ -1,10 +1,11 @@
 pub mod big_number;
 pub mod code;
-pub mod compile;
+pub mod build;
 pub mod debug;
 pub mod execute;
 pub mod interpreter;
 pub mod io;
 pub mod number;
+pub mod optimize;
 pub mod parse;
 pub mod update;

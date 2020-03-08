@@ -234,7 +234,3 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
 
     (state, opt_code_vec)
 }
-
-pub fn build_source<T: code::State>(state: T, code: &Vec<T::CodeType>) -> String {
-    unimplemented!()
-}

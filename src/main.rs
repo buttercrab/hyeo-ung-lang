@@ -3,7 +3,7 @@ use std::io::{stderr, stdout, Write};
 use clap::*;
 
 use hyeong::code::State;
-use hyeong::{code, compile, debug, execute, interpreter, io, update};
+use hyeong::{code, build, debug, execute, interpreter, io, update, optimize};
 
 #[tokio::main]
 async fn main() {
@@ -120,20 +120,19 @@ async fn main() {
         .get_matches();
 
     if let Some(ref matches) = matches.subcommand_matches("build") {
-        // build
         let file = matches.value_of("input").unwrap();
         let un_opt_code = io::read_file(file);
         let level_str = matches.value_of("optimize").unwrap();
         let level = io::handle_error(level_str.parse::<usize>());
 
         let source = if level >= 1 {
-            let (state, opt_code) = compile::optimize(un_opt_code, level);
+            let (state, opt_code) = optimize::optimize(un_opt_code, level);
             io::print_log("compiling to rust");
-            compile::build_source(state, &opt_code)
+            build::build_source(state, &opt_code)
         } else {
             let state = code::UnOptState::new();
             io::print_log("compiling to rust");
-            compile::build_source(state, &un_opt_code)
+            build::build_source(state, &un_opt_code)
         };
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         let file = matches.value_of("input").unwrap();
@@ -156,7 +155,7 @@ async fn main() {
         let mut stderr = stderr();
 
         if level >= 1 {
-            let (mut state, opt_code) = compile::optimize(un_opt_code, level);
+            let (mut state, opt_code) = optimize::optimize(un_opt_code, level);
             io::print_log("running code");
 
             if !state.get_stack(1).is_empty() {
