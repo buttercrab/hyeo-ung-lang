@@ -1,10 +1,10 @@
 #!/bin/bash
 
-printf "\e[01;36m==> cloning repo to ~/.hyeong\e[0m \n"
+printf "\e[01;36m==> cloning repo to ~/.hyeong/hyeong\e[0m \n"
 git clone https://github.com/buttercrab/hyeo-ung-lang ~/.hyeong/hyeong || (cd ~/.hyeong/hyeong && git pull)
 
 printf "\n\e[01;36m==> building hyeong\e[0m \n"
-cargo build --manifest-path="$HOME"/.hyeong/Cargo.toml --release
+cargo build --manifest-path="$HOME"/.hyeong/hyeong/Cargo.toml --release
 
 printf "\n\e[01;36m==> done!\e[0m \n"
 
