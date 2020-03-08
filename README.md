@@ -65,7 +65,7 @@
   + interactive code runner
 - Optimizer:
   + level 1 optimize
-  + level 2 optimize (experimental)
+  + level 2 optimize
 - Debugger:
   + line by line (with going back feature)
   
