@@ -39,7 +39,6 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let mut state_stack = vec![(0, state)];
 
     while state_stack.last().unwrap().0 < code.len() {
-        let c = &code[state_stack.last().unwrap().0];
         if is_running {
             if break_points.contains(&state_stack.last().unwrap().0) {
                 let out_str = out.to_string();
@@ -82,6 +81,8 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 match parsed[0] {
                     "next" | "n" => {
+                        let c = &code[state_stack.last().unwrap().0];
+
                         println!(
                             "{}:{}|{} {}",
                             c.get_location().0,
