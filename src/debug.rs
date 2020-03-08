@@ -171,11 +171,15 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                         }
                     }
 
-                    "help" => {
-                        println!("exit      Exit debugger");
-                        println!("help      Print this");
-                        println!("next(n)   goto next command");
-                        println!("state(s)  print state status");
+                    "help" | "h" => {
+                        println!("break(b)       show breakpoints");
+                        println!("break(b) NUM   set/unset breakpoint on NUM");
+                        println!("exit           Exit debugger");
+                        println!("help(h)        Print this");
+                        println!("next(n)        goto next command");
+                        println!("state(s)       print state status");
+                        println!("previous(p)    move to previous state");
+                        println!("run(r)         run until breakpoint");
                         continue;
                     }
 
