@@ -200,5 +200,16 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
         }
     }
 
+    let out_str = out.to_string();
+    let err_str = err.to_string();
+
+    if !out_str.is_empty() {
+        println!("[{}] {}", "stdout".bold(), out_str);
+    }
+
+    if !err_str.is_empty() {
+        println!("[{}] {}", "stderr".bold().bright_red(), err_str);
+    }
+
     process::exit(0);
 }
