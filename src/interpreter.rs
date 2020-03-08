@@ -38,20 +38,16 @@ pub fn run() -> ! {
         }
 
         let mut out = io::CustomWriter::new(|x| {
-            let out_str = io::handle_error(String::from_utf8(x.clone()));
-
-            if !out_str.is_empty() {
-                println!("[{}] {}", "stdout".bold(), out_str);
+            if !x.is_empty() {
+                println!("[{}] {}", "stdout".bold(), x);
             }
 
             Result::Ok(())
         });
 
         let mut err = io::CustomWriter::new(|x| {
-            let err_str = io::handle_error(String::from_utf8(x.clone()));
-
-            if !err_str.is_empty() {
-                println!("[{}] {}", "stderr".bold().bright_red(), err_str);
+            if !x.is_empty() {
+                println!("[{}] {}", "stderr".bold().bright_red(), x);
             }
 
             Result::Ok(())

@@ -9,7 +9,7 @@ use crate::{code, parse};
 
 pub struct CustomWriter<T>
 where
-    T: Fn(&Vec<u8>) -> std::io::Result<()>,
+    T: Fn(String) -> std::io::Result<()>,
 {
     buffer: Vec<u8>,
     print_func: T,
@@ -17,7 +17,7 @@ where
 
 impl<T> Write for CustomWriter<T>
 where
-    T: Fn(&Vec<u8>) -> std::io::Result<()>,
+    T: Fn(String) -> std::io::Result<()>,
 {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
         self.buffer.append(&mut buf.to_vec());
@@ -25,7 +25,7 @@ where
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        let res = (self.print_func)(&self.buffer);
+        let res = (self.print_func)(self.to_string());
         self.buffer = Vec::new();
         res
     }
@@ -33,7 +33,7 @@ where
 
 impl<T> CustomWriter<T>
 where
-    T: Fn(&Vec<u8>) -> std::io::Result<()>,
+    T: Fn(String) -> std::io::Result<()>,
 {
     pub fn new(func: T) -> CustomWriter<T> {
         CustomWriter {
