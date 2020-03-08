@@ -166,23 +166,26 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         let mut chk = vec![false; 100];
         let mut num: usize = 4;
         let mut pos = vec![0usize; 100];
+        let mut now = 3;
 
         for un_opt_code in &code {
             if un_opt_code.get_type() == 0 {
                 continue;
             }
-            if un_opt_code.get_dot_count() <= 3 {
+            if un_opt_code.get_dot_count() <= 2 {
                 continue;
             }
-
+            chk[now] = true;
+            if un_opt_code.get_dot_count() == 3 {
+                now = 3;
+                continue;
+            }
             let cnt = dot_map.entry(un_opt_code.get_dot_count()).or_insert(0);
             if *cnt == 0 {
                 *cnt = max;
-                chk[max] = true;
                 max += 1;
-            } else{
-                chk[*cnt] = true;
             }
+            now = *cnt;
         }
 
         for i in 0..max {
