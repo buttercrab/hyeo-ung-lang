@@ -1,11 +1,11 @@
 use crate::code::{State, UnOptCode};
 use crate::{code, execute, io};
 use colored::Colorize;
+use std::collections::HashSet;
 use std::io::{stdout, Write};
 use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use std::collections::HashSet;
 
 pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let running = Arc::new(AtomicBool::new(true));
@@ -57,8 +57,7 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 is_running = false;
             } else {
-                let (new_state, new_loc) =
-                    execute::execute_one(&mut out, &mut err, state, cur_loc);
+                let (new_state, new_loc) = execute::execute_one(&mut out, &mut err, state, cur_loc);
                 state = new_state;
                 cur_loc = new_loc;
             }
