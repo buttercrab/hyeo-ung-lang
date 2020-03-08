@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::code::{Code, State};
 use crate::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::number::Num;
-use crate::{code, execute, io};
+use crate::{code, io};
 use std::io::Write;
 
 fn opt_execute<T: code::State + Clone>(
