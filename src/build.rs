@@ -1,4 +1,5 @@
 use crate::code;
+use crate::code::{Area, Code};
 
 fn make_indent(value: usize) -> String {
     std::iter::repeat(' ').take(value * 4).collect::<String>()
@@ -6,6 +7,18 @@ fn make_indent(value: usize) -> String {
 
 fn fn_print(indent: usize, s: String) -> String {
     format!("\n{}print!({:?});", make_indent(indent), s)
+}
+
+fn fn_eprint(indent: usize, s: String) -> String {
+    format!("\n{}eprint!({:?});", make_indent(indent), s)
+}
+
+fn fn_exit(indent: usize, code: i32) -> String {
+    format!("\n{}std::process::exit({});", make_indent(indent), code)
+}
+
+fn command(indent: usize, c: &impl Code) -> String {
+    "\n".to_string()
 }
 
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
@@ -127,7 +140,7 @@ fn main() {
     }
 
     if !state.get_stack(2).is_empty() {
-        res.push_str(&*fn_print(
+        res.push_str(&*fn_eprint(
             indent,
             state
                 .get_stack(2)
@@ -138,10 +151,66 @@ fn main() {
         state.get_stack(2).clear();
     }
 
-    // do something
+    let mut codes: Vec<Vec<T::CodeType>> = Vec::new();
+    codes.push(Vec::new());
+
+    for c in code {
+        match c.get_area() {
+            Area::Val {
+                type_: _,
+                left: _,
+                right: _,
+            } => {
+                codes.push(vec![c.clone()]);
+                codes.push(Vec::new());
+            }
+            Area::Nil => {
+                codes.last_mut().unwrap().push(c.clone());
+            }
+        }
+    }
+
+    res.push_str(&*format!(
+        "
+    while state < {} {{",
+        codes.len()
+    ));
+    indent += 1;
+
+    let mut stack = vec![(codes.len(), false)];
+
+    for i in 0..codes.len() {
+        while stack.last().unwrap().0 > 1 {
+            stack.push((stack.last().unwrap().0 / 2, false));
+            res.push_str(&*format!(
+                "\n{}if state < {} {{",
+                make_indent(indent),
+                stack.last().unwrap().0 + i
+            ));
+            indent += 1;
+        }
+
+        for item in &codes[i] {
+            res.push_str(&*command(indent, item));
+        }
+
+        while stack.len() > 1 && stack.last().unwrap().1 {
+            stack.pop();
+            indent -= 1;
+            res.push_str(&*format!("\n{}}}", make_indent(indent)));
+        }
+
+        if i != codes.len() - 1 {
+            let last = stack.pop().unwrap().0;
+            stack.push((stack.last().unwrap().0 - last, true));
+            res.push_str(&*format!("\n{}}} else {{", make_indent(indent - 1)));
+        }
+    }
 
     res.push_str(
         "
+        state += 1;
+    }
 }",
     );
     res
