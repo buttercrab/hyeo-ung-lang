@@ -4,6 +4,7 @@ use clap::*;
 
 use hyeong::code::State;
 use hyeong::{build, code, debug, execute, interpreter, io, optimize, update};
+use std::process::Command;
 
 #[tokio::main]
 async fn main() {
@@ -125,6 +126,13 @@ async fn main() {
         let un_opt_code = io::read_file(file);
         let level_str = matches.value_of("optimize").unwrap();
         let level = io::handle_error(level_str.parse::<usize>());
+        let output_file = match matches.value_of("output") {
+            Some(v) => v.to_string(),
+            None => {
+                let v = file.split(".").collect::<Vec<_>>();
+                v[..v.len() - 1].join(".")
+            }
+        };
 
         let source = if level >= 1 {
             let (state, opt_code) = optimize::optimize(un_opt_code, level);
@@ -136,6 +144,38 @@ async fn main() {
             build::build_source(state, &un_opt_code, 0)
         };
         io::save_to_file(&*(io::get_build_path() + "/src/main.rs"), source);
+        io::print_log("compiling rust code");
+        let output = if cfg!(target_os = "windows") {
+            io::handle_error(
+                Command::new("cmd")
+                    .arg("/C")
+                    .arg("cargo build --manifest-path=\"$HOME\"/.hyeong/hyeong-build/Cargo.toml --release --color always")
+                    .output(),
+            )
+        } else {
+            io::handle_error(
+                Command::new("bash")
+                    .arg("-c")
+                    .arg("cargo build --manifest-path=\"$HOME\"/.hyeong/hyeong-build/Cargo.toml --release --color always")
+                    .output(),
+            )
+        };
+        print!("{}", io::handle_error(String::from_utf8(output.stderr)));
+        io::print_log("moving binary to current directory");
+        if cfg!(target_os = "windows") {
+            io::handle_error(Command::new("cmd").arg("/C").arg("TODO").output())
+        } else {
+            io::handle_error(
+                Command::new("bash")
+                    .arg("-c")
+                    .arg(format!(
+                        "cp \"$HOME\"/.hyeong/hyeong-build/target/release/hyeong-build {}",
+                        output_file
+                    ))
+                    .output(),
+            )
+        };
+        io::print_log("done!");
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         let file = matches.value_of("input").unwrap();
         let code = io::read_file(file);
