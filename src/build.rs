@@ -46,7 +46,7 @@ impl Stack {
 
 fn main() {
     let mut stack = Stack::new();
-    let mut point = HashMap<u128, usize>::new();
+    let mut point: HashMap<u128, usize> = HashMap::new();
     let mut state = 0usize;
     let mut last = 0usize;
 ",
