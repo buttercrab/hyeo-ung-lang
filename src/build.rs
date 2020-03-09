@@ -13,12 +13,97 @@ fn fn_eprint(indent: usize, s: String) -> String {
     format!("\n{}eprint!({:?});", make_indent(indent), s)
 }
 
-fn fn_exit(indent: usize, code: i32) -> String {
-    format!("\n{}std::process::exit({});", make_indent(indent), code)
+fn command(indent: usize, c: &impl Code) -> String {
+    String::from(format!(
+        "{}\n{}",
+        match c.get_type() {
+            0 => {
+                format!(
+                    "\n{}stack.push(cur, Num::from_num({}));",
+                    make_indent(indent),
+                    c.get_hangul_count() * c.get_dot_count()
+                )
+            }
+            1 => {
+                format!(
+                    "\n{0}let mut n = Num::zero();\
+                     \n{0}for _ in 0..{1} {{\
+                     \n{0}    n += &stack.pop(cur);\
+                     \n{0}}}\
+                     \n{0}stack.push({2}, n);",
+                    make_indent(indent),
+                    c.get_hangul_count(),
+                    c.get_dot_count()
+                )
+            }
+            2 => {
+                format!(
+                    "\n{0}let mut n = Num::one();\
+                     \n{0}for _ in 0..{1} {{\
+                     \n{0}    n *= &stack.pop(cur);\
+                     \n{0}}}\
+                     \n{0}stack.push({2}, n);",
+                    make_indent(indent),
+                    c.get_hangul_count(),
+                    c.get_dot_count()
+                )
+            }
+            3 => {
+                format!(
+                    "\n{0}let mut n = Num::zero();\
+                     \n{0}let mut v = Vec::with_capacity({1});\
+                     \n{0}for _ in 0..{1} {{\
+                     \n{0}    v.push(stack.pop(cur));\
+                     \n{0}}}\
+                     \n{0}for mut x in v {{\
+                     \n{0}    x.minus();\
+                     \n{0}    n += &x;\
+                     \n{0}    stack.push(cur, x);\
+                     \n{0}}}\
+                     \n{0}stack.push({2}, n);",
+                    make_indent(indent),
+                    c.get_hangul_count(),
+                    c.get_dot_count()
+                )
+            }
+            4 => {
+                format!(
+                    "\n{0}let mut n = Num::one();\
+                     \n{0}let mut v = Vec::with_capacity({1});\
+                     \n{0}for _ in 0..{1} {{\
+                     \n{0}    v.push(stack.pop(cur));\
+                     \n{0}}}\
+                     \n{0}for mut x in v {{\
+                     \n{0}    x.flip();\
+                     \n{0}    n *= &x;\
+                     \n{0}    stack.push(cur, x);\
+                     \n{0}}}\
+                     \n{0}stack.push({2}, n);",
+                    make_indent(indent),
+                    c.get_hangul_count(),
+                    c.get_dot_count()
+                )
+            }
+            _ => {
+                format!(
+                    "\n{0}let n = stack.pop(cur);\
+                     \n{0}for _ in 0..{1} {{\
+                     \n{0}    stack.push({2}, n.clone());\
+                     \n{0}}}\
+                     \n{0}stack.push(cur, n);\
+                     \n{0}cur = {2};",
+                    make_indent(indent),
+                    c.get_hangul_count(),
+                    c.get_dot_count()
+                )
+            }
+        },
+        area(indent, c.get_area())
+    ))
 }
 
-fn command(indent: usize, c: &impl Code) -> String {
-    "\n".to_string()
+fn area(indent: usize, a: &Area) -> String {
+    format!("\n{}", make_indent(indent))
 }
 
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
@@ -51,7 +136,14 @@ impl Stack {
         }
     }
 
+    #[allow(dead_code)]
     fn pop(&mut self, idx: usize) -> Num {
+        if idx == 1 {
+            std::process::exit(0);
+        }
+        if idx == 2 {
+            std::process::exit(1);
+        }
         ",
         if opt {
             "if idx < self.data.len() {
@@ -99,7 +191,24 @@ impl Stack {
         "
     }
 
+    #[allow(dead_code)]
     fn push(&mut self, idx: usize, num: Num) {
+        if idx == 1 {
+            if num.is_pos() {
+                print!(\"{}\", num.floor().to_int() as u8 as char);
+            } else {
+                print!(\"{}\", -&num);
+            }
+            return;
+        }
+        if idx == 2 {
+            if num.is_pos() {
+                eprint!(\"{}\", num.floor().to_int() as u8 as char);
+            } else {
+                eprint!(\"{}\", -&num);
+            }
+            return;
+        }
         ",
         if opt {
             "if idx < self.data.len() {
@@ -118,10 +227,15 @@ impl Stack {
 }
 
 fn main() {
+    #[allow(unused_mut, unused_variables)]
     let mut stack = Stack::new();
+    #[allow(unused_mut, unused_variables)]
     let mut point: HashMap<u128, usize> = HashMap::new();
     let mut state = 0usize;
+    #[allow(unused_mut, unused_variables)]
     let mut last = 0usize;
+    #[allow(unused_mut, unused_variables)]
+    let mut cur = 3usize;
 ",
     ));
 
