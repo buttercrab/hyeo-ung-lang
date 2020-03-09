@@ -5,7 +5,7 @@ fn make_indent(value: usize) -> String {
     std::iter::repeat(' ').take(value * 4).collect::<String>()
 }
 
-fn fn_print(s: String, indent: usize) -> String {
+fn fn_print(indent: usize, s: String) -> String {
     format!("\n{}print!({:?});", make_indent(indent), s)
 }
 
@@ -52,26 +52,28 @@ fn main() {
 ",
     ));
 
+    let mut indent = 1usize;
+
     if !state.get_stack(1).is_empty() {
         res.push_str(&*fn_print(
+            indent,
             state
                 .get_stack(1)
                 .iter()
                 .map(|num| num.floor().to_int() as u8 as char)
                 .collect(),
-            1,
         ));
         state.get_stack(1).clear();
     }
 
     if !state.get_stack(2).is_empty() {
         res.push_str(&*fn_print(
+            indent,
             state
                 .get_stack(2)
                 .iter()
                 .map(|num| num.floor().to_int() as u8 as char)
                 .collect(),
-            1,
         ));
         state.get_stack(2).clear();
     }
