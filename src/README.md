@@ -9,7 +9,7 @@
 | `big_number.rs`  |✅     |✅     |✅    |
 | `code.rs`        |✅     |      |     |
 | `compile.rs`     |      |      |     |
-| `debug.rs`       |      |      |     |
+| `debug.rs`       |✅     |      |     |
 | `execute.rs`     |✅     |      |     |
 | `interpreter.rs` |✅     |      |     |
 | `io.rs`          |✅     |      |     |
