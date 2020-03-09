@@ -164,39 +164,28 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
     if level >= 1 {
         let mut dot_map: HashMap<usize, usize> = HashMap::new();
         let mut max: usize = 4;
-        let mut chk = vec![false; 100];
-        let mut num: usize = 4;
-        let mut pos = vec![0usize; 100];
         let mut now = 3;
+        let mut chk = Vec::new();
 
         for un_opt_code in &code {
-            if un_opt_code.get_type() == 0 {
+            if un_opt_code.get_type() == 0{
                 continue;
             }
-            if un_opt_code.get_dot_count() <= 2 {
-                continue;
+            chk.push(now);
+            if un_opt_code.get_type() == 5 {
+                now = un_opt_code.get_dot_count();
             }
-            chk[now] = true;
-            if un_opt_code.get_dot_count() == 3 {
-                now = 3;
-                continue;
-            }
-            let cnt = dot_map.entry(un_opt_code.get_dot_count()).or_insert(0);
-            if *cnt == 0 {
-                *cnt = max;
-                max += 1;
-            }
-            now = *cnt;
         }
 
-        for i in 0..max {
+        chk.sort();
+        for i in chk {
             if i <= 3 {
-                chk[i] = true;
                 continue;
             }
-            if chk[i] {
-                pos[i] = num;
-                num += 1;
+            let temp = dot_map.entry(i).or_insert(0);
+            if *temp == 0 {
+                *temp = max;
+                max += 1;
             }
         }
 
@@ -206,21 +195,21 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             let mut opt_dot_count = un_opt_code.get_dot_count();
             let opt_area_count = un_opt_code.get_area_count();
             let opt_area = un_opt_code.get_area().clone();
-            let mut temp = 0;
 
-            if opt_type_ != 0 && un_opt_code.get_dot_count() > 3 {
-                temp = *dot_map.get(&(un_opt_code.get_dot_count())).unwrap();
-                if chk[temp] {
-                    opt_dot_count = pos[temp];
-                    opt_code_vec.push(code::OptCode::new(
-                        opt_type_,
-                        opt_hangul_count,
-                        opt_dot_count,
-                        opt_area_count,
-                        opt_area,
-                    ));
-                }
+            if opt_type_ == 0 || un_opt_code.get_dot_count() <= 3 {
+                opt_code_vec.push(code::OptCode::new(
+                    opt_type_,
+                    opt_hangul_count,
+                    opt_dot_count,
+                    opt_area_count,
+                    opt_area,
+                ));
             } else {
+                let temp = dot_map.entry(opt_dot_count).or_insert(0);
+                if *temp == 0 {
+                    *temp = max;
+                }
+                opt_dot_count = *temp;
                 opt_code_vec.push(code::OptCode::new(
                     opt_type_,
                     opt_hangul_count,
@@ -231,7 +220,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             }
         }
 
-        size = num;
+        size = max + 1;
     }
 
     let mut state = code::OptState::new(size);
