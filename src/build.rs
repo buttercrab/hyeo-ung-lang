@@ -1,7 +1,7 @@
 use crate::code;
 
 fn fn_print(s: String) -> String {
-    format!("\nprint!(\"{}\");", s)
+    format!("\nprint!({:?});", s)
 }
 
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>) -> String
