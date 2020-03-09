@@ -129,11 +129,11 @@ async fn main() {
         let source = if level >= 1 {
             let (state, opt_code) = optimize::optimize(un_opt_code, level);
             io::print_log("compiling to rust");
-            build::build_source(state, &opt_code)
+            build::build_source(state, &opt_code, level)
         } else {
             let state = code::UnOptState::new();
             io::print_log("compiling to rust");
-            build::build_source(state, &un_opt_code)
+            build::build_source(state, &un_opt_code, 0)
         };
         io::save_to_file(&*(io::get_build_path() + "/src/main.rs"), source);
     } else if let Some(ref matches) = matches.subcommand_matches("check") {

@@ -1,21 +1,24 @@
 use crate::code;
 use std::any::Any;
 
-fn fn_print(s: String) -> String {
-    format!("\nprint!({:?});", s)
+fn make_indent(value: usize) -> String {
+    std::iter::repeat(' ').take(value * 4).collect::<String>()
 }
 
-pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>) -> String
-where
-    T: code::State + 'static,
-{
-    let opt = state.type_id() == code::OptCode::new(0, 0, 0, 0, code::Area::Nil).type_id();
+fn fn_print(s: String, indent: usize) -> String {
+    format!("\n{}print!({:?});", make_indent(indent), s)
+}
 
+pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
+where
+    T: code::State,
+{
+    let opt = level != 0;
     let mut res = String::from(format!(
         "{}{}{}{}{}",
         "\
-use hyeong_build::big_number;
-use hyeong_build::number;
+use hyeong_build::number::Num;
+use std::collections::HashMap;
 
 struct Stack {
     data: ",
@@ -27,8 +30,8 @@ impl Stack {
     fn new() -> Stack {
         Stack {
             data: ",
-        if opt { "Vec<" } else { "HashMap<usize, " },
-        "Vec<Num>>::new(),
+        if opt { "Vec" } else { "HashMap" },
+        "::new(),
         }
     }
 
@@ -56,6 +59,7 @@ fn main() {
                 .iter()
                 .map(|num| num.floor().to_int() as u8 as char)
                 .collect(),
+            1,
         ));
         state.get_stack(1).clear();
     }
@@ -67,6 +71,7 @@ fn main() {
                 .iter()
                 .map(|num| num.floor().to_int() as u8 as char)
                 .collect(),
+            1,
         ));
         state.get_stack(2).clear();
     }
