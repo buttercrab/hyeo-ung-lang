@@ -2,7 +2,7 @@ use crate::code::{State, UnOptCode};
 use crate::{code, execute, io};
 use colored::Colorize;
 use std::collections::HashSet;
-use std::io::{stdout, Write};
+use std::io::{stdin, stdout, Write};
 use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
@@ -59,6 +59,7 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                 is_running = false;
             } else {
                 state_stack.push(execute::execute_one(
+                    &mut stdin(),
                     &mut out,
                     &mut err,
                     state_stack.last().unwrap().0.clone(),
@@ -92,6 +93,7 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
                         );
 
                         state_stack.push(execute::execute_one(
+                            &mut stdin(),
                             &mut out,
                             &mut err,
                             state_stack.last().unwrap().0.clone(),
@@ -115,6 +117,7 @@ pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
 
                     "run" | "r" => {
                         state_stack.push(execute::execute_one(
+                            &mut stdin(),
                             &mut out,
                             &mut err,
                             state_stack.last().unwrap().0.clone(),

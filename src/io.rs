@@ -11,8 +11,8 @@ pub struct CustomWriter<T>
 where
     T: Fn(String) -> std::io::Result<()>,
 {
-    buffer: Vec<u8>,
-    print_func: T,
+    buf: Vec<u8>,
+    print_fn: T,
 }
 
 impl<T> Write for CustomWriter<T>
@@ -20,13 +20,13 @@ where
     T: Fn(String) -> std::io::Result<()>,
 {
     fn write(&mut self, buf: &[u8]) -> std::io::Result<usize> {
-        self.buffer.append(&mut buf.to_vec());
+        self.buf.append(&mut buf.to_vec());
         Result::Ok(buf.len())
     }
 
     fn flush(&mut self) -> std::io::Result<()> {
-        let res = (self.print_func)(self.to_string());
-        self.buffer = Vec::new();
+        let res = (self.print_fn)(self.to_string());
+        self.buf = Vec::new();
         res
     }
 }
@@ -37,13 +37,51 @@ where
 {
     pub fn new(func: T) -> CustomWriter<T> {
         CustomWriter {
-            buffer: Vec::new(),
-            print_func: func,
+            buf: Vec::new(),
+            print_fn: func,
         }
     }
 
     pub fn to_string(&self) -> String {
-        handle_error(String::from_utf8(self.buffer.clone()))
+        handle_error(String::from_utf8(self.buf.clone()))
+    }
+}
+
+pub trait ReadLine {
+    fn read_line_(&mut self) -> String;
+}
+
+pub struct CustomReader {
+    buf: Vec<String>,
+    idx: usize,
+}
+
+impl ReadLine for std::io::Stdin {
+    fn read_line_(&mut self) -> String {
+        let mut res = String::new();
+        handle_error(self.read_line(&mut res));
+        res
+    }
+}
+
+impl ReadLine for CustomReader {
+    fn read_line_(&mut self) -> String {
+        if self.buf.len() == self.idx {
+            String::from("")
+        } else {
+            let res = self.buf[self.idx].clone();
+            self.idx += 1;
+            res
+        }
+    }
+}
+
+impl CustomReader {
+    pub fn new(s: String) -> CustomReader {
+        CustomReader {
+            buf: s.split("\n").map(|x| String::from(x)).collect(),
+            idx: 0,
+        }
     }
 }
 
@@ -71,11 +109,11 @@ fn check_file(file: &str) -> bool {
 }
 
 pub fn read_line() -> String {
-    let mut res = String::new();
-    match std::io::stdin().read_line(&mut res) {
-        Ok(_) => res,
-        Err(e) => print_error(e),
-    }
+    read_line_from(&mut std::io::stdin())
+}
+
+pub fn read_line_from(input: &mut impl ReadLine) -> String {
+    input.read_line_()
 }
 
 pub fn handle_error<T>(res: Result<T, impl Error>) -> T {

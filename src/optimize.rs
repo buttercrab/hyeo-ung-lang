@@ -2,11 +2,13 @@ use std::collections::HashMap;
 
 use crate::code::{Code, State};
 use crate::execute::{pop_stack_wrap, push_stack_wrap};
+use crate::io::ReadLine;
 use crate::number::Num;
 use crate::{code, io};
-use std::io::Write;
+use std::io::{stdin, Write};
 
 fn opt_execute<T>(
+    ipt: &mut impl ReadLine,
     out: &mut impl Write,
     err: &mut impl Write,
     mut state: T,
@@ -45,7 +47,7 @@ where
                     if cur_stack <= 2 {
                         return (state_clone, false);
                     }
-                    n += &pop_stack_wrap(out, err, &mut state, cur_stack);
+                    n += &pop_stack_wrap(ipt, out, err, &mut state, cur_stack);
                 }
                 push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
@@ -55,7 +57,7 @@ where
                     if cur_stack <= 2 {
                         return (state_clone, false);
                     }
-                    n *= &pop_stack_wrap(out, err, &mut state, cur_stack);
+                    n *= &pop_stack_wrap(ipt, out, err, &mut state, cur_stack);
                 }
                 push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
             }
@@ -67,7 +69,7 @@ where
                     if cur_stack <= 2 {
                         return (state_clone, false);
                     }
-                    v.push(pop_stack_wrap(out, err, &mut state, cur_stack));
+                    v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack));
                 }
 
                 for mut x in v {
@@ -86,7 +88,7 @@ where
                     if cur_stack <= 2 {
                         return (state_clone, false);
                     }
-                    v.push(pop_stack_wrap(out, err, &mut state, cur_stack));
+                    v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack));
                 }
 
                 for mut x in v {
@@ -102,7 +104,7 @@ where
                 if cur_stack <= 2 {
                     return (state_clone, false);
                 }
-                let n = pop_stack_wrap(out, err, &mut state, cur_stack);
+                let n = pop_stack_wrap(ipt, out, err, &mut state, cur_stack);
                 for _ in 0..code.get_hangul_count() {
                     push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone());
                 }
@@ -116,7 +118,7 @@ where
             if cur_stack <= 2 {
                 Option::None
             } else {
-                Option::Some(pop_stack_wrap(out, err, &mut state, cur_stack))
+                Option::Some(pop_stack_wrap(ipt, out, err, &mut state, cur_stack))
             }
         }) {
             Some(value) => value,
@@ -231,7 +233,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
 
         let mut idx = 0;
         for (i, opt_code) in opt_code_vec.iter().enumerate() {
-            let (new_state, next) = opt_execute(&mut out, &mut err, state, opt_code);
+            let (new_state, next) = opt_execute(&mut stdin(), &mut out, &mut err, state, opt_code);
             state = new_state;
             if !next {
                 idx = i;

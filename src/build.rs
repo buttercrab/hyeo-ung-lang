@@ -1,5 +1,4 @@
 use crate::code;
-use std::any::Any;
 
 fn make_indent(value: usize) -> String {
     std::iter::repeat(' ').take(value * 4).collect::<String>()

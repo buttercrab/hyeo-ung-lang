@@ -1,4 +1,4 @@
-use std::io::{stderr, stdout, Write};
+use std::io::{stderr, stdin, stdout, Write};
 
 use clap::*;
 
@@ -182,13 +182,13 @@ async fn main() {
                 state.get_stack(2).clear();
             }
             for code in opt_code {
-                state = execute::execute(&mut stdout, &mut stderr, state, &code);
+                state = execute::execute(&mut stdin(), &mut stdout, &mut stderr, state, &code);
             }
         } else {
             let mut state = code::UnOptState::new();
             io::print_log("running code");
             for code in un_opt_code {
-                state = execute::execute(&mut stdout, &mut stderr, state, &code);
+                state = execute::execute(&mut stdin(), &mut stdout, &mut stderr, state, &code);
             }
         }
     } else if let Some(ref matches) = matches.subcommand_matches("update") {
