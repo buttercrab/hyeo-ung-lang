@@ -44,4 +44,21 @@ mod execute_test {
             "",
         ));
     }
+    
+    #[test]
+    fn execute_test06() {
+        assert!(helper_function("형. 흑. 항..", "", ""));
+    }
+
+    #[test]
+    fn execute_test07() {
+        assert!(helper_function("형. 흑.. 항.", "", ""));
+    }
+
+    #[test]
+    fn execute_test08() {
+        assert!(helper_function("형. 흣..", "", "1"));
+    }
 }
+
+

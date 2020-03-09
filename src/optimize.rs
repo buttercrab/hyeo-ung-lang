@@ -168,7 +168,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         let mut chk = Vec::new();
 
         for un_opt_code in &code {
-            if un_opt_code.get_type() == 0{
+            if un_opt_code.get_type() == 0 {
                 continue;
             }
             chk.push(now);
