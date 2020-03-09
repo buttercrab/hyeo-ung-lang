@@ -352,6 +352,8 @@ impl Code for UnOptCode {
 pub trait State {
     type CodeType: Code;
 
+    fn stack_size(&self) -> usize;
+
     fn current_stack(&self) -> usize;
 
     fn set_current_stack(&mut self, cur: usize);
@@ -407,6 +409,10 @@ impl OptState {
 impl State for OptState {
     type CodeType = OptCode;
 
+    fn stack_size(&self) -> usize {
+        self.stack.len()
+    }
+
     fn current_stack(&self) -> usize {
         self.cur
     }
@@ -421,7 +427,9 @@ impl State for OptState {
 
     fn push_stack(&mut self, idx: usize, num: number::Num) {
         if idx < self.stack.len() {
-            self.get_stack(idx).push(num);
+            if !self.stack[idx].is_empty() || !num.is_nan() {
+                self.get_stack(idx).push(num);
+            }
         }
     }
 
@@ -482,6 +490,10 @@ impl UnOptState {
 
 impl State for UnOptState {
     type CodeType = UnOptCode;
+
+    fn stack_size(&self) -> usize {
+        self.stack.len()
+    }
 
     fn current_stack(&self) -> usize {
         self.cur

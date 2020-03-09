@@ -14,7 +14,7 @@ where
 {
     let opt = level != 0;
     let mut res = String::from(format!(
-        "{}{}{}{}{}",
+        "{}{}{}{}{}{}{}{}{}",
         "\
 use hyeong_build::number::Num;
 use std::collections::HashMap;
@@ -29,17 +29,78 @@ impl Stack {
     fn new() -> Stack {
         Stack {
             data: ",
-        if opt { "Vec" } else { "HashMap" },
-        "::new(),
+        if opt {
+            format!("vec![Vec::new(); {}]", state.stack_size())
+        } else {
+            "HashMap::new()".to_string()
+        },
+        ",
         }
     }
 
     fn pop(&mut self, idx: usize) -> Num {
-        unimplemented!()
+        ",
+        if opt {
+            "if idx < self.data.len() {
+            match self.data[idx].pop() {
+                Some(n) => n,
+                None => {
+                    if idx == 0 {
+                        let mut s = String::new();
+                        std::io::stdin().read_line(&mut s).unwrap();
+                        for c in s.chars().rev() {
+                            self.data[0].push(Num::from_num(c as isize));
+                        }
+                        match self.data[0].pop() {
+                            Some(n) => n,
+                            None => Num::nan(),
+                        }
+                    } else {
+                        Num::nan()
+                    }
+                },
+            }
+        } else {
+            Num::nan()
+        }"
+        } else {
+            "match self.data.entry(idx).or_insert(Vec::new()).pop() {
+            Some(n) => n,
+            None => {
+                if idx == 0 {
+                    let mut s = String::new();
+                    std::io::stdin().read_line(&mut s).unwrap();
+                    for c in s.chars().rev() {
+                        self.data.get_mut(&0).unwrap().push(Num::from_num(c as isize));
+                    }
+                    match self.data.get_mut(&0).unwrap().pop() {
+                        Some(n) => n,
+                        None => Num::nan(),
+                    }
+                } else {
+                    Num::nan()
+                }
+            },
+        }"
+        },
+        "
     }
 
     fn push(&mut self, idx: usize, num: Num) {
-        unimplemented!()
+        ",
+        if opt {
+            "if idx < self.data.len() {
+            if !self.data[idx].is_empty() || !num.is_nan() {
+                self.data[idx].push(num);
+            }
+         }"
+        } else {
+            "let st = self.data.entry(idx).or_insert(Vec::new());
+        if !st.is_empty() || !num.is_nan() {
+            st.push(num);
+        }"
+        },
+        "
     }
 }
 
