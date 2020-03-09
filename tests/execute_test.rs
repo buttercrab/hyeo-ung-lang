@@ -41,10 +41,10 @@ mod execute_test {
         assert!(helper_function(
             "형 흣........💕 흣.... 형. 하앙... 흣. 흑... 흐읏....!💕",
             "12345678",
-            "",
+            ""
         ));
     }
-    
+
     #[test]
     fn execute_test06() {
         assert!(helper_function("형. 흑. 항..", "", ""));
@@ -60,5 +60,3 @@ mod execute_test {
         assert!(helper_function("형. 흣..", "", "1"));
     }
 }
-
-
