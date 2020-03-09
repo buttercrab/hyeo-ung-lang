@@ -6,8 +6,7 @@ before_install:
 matrix:
   include:
     - os: linux
-      rust:
-        nightly
+      rust: nightly
 
 script:
   - export CARGO_INCREMENTAL=0
@@ -16,5 +15,5 @@ script:
   - cargo test --verbose $CARGO_OPTIONS
   - |
     zip -0 ccov.zip `find . \( -name "hyeong*.gc*" \) -print`;
-    ./grcov ccov.zip -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
+    ./grcov . -s . -t lcov --llvm --branch --ignore-not-existing --ignore "/*" -o lcov.info;
     bash <(curl -s https://codecov.io/bash) -f lcov.info;
