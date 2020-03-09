@@ -1,7 +1,7 @@
 use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::{process, env};
+use std::{env, process};
 
 use colored::Colorize;
 
