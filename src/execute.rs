@@ -160,9 +160,10 @@ where
     if area_type != 0 {
         if area_type != 13 {
             let id = ((code.get_area_count() as u128) << 4) + area_type as u128;
-            match state.get_point(id, cur_loc) {
+            match state.get_point(id) {
                 Some(value) => {
                     if cur_loc != value {
+                        state.set_latest_loc(cur_loc);
                         return (state, value);
                     }
                 }

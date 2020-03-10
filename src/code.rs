@@ -352,6 +352,8 @@ impl Code for UnOptCode {
 pub trait State {
     type CodeType: Code;
 
+    fn get_all_stack_index(&self) -> Vec<usize>;
+
     fn stack_size(&self) -> usize;
 
     fn current_stack(&self) -> usize;
@@ -380,7 +382,11 @@ pub trait State {
 
     fn set_point(&mut self, id: u128, loc: usize);
 
-    fn get_point(&mut self, id: u128, cur_loc: usize) -> Option<usize>;
+    fn get_point(&self, id: u128) -> Option<usize>;
+
+    fn get_all_point(&self) -> Vec<(u128, usize)>;
+
+    fn set_latest_loc(&mut self, loc: usize);
 
     fn get_latest_loc(&self) -> Option<usize>;
 }
@@ -408,6 +414,10 @@ impl OptState {
 
 impl State for OptState {
     type CodeType = OptCode;
+
+    fn get_all_stack_index(&self) -> Vec<usize> {
+        (0..self.stack.len()).collect()
+    }
 
     fn stack_size(&self) -> usize {
         self.stack.len()
@@ -457,9 +467,20 @@ impl State for OptState {
         self.point.insert(id, loc);
     }
 
-    fn get_point(&mut self, id: u128, cur_loc: usize) -> Option<usize> {
-        self.latest = Option::Some(cur_loc);
+    fn get_point(&self, id: u128) -> Option<usize> {
         self.point.get(&id).map(|&x| x)
+    }
+
+    fn get_all_point(&self) -> Vec<(u128, usize)> {
+        let mut v = Vec::with_capacity(self.point.len());
+        for (a, b) in &self.point {
+            v.push((*a, *b));
+        }
+        v
+    }
+
+    fn set_latest_loc(&mut self, loc: usize) {
+        self.latest = Option::Some(loc);
     }
 
     fn get_latest_loc(&self) -> Option<usize> {
@@ -491,6 +512,14 @@ impl UnOptState {
 impl State for UnOptState {
     type CodeType = UnOptCode;
 
+    fn get_all_stack_index(&self) -> Vec<usize> {
+        let mut v = Vec::with_capacity(self.stack.len());
+        for (i, _) in &self.stack {
+            v.push(*i);
+        }
+        v
+    }
+
     fn stack_size(&self) -> usize {
         self.stack.len()
     }
@@ -520,9 +549,20 @@ impl State for UnOptState {
         self.point.insert(id, loc);
     }
 
-    fn get_point(&mut self, id: u128, cur_loc: usize) -> Option<usize> {
-        self.latest = Option::Some(cur_loc);
+    fn get_point(&self, id: u128) -> Option<usize> {
         self.point.get(&id).map(|&x| x)
+    }
+
+    fn get_all_point(&self) -> Vec<(u128, usize)> {
+        let mut v = Vec::with_capacity(self.point.len());
+        for (a, b) in &self.point {
+            v.push((*a, *b));
+        }
+        v
+    }
+
+    fn set_latest_loc(&mut self, loc: usize) {
+        self.latest = Option::Some(loc);
     }
 
     fn get_latest_loc(&self) -> Option<usize> {

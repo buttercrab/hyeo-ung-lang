@@ -15,7 +15,7 @@ fn fn_eprint(indent: usize, s: String) -> String {
 
 fn command(indent: usize, c: &impl Code) -> String {
     String::from(format!(
-        "{}\n{}",
+        "{}{}",
         match c.get_type() {
             0 => {
                 format!(
@@ -98,12 +98,79 @@ fn command(indent: usize, c: &impl Code) -> String {
                 )
             }
         },
-        area(indent, c.get_area())
+        area(indent, c.get_area(), c.get_area_count())
     ))
 }
 
-fn area(indent: usize, a: &Area) -> String {
-    format!("\n{}", make_indent(indent))
+fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
+    let mut st = vec![(a, &Area::Nil, false)];
+    let mut res = String::new();
+    loop {
+        loop {
+            if let Area::Val { type_, left, right } = st.last().unwrap().0 {
+                if *type_ <= 1 {
+                    st.push((left, right, false));
+                    res.push_str(&*format!(
+                        "\n{0}match stack.pop(cur).partial_cmp(&Num::from_num({1})) {{\
+                         \n{0}    Some(std::cmp::Ordering::{2}) => {{",
+                        make_indent(indent),
+                        cnt,
+                        if *type_ == 0 { "Less" } else { "Equal" }
+                    ));
+                    indent += 2;
+                    continue;
+                } else {
+                    if *type_ < 13 {
+                        res.push_str(&*format!(
+                            "\n{0}let v = *point.entry({1}u128).or_insert(state);\
+                             \n{0}if v != state {{\
+                             \n{0}    last = Option::Some(state);\
+                             \n{0}    state = v;\
+                             \n{0}    continue;\
+                             \n{0}}}",
+                            make_indent(indent),
+                            ((cnt as u128) << 4) + *type_ as u128
+                        ));
+                    } else {
+                        res.push_str(&*format!(
+                            "\n{0}if let Option::Some(v) = last {{\
+                             \n{0}    state = v;\
+                             \n{0}    continue;\
+                             \n{0}}}",
+                            make_indent(indent)
+                        ));
+                    }
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+
+        while st.len() > 1 && st.last().unwrap().2 {
+            st.pop();
+            indent -= 2;
+            res.push_str(&*format!(
+                "\n{0}    }}\
+                 \n{0}}}",
+                make_indent(indent)
+            ));
+        }
+
+        if st.len() > 1 {
+            let (left, right, _) = st.pop().unwrap();
+            st.push((right, left, true));
+            indent -= 1;
+            res.push_str(&*format!(
+                "\n{0}}}\
+                 \n{0}_ => {{",
+                make_indent(indent)
+            ));
+            indent += 1;
+        } else {
+            break res;
+        }
+    }
 }
 
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
@@ -232,12 +299,49 @@ fn main() {
     #[allow(unused_mut, unused_variables)]
     let mut point: HashMap<u128, usize> = HashMap::new();
     let mut state = 0usize;
-    #[allow(unused_mut, unused_variables)]
-    let mut last = 0usize;
-    #[allow(unused_mut, unused_variables)]
+    #[allow(unused_mut, unused_variables, unused_assignments)]
+    let mut last = Option::None;
+    #[allow(unused_mut, unused_variables, unused_assignments)]
     let mut cur = 3usize;
 ",
     ));
+
+    if opt {
+        for i in state.get_all_stack_index() {
+            if state.get_stack(i).is_empty() {
+                continue;
+            }
+            res.push_str(&*format!(
+                "
+    stack.data[{}] = vec!{:?}.iter().map(|x| Num::from_num(*x)).collect();",
+                i,
+                state.get_stack(i)
+            ));
+        }
+
+        for (a, b) in state.get_all_point() {
+            res.push_str(&*format!(
+                "
+    point.insert({}u128, {});",
+                a, b
+            ));
+        }
+
+        res.push_str(&*format!(
+            "
+    cur = {};",
+            state.current_stack()
+        ));
+
+        res.push_str(&*format!(
+            "
+    last = Option::{};",
+            match state.get_latest_loc() {
+                Some(v) => format!("Some({})", v),
+                None => "None".to_string(),
+            }
+        ))
+    }
 
     let mut indent = 1usize;
 
@@ -275,7 +379,11 @@ fn main() {
                 left: _,
                 right: _,
             } => {
-                codes.push(vec![c.clone()]);
+                if !codes.last().unwrap().is_empty() {
+                    codes.push(vec![c.clone()]);
+                } else {
+                    codes.last_mut().unwrap().push(c.clone());
+                }
                 codes.push(Vec::new());
             }
             Area::Nil => {
@@ -284,47 +392,56 @@ fn main() {
         }
     }
 
-    res.push_str(&*format!(
-        "
-    while state < {} {{",
-        codes.len()
-    ));
-    indent += 1;
-
-    let mut stack = vec![(codes.len(), false)];
-
-    for i in 0..codes.len() {
-        while stack.last().unwrap().0 > 1 {
-            stack.push((stack.last().unwrap().0 / 2, false));
-            res.push_str(&*format!(
-                "\n{}if state < {} {{",
-                make_indent(indent),
-                stack.last().unwrap().0 + i
-            ));
-            indent += 1;
-        }
-
-        for item in &codes[i] {
-            res.push_str(&*command(indent, item));
-        }
-
-        while stack.len() > 1 && stack.last().unwrap().1 {
-            stack.pop();
-            indent -= 1;
-            res.push_str(&*format!("\n{}}}", make_indent(indent)));
-        }
-
-        if i != codes.len() - 1 {
-            let last = stack.pop().unwrap().0;
-            stack.push((stack.last().unwrap().0 - last, true));
-            res.push_str(&*format!("\n{}}} else {{", make_indent(indent - 1)));
-        }
+    if codes.last().unwrap().is_empty() {
+        codes.pop().unwrap();
     }
 
+    if codes.len() > 0 {
+        res.push_str(&*format!(
+            "
+    while state < {} {{",
+            codes.len()
+        ));
+        indent += 1;
+
+        let mut stack = vec![(codes.len(), false)];
+
+        for i in 0..codes.len() {
+            while stack.last().unwrap().0 > 1 {
+                stack.push((stack.last().unwrap().0 / 2, false));
+                res.push_str(&*format!(
+                    "\n{}if state < {} {{",
+                    make_indent(indent),
+                    stack.last().unwrap().0 + i
+                ));
+                indent += 1;
+            }
+
+            for item in &codes[i] {
+                res.push_str(&*command(indent, item));
+            }
+
+            while stack.len() > 1 && stack.last().unwrap().1 {
+                stack.pop();
+                indent -= 1;
+                res.push_str(&*format!("\n{}}}", make_indent(indent)));
+            }
+
+            if i != codes.len() - 1 {
+                let last = stack.pop().unwrap().0;
+                stack.push((stack.last().unwrap().0 - last, true));
+                res.push_str(&*format!("\n{}}} else {{", make_indent(indent - 1)));
+            }
+        }
+
+        res.push_str(
+            "
+        state += 1;
+    }",
+        );
+    }
     res.push_str(
         "
-        state += 1;
-    }
 }",
     );
     res

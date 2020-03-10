@@ -128,9 +128,10 @@ where
         if area_type != 0 {
             if area_type != 13 {
                 let id = ((code.get_area_count() as u128) << 4) + area_type as u128;
-                match state.get_point(id, cur_loc) {
+                match state.get_point(id) {
                     Some(value) => {
                         if cur_loc != value {
+                            state.set_latest_loc(cur_loc);
                             cur_loc = value;
                             exec_count += 1;
                             continue;
@@ -231,7 +232,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
 
-        let mut idx = 0;
+        let mut idx = opt_code_vec.len();
         for (i, opt_code) in opt_code_vec.iter().enumerate() {
             let (new_state, next) = opt_execute(&mut stdin(), &mut out, &mut err, state, opt_code);
             state = new_state;
