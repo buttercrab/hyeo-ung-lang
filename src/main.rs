@@ -4,6 +4,7 @@ use clap::*;
 
 use hyeong::code::State;
 use hyeong::{build, code, debug, execute, interpreter, io, optimize, update};
+use std::path::Path;
 use std::process::Command;
 
 #[tokio::main]
@@ -143,30 +144,31 @@ async fn main() {
             io::print_log("compiling to rust");
             build::build_source(state, &un_opt_code, 0)
         };
+        if !Path::new(&*io::get_build_path()).exists() {
+            io::print_log("making temporary crate");
+            io::execute_command_stderr(
+                &*format!(
+                    "cargo new {} --color always --vcs none",
+                    io::get_build_path()
+                ),
+                &*format!(
+                    "cargo new {} --color always --vcs none",
+                    io::get_build_path()
+                ),
+            );
+        }
         io::save_to_file(&*(io::get_build_path() + "/src/main.rs"), source);
         io::print_log("compiling rust code");
-        let output = if cfg!(target_os = "windows") {
-            io::handle_error(
-                Command::new("cmd")
-                    .arg("/C")
-                    .arg(format!(
-                        "cargo build --manifest-path={}\\Cargo.toml --release --color always",
-                        io::get_build_path()
-                    ))
-                    .output(),
-            )
-        } else {
-            io::handle_error(
-                Command::new("bash")
-                    .arg("-c")
-                    .arg(format!(
-                        "cargo build --manifest-path={}/Cargo.toml --release --color always",
-                        io::get_build_path()
-                    ))
-                    .output(),
-            )
-        };
-        print!("{}", io::handle_error(String::from_utf8(output.stderr)));
+        io::execute_command_stderr(
+            &*format!(
+                "cargo build --manifest-path={}\\Cargo.toml --release --color always",
+                io::get_build_path()
+            ),
+            &*format!(
+                "cargo build --manifest-path={}/Cargo.toml --release --color always",
+                io::get_build_path()
+            ),
+        );
         io::print_log("moving binary to current directory");
         if cfg!(target_os = "windows") {
             io::handle_error(Command::new("cmd").arg("/C").arg("TODO").output())

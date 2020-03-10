@@ -6,6 +6,7 @@ use std::{env, process};
 use colored::Colorize;
 
 use crate::{code, parse};
+use std::process::Command;
 
 pub struct CustomWriter<T>
 where
@@ -178,4 +179,32 @@ pub fn get_build_path() -> String {
     } else {
         env::var("HOME").unwrap() + "/.hyeong/hyeong-build"
     }
+}
+
+pub fn execute_command_stdout(windows: &str, linux: &str) {
+    print!(
+        "{}",
+        handle_error(String::from_utf8(
+            handle_error(if cfg!(target_os = "windows") {
+                Command::new("cnd").arg("/C").arg(windows).output()
+            } else {
+                Command::new("bash").arg("-c").arg(linux).output()
+            })
+            .stdout
+        ))
+    );
+}
+
+pub fn execute_command_stderr(windows: &str, linux: &str) {
+    print!(
+        "{}",
+        handle_error(String::from_utf8(
+            handle_error(if cfg!(target_os = "windows") {
+                Command::new("cnd").arg("/C").arg(windows).output()
+            } else {
+                Command::new("bash").arg("-c").arg(linux).output()
+            })
+            .stderr
+        ))
+    );
 }
