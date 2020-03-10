@@ -69,7 +69,7 @@
 - Debugger:
   + line by line (with going back feature)
 - Compiler:
-  + commands only (area will be supported soon)
+  + supports optimize
 - Examples:
   + `Hello, world!`, `a + b`, `a * b`
   
