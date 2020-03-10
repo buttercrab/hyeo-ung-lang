@@ -171,7 +171,10 @@ async fn main() {
         );
         io::print_log("moving binary to current directory");
         if cfg!(target_os = "windows") {
-            io::handle_error(Command::new("cmd").arg("/C").arg("TODO").output())
+            io::handle_error(Command::new("cmd").arg("/C").arg(format!(
+                "copy %USERPROFILE%\\.hyeong\\hyeong-build\\target\\release\\hyeong-build.exe {}.exe",
+                output_file
+            )).output())
         } else {
             io::handle_error(
                 Command::new("bash")
