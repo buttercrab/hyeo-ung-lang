@@ -301,7 +301,7 @@ fn main() {
     let mut point: HashMap<u128, usize> = HashMap::new();
     let mut state = 0usize;
     #[allow(unused)]
-    let mut last = Option::None;
+    let mut last = Option::<usize>::None;
     #[allow(unused)]
     let mut cur = 3usize;
 ",
