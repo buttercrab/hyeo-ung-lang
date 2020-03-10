@@ -9,6 +9,8 @@ cargo build --manifest-path="$HOME"/.hyeong/hyeong/Cargo.toml --release
 printf "\n\e[01;36m==> making directory for building hyeong code\e[0m \n"
 if [ ! -d "$HOME/.hyeong/hyeong-build/" ]; then
   cd ~/.hyeong && cargo new hyeong-build
+  rm -rf ~/.hyeong/hyeong-build/.git
+  rm ~/.hyeong/hyeong-build/.gitignore
 fi
 cp ~/.hyeong/hyeong/src/number.rs ~/.hyeong/hyeong-build/src/
 cp ~/.hyeong/hyeong/src/big_number.rs ~/.hyeong/hyeong-build/src/
