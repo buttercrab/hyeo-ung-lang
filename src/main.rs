@@ -143,20 +143,27 @@ async fn main() {
             io::print_log("compiling to rust");
             build::build_source(state, &un_opt_code, 0)
         };
-        io::save_to_file(&*(io::get_build_path() + "/src/main.rs"), source);
+        let build_path = io::get_build_path();
+        io::save_to_file(&*(build_path + "/src/main.rs"), source);
         io::print_log("compiling rust code");
         let output = if cfg!(target_os = "windows") {
             io::handle_error(
                 Command::new("cmd")
                     .arg("/C")
-                    .arg("cargo build --manifest-path=\"$HOME\"/.hyeong/hyeong-build/Cargo.toml --release --color always")
+                    .arg(format!(
+                        "cargo build --manifest-path={}\\Cargo.toml --release --color always",
+                        build_path
+                    ))
                     .output(),
             )
         } else {
             io::handle_error(
                 Command::new("bash")
                     .arg("-c")
-                    .arg("cargo build --manifest-path=\"$HOME\"/.hyeong/hyeong-build/Cargo.toml --release --color always")
+                    .arg(format!(
+                        "cargo build --manifest-path={}/Cargo.toml --release --color always",
+                        build_path
+                    ))
                     .output(),
             )
         };
