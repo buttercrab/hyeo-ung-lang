@@ -22,7 +22,7 @@
   + `$ hyeong`
 - [x] Code runner
   + `$ hyeong run FILE`
-- [ ] Compiler
+- [x] Compiler
   + `$ hyeong build FILE --flags...`
 - [x] Optimization
 - [x] Debugger
@@ -33,7 +33,7 @@
 - [x] No unsafe rust code
 - [ ] Documented code
 - [ ] Language tutorial (English)
-- [ ] Examples
+- [x] Examples
 
 ## Implementation
 
@@ -68,6 +68,10 @@
   + level 2 optimize
 - Debugger:
   + line by line (with going back feature)
+- Compiler:
+  + commands onlY (area will be supported soon)
+- Examples:
+  + `Hello, world!`, `a + b`, `a * b`
   
 ---
 
