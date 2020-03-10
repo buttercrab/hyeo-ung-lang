@@ -1,13 +1,17 @@
 ﻿@ECHO OFF
 
 print "\e[01;36m==> cloning repo to ~/.hyeong/hyeong\e[0m \n"
-git clone https://github.com/buttercrab/hyeo-ung-lang %USERPROFILE%\.hyeong\hyeong || (cd %USERPROFILE%\.hyeong\hyeong && git pull)
+IF EXIST %USERPROFILE%\.hyeong\hyeong (
+  cd %USERPROFILE%\.hyeong\hyeong && git pull
+) else (
+  git clone https://github.com/buttercrab/hyeo-ung-lang %USERPROFILE%\.hyeong\hyeong
+)
 
 print "\n\e[01;36m==> building hyeong\e[0m \n"
 cargo build --manifest-path=%USERPROFILE%\.hyeong\hyeong\Cargo.toml --release
 
 print "\n\e[01;36m==> making directory for building hyeong code\e[0m \n"
-IF NOT EXIST %USERPROFILE%\.hyeong\hyeong-build/ (
+IF NOT EXIST %USERPROFILE%\.hyeong\hyeong-build (
     cd %USERPROFILE%\.hyeong && cargo new hyeong-build --vcs none
 ) 
 
