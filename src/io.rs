@@ -175,7 +175,7 @@ pub fn save_to_file(file: &str, content: String) {
 
 pub fn get_build_path() -> String {
     if cfg!(target_os = "windows") {
-        env::var("USERPROFILE").unwrap() + "/.hyeong/hyeong-build"
+        env::var("USERPROFILE").unwrap() + "\\.hyeong\\hyeong-build"
     } else {
         env::var("HOME").unwrap() + "/.hyeong/hyeong-build"
     }
@@ -186,7 +186,7 @@ pub fn execute_command_stdout(windows: &str, linux: &str) {
         "{}",
         handle_error(String::from_utf8(
             handle_error(if cfg!(target_os = "windows") {
-                Command::new("cnd").arg("/C").arg(windows).output()
+                Command::new("cmd").arg("/C").arg(windows).output()
             } else {
                 Command::new("bash").arg("-c").arg(linux).output()
             })
@@ -200,7 +200,7 @@ pub fn execute_command_stderr(windows: &str, linux: &str) {
         "{}",
         handle_error(String::from_utf8(
             handle_error(if cfg!(target_os = "windows") {
-                Command::new("cnd").arg("/C").arg(windows).output()
+                Command::new("cmd").arg("/C").arg(windows).output()
             } else {
                 Command::new("bash").arg("-c").arg(linux).output()
             })
