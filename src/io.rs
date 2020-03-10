@@ -175,7 +175,7 @@ pub fn save_to_file(file: &str, content: String) {
 
 pub fn get_build_path() -> String {
     if cfg!(target_os = "windows") {
-        env::var("HOMEPATH").unwrap() + "/.hyeong/hyeong-build"
+        env::var("USERPROFILE").unwrap() + "/.hyeong/hyeong-build"
     } else {
         env::var("HOME").unwrap() + "/.hyeong/hyeong-build"
     }
