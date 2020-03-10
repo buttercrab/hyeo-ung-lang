@@ -7,6 +7,9 @@
 <a href="https://codecov.io/gh/buttercrab/hyeo-ung-lang">
 <img alt="Codecov" src="https://img.shields.io/codecov/c/github/buttercrab/hyeo-ung-lang?style=flat-square"/>
 </a>
+<a href="https://github.com/buttercrab/hyeo-ung-lang/releases">
+<img alt="Release" src="https://img.shields.io/github/v/release/buttercrab/hyeo-ung-lang?include_prereleases&style=flat-square"/>
+</a>
 <a href="https://github.com/buttercrab/hyeo-ung-lang/blob/master/LICENSE">
 <img alt="License" src="https://img.shields.io/github/license/buttercrab/hyeo-ung-lang?style=flat-square"/>
 </a>
