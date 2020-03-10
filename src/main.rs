@@ -143,8 +143,7 @@ async fn main() {
             io::print_log("compiling to rust");
             build::build_source(state, &un_opt_code, 0)
         };
-        let build_path = io::get_build_path();
-        io::save_to_file(&*(build_path + "/src/main.rs"), source);
+        io::save_to_file(&*(io::get_build_path() + "/src/main.rs"), source);
         io::print_log("compiling rust code");
         let output = if cfg!(target_os = "windows") {
             io::handle_error(
@@ -152,7 +151,7 @@ async fn main() {
                     .arg("/C")
                     .arg(format!(
                         "cargo build --manifest-path={}\\Cargo.toml --release --color always",
-                        build_path
+                        io::get_build_path()
                     ))
                     .output(),
             )
@@ -162,7 +161,7 @@ async fn main() {
                     .arg("-c")
                     .arg(format!(
                         "cargo build --manifest-path={}/Cargo.toml --release --color always",
-                        build_path
+                        io::get_build_path()
                     ))
                     .output(),
             )
