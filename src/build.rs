@@ -181,6 +181,7 @@ where
     let mut res = String::from(format!(
         "{}{}{}{}{}{}{}{}{}",
         "\
+#![allow(warnings)]
 use hyeong_build::number::Num;
 use std::collections::HashMap;
 
@@ -203,7 +204,7 @@ impl Stack {
         }
     }
 
-    #[allow(dead_code)]
+    #[allow(unused)]
     fn pop(&mut self, idx: usize) -> Num {
         if idx == 1 {
             std::process::exit(0);
@@ -258,7 +259,7 @@ impl Stack {
         "
     }
 
-    #[allow(dead_code)]
+    #[allow(unused)]
     fn push(&mut self, idx: usize, num: Num) {
         if idx == 1 {
             if num.is_pos() {
@@ -294,14 +295,14 @@ impl Stack {
 }
 
 fn main() {
-    #[allow(unused_mut, unused_variables)]
+    #[allow(unused)]
     let mut stack = Stack::new();
-    #[allow(unused_mut, unused_variables)]
+    #[allow(unused)]
     let mut point: HashMap<u128, usize> = HashMap::new();
     let mut state = 0usize;
-    #[allow(unused_mut, unused_variables, unused_assignments)]
+    #[allow(unused)]
     let mut last = Option::None;
-    #[allow(unused_mut, unused_variables, unused_assignments)]
+    #[allow(unused)]
     let mut cur = 3usize;
 ",
     ));
