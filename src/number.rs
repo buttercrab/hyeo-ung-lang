@@ -220,14 +220,18 @@ impl Num {
                 s = s[1..].to_string();
             }
             let v = s.split('/').map(|x| x.to_string()).collect::<Vec<_>>();
-            if v.len() == 1 {
+            let mut res = if v.len() == 1 {
                 Num::from_big_num(BigNum::from_string(v[0].clone()).unwrap(), BigNum::one())
             } else {
                 Num::from_big_num(
                     BigNum::from_string(v[0].clone()).unwrap(),
                     BigNum::from_string(v[1].clone()).unwrap(),
                 )
+            };
+            if neg {
+                res.minus();
             }
+            res
         }
     }
 

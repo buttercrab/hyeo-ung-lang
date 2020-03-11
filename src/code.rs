@@ -72,6 +72,16 @@ impl Area {
     }
 }
 
+/// Calculates Area when value and stack is given.
+///
+/// # Examples
+/// ```
+/// use hyeong::code::{Area, calc};
+/// use hyeong::number::Num;
+///
+/// let a = Area::new(10);
+/// assert_eq!(10, calc(&a, 1, || Option::Some(Num::one())).unwrap());
+/// ```
 pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Option<u8>
 where
     T: FnMut() -> Option<Num>,
