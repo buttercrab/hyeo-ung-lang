@@ -3,14 +3,13 @@ use std::io::{stderr, stdin, stdout, Write};
 use clap::*;
 
 use hyeong::code::State;
-use hyeong::{build, code, debug, execute, interpreter, io, optimize, update};
+use hyeong::{build, code, debug, execute, interpreter, io, optimize};
 use std::path::Path;
 use std::process::Command;
 
-#[tokio::main]
-async fn main() {
+fn main() {
     let matches = App::new("hyeong")
-        .version("0.1.0")
+        .version("0.1.0-beta")
         .about("Hyeo-ung programming language tool")
         .subcommand(
             App::new("build")
@@ -110,15 +109,6 @@ async fn main() {
                         .help("warning level (0/none: no warning, 1/all: all warning")
                         .default_value("all"),
                 ),
-        )
-        .subcommand(
-            App::new("update").about("Update this tool").arg(
-                Arg::with_name("version")
-                    .value_name("version")
-                    .takes_value(true)
-                    .help("update to specific version (latest by default)")
-                    .default_value("latest"),
-            ),
         )
         .get_matches();
 
@@ -241,18 +231,6 @@ async fn main() {
             for code in un_opt_code {
                 state = execute::execute(&mut stdin(), &mut stdout, &mut stderr, state, &code);
             }
-        }
-    } else if let Some(ref matches) = matches.subcommand_matches("update") {
-        let cur_version = update::get_current_version();
-        let version = io::handle_error(
-            update::get_update_version(matches.value_of("version").unwrap()).await,
-        );
-
-        if cur_version != version {
-            // update
-        } else {
-            io::print_warn("This is the same version");
-            io::print_note("Check repository: https://github.com/buttercrab/hyeo-ung-lang");
         }
     } else {
         interpreter::run();

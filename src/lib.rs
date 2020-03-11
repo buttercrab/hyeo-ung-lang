@@ -8,4 +8,3 @@ pub mod io;
 pub mod number;
 pub mod optimize;
 pub mod parse;
-pub mod update;
