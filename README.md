@@ -18,85 +18,54 @@
 [Hyeo-ung Programming Language](https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069) compiler written in rust.
 (Developing)
 
-## Goal
+**version 0.1.0 beta released**
 
-- [x] Big Number
-- [x] Interpreter
-  + `$ hyeong`
-- [x] Code runner
-  + `$ hyeong run FILE`
-- [x] Compiler
-  + `$ hyeong build FILE --flags...`
-- [x] Optimization
-- [x] Debugger
-  + `$ hyeong debug FILE --flag...`
-- [ ] String to Hyeo-ung Code Generator
-  + `$ hyeong string "Hello, World!"`
-- [ ] Prove whether it is Turing Complete
-- [x] No unsafe rust code
-- [ ] Documented code
-- [ ] Language tutorial (English)
-- [x] Examples
+# How to install
 
-## Implementation
+One of these commands **must** be executed.
 
-```
- Complier:      | Interpreter:
-                | 
- Hyeo-ung code  |  Hyeo-ung code
-                | 
-       |        |        |
-       V        |        V
-                | 
-   Rust code    | Execute by line
-                | 
-       |        | 
-       V        | 
-                | 
- Binary Program | 
+## Build from source
+
+1. Windows
+```cmd
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.cmd" | cmd
 ```
 
-## Implemented
-
-- Big Number:
-  + Arithmetic operators, `to_string` and `from_string` method
-- Compiler:
-  + parser: O(n) algorithm **iterates whole code exactly twice**
-- Code Runner:
-  + optimized & unoptimized code runner
-- Interpreter:
-  + interactive code runner
-- Optimizer:
-  + level 1 optimize
-  + level 2 optimize
-- Debugger:
-  + line by line (with going back feature)
-- Compiler:
-  + supports optimize
-- Examples:
-  + `Hello, world!`, `a + b`, `a * b`
-  
----
-
-## Feature
-
-- Compile hyeo-ung code
-  + `$ hyeong build FILE -O2 -Wall`
-- Parse hyeo-ung code
-  + `$ hyeong check FILE`
-- Debug hyeo-ung code
-  + `$ hyeong debug FILE --from 12`
-- Run directly without making binary file
-  + `$ hyeong run FILE -O2 -Wall`
-- Update this tool
-  + `$ hyeong update`
-- Interpreter
-  + `$ hyeong`
-  
-## How to install
-
-*(will be published when stable version comes out)*
-
+2. Mac, Linux
 ```shell script
 curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh" | /bin/bash
 ```
+
+## Install without build (don't install binary)
+
+1. Windows
+```cmd
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.cmd" | cmd
+```
+
+2. Mac, Linux
+```shell script
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.sh" | /bin/bash
+```
+
+# Features
+
+## `hyeong`
+
+Runs interpreter
+
+## `hyeong build FILE -O2 -o output_file`
+
+Builds hyeong code to binary file, can optimize hyeong code
+
+## `hyeong check FILE`
+
+Check FILE and print each command 
+
+## `hyeong debug FILE`
+
+Debug file line by line, breakpoints, going previous
+
+## `hyeong run FILE -O2`
+
+Runs directly without making binary file
