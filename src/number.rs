@@ -200,6 +200,37 @@ impl Num {
         self.down.is_zero()
     }
 
+    /// Make `Num` from `String
+    /// Supports NaN, Negative
+    ///
+    /// # Examples
+    /// ```
+    /// use hyeong::number::Num;
+    ///
+    /// assert_eq!("10/3", Num::from_string("10/3".to_string()).to_string());
+    /// assert_eq!("너무 커엇...", Num::from_string("너무 커엇...".to_string()).to_string());
+    /// assert_eq!("-12", Num::from_string("-12".to_string()).to_string());
+    /// ```
+    pub fn from_string(mut s: String) -> Num {
+        if s == "너무 커엇..." {
+            Num::nan()
+        } else {
+            let neg = s.starts_with('-');
+            if neg {
+                s = s[1..].to_string();
+            }
+            let v = s.split('/').map(|x| x.to_string()).collect::<Vec<_>>();
+            if v.len() == 1 {
+                Num::from_big_num(BigNum::from_string(v[0].clone()).unwrap(), BigNum::one())
+            } else {
+                Num::from_big_num(
+                    BigNum::from_string(v[0].clone()).unwrap(),
+                    BigNum::from_string(v[1].clone()).unwrap(),
+                )
+            }
+        }
+    }
+
     /// Make string from itself (10 based)
     /// Negative numbers and NaN are supported
     ///

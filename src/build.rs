@@ -344,14 +344,17 @@ fn main() {
     }
 
     if code.len() > 0 {
-        if opt {
+        let mut codes: Vec<Vec<T::CodeType>> = Vec::new();
+        codes.push(Vec::new());
+
+        if level >= 2 {
             for i in state.get_all_stack_index() {
                 if state.get_stack(i).is_empty() {
                     continue;
                 }
                 res.push_str(&*format!(
                     "
-    stack.data[{}] = vec![{}].iter().map(|x| Num::from_big_num(BigNum::from_string((&**x).to_string()).unwrap(), BigNum::one())).collect();",
+    stack.data[{}] = vec![{}].iter().map(|x| Num::from_string(x.to_string())).collect();",
                     i,
                     vec_to_str(state.get_stack(i))
                 ));
@@ -370,57 +373,54 @@ fn main() {
                     Some(v) => format!("Some({})", v),
                     None => "None".to_string(),
                 }
-            ))
-        }
+            ));
 
-        let mut codes: Vec<Vec<T::CodeType>> = Vec::new();
-        codes.push(Vec::new());
+            let mut point = state.get_all_point();
+            point.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+            let mut idx = 0;
 
-        let mut point = state.get_all_point();
-        point.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
-        let mut idx = 0;
-
-        for (i, c) in state.get_all_code().iter().enumerate() {
-            match c.get_area() {
-                Area::Val {
-                    type_: _,
-                    left: _,
-                    right: _,
-                } => {
-                    if !codes.last().unwrap().is_empty() {
-                        codes.push(vec![c.clone()]);
-                    } else {
+            for (i, c) in state.get_all_code().iter().enumerate() {
+                match c.get_area() {
+                    Area::Val {
+                        type_: _,
+                        left: _,
+                        right: _,
+                    } => {
+                        if !codes.last().unwrap().is_empty() {
+                            codes.push(vec![c.clone()]);
+                        } else {
+                            codes.last_mut().unwrap().push(c.clone());
+                        }
+                        while idx < point.len() && point[idx].1 == i {
+                            point[idx].1 = codes.len() - 1;
+                            idx += 1;
+                        }
+                        codes.push(Vec::new());
+                    }
+                    Area::Nil => {
                         codes.last_mut().unwrap().push(c.clone());
                     }
-                    while idx < point.len() && point[idx].1 == i {
-                        point[idx].1 = codes.len() - 1;
-                        idx += 1;
-                    }
-                    codes.push(Vec::new());
-                }
-                Area::Nil => {
-                    codes.last_mut().unwrap().push(c.clone());
                 }
             }
-        }
 
-        if opt {
-            for (a, b) in point {
+            if opt {
+                for (a, b) in point {
+                    res.push_str(&*format!(
+                        "
+    point.insert({}u128, {});",
+                        a, b
+                    ));
+                }
+
                 res.push_str(&*format!(
                     "
-    point.insert({}u128, {});",
-                    a, b
+    state = {};",
+                    codes.len(),
                 ));
             }
-
-            res.push_str(&*format!(
-                "
-    state = {};",
-                codes.len(),
-            ));
-        }
-        if !codes.last().unwrap().is_empty() {
-            codes.push(Vec::new());
+            if !codes.last().unwrap().is_empty() {
+                codes.push(Vec::new());
+            }
         }
 
         for c in code {
