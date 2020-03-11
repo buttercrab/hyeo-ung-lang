@@ -17,9 +17,9 @@ fn opt_execute<T>(
 where
     T: code::State + Clone,
 {
+    let state_clone = state.clone();
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
-    let state_clone = state.clone();
     let mut exec_count = 0;
 
     while cur_loc < length {

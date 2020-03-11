@@ -71,6 +71,25 @@ impl Num {
         }
     }
 
+    /// Makes new `Num` from `BigNum`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::number::Num;
+    /// use hyeong::big_number::BigNum;
+    ///
+    /// let a = BigNum::new(1000);
+    /// let b = BigNum::new(14);
+    ///
+    /// assert_eq!("500/7", Num::from_big_num(a, b).to_string());
+    /// ```
+    pub fn from_big_num(up: BigNum, down: BigNum) -> Num {
+        let mut res = Num { up, down };
+        res.optimize();
+        res
+    }
+
     /// Makes new zero `Num`
     ///
     /// # Examples

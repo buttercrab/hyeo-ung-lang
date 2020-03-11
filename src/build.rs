@@ -1,5 +1,6 @@
 use crate::code;
 use crate::code::{Area, Code};
+use crate::number::Num;
 
 fn make_indent(value: usize) -> String {
     std::iter::repeat(' ').take(value * 4).collect::<String>()
@@ -11,6 +12,14 @@ fn fn_print(indent: usize, s: String) -> String {
 
 fn fn_eprint(indent: usize, s: String) -> String {
     format!("\n{}eprint!({:?});", make_indent(indent), s)
+}
+
+fn vec_to_str(v: &Vec<Num>) -> String {
+    let mut res = String::new();
+    for i in v {
+        res.push_str(&*format!("{:?}, ", i.to_string()));
+    }
+    res
 }
 
 fn command(indent: usize, c: &impl Code) -> String {
@@ -182,6 +191,7 @@ where
         "{}{}{}{}{}{}{}{}{}",
         "\
 #![allow(warnings)]
+use hyeong_build::big_number::BigNum;
 use hyeong_build::number::Num;
 use std::collections::HashMap;
 
@@ -307,43 +317,6 @@ fn main() {
 ",
     ));
 
-    if opt {
-        for i in state.get_all_stack_index() {
-            if state.get_stack(i).is_empty() {
-                continue;
-            }
-            res.push_str(&*format!(
-                "
-    stack.data[{}] = vec!{:?}.iter().map(|x| Num::from_num(*x)).collect();",
-                i,
-                state.get_stack(i)
-            ));
-        }
-
-        for (a, b) in state.get_all_point() {
-            res.push_str(&*format!(
-                "
-    point.insert({}u128, {});",
-                a, b
-            ));
-        }
-
-        res.push_str(&*format!(
-            "
-    cur = {};",
-            state.current_stack()
-        ));
-
-        res.push_str(&*format!(
-            "
-    last = Option::{};",
-            match state.get_latest_loc() {
-                Some(v) => format!("Some({})", v),
-                None => "None".to_string(),
-            }
-        ))
-    }
-
     let mut indent = 1usize;
 
     if !state.get_stack(1).is_empty() {
@@ -370,34 +343,110 @@ fn main() {
         state.get_stack(2).clear();
     }
 
-    let mut codes: Vec<Vec<T::CodeType>> = Vec::new();
-    codes.push(Vec::new());
+    if code.len() > 0 {
+        if opt {
+            for i in state.get_all_stack_index() {
+                if state.get_stack(i).is_empty() {
+                    continue;
+                }
+                res.push_str(&*format!(
+                    "
+    stack.data[{}] = vec![{}].iter().map(|x| Num::from_big_num(BigNum::from_string((&**x).to_string()).unwrap(), BigNum::one())).collect();",
+                    i,
+                    vec_to_str(state.get_stack(i))
+                ));
+            }
 
-    for c in code {
-        match c.get_area() {
-            Area::Val {
-                type_: _,
-                left: _,
-                right: _,
-            } => {
-                if !codes.last().unwrap().is_empty() {
-                    codes.push(vec![c.clone()]);
-                } else {
+            res.push_str(&*format!(
+                "
+    cur = {};",
+                state.current_stack()
+            ));
+
+            res.push_str(&*format!(
+                "
+    last = Option::{};",
+                match state.get_latest_loc() {
+                    Some(v) => format!("Some({})", v),
+                    None => "None".to_string(),
+                }
+            ))
+        }
+
+        let mut codes: Vec<Vec<T::CodeType>> = Vec::new();
+        codes.push(Vec::new());
+
+        let mut point = state.get_all_point();
+        point.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+        let mut idx = 0;
+
+        for (i, c) in state.get_all_code().iter().enumerate() {
+            match c.get_area() {
+                Area::Val {
+                    type_: _,
+                    left: _,
+                    right: _,
+                } => {
+                    if !codes.last().unwrap().is_empty() {
+                        codes.push(vec![c.clone()]);
+                    } else {
+                        codes.last_mut().unwrap().push(c.clone());
+                    }
+                    while idx < point.len() && point[idx].1 == i {
+                        point[idx].1 = codes.len() - 1;
+                        idx += 1;
+                    }
+                    codes.push(Vec::new());
+                }
+                Area::Nil => {
                     codes.last_mut().unwrap().push(c.clone());
                 }
-                codes.push(Vec::new());
-            }
-            Area::Nil => {
-                codes.last_mut().unwrap().push(c.clone());
             }
         }
-    }
 
-    if codes.last().unwrap().is_empty() {
-        codes.pop().unwrap();
-    }
+        if opt {
+            for (a, b) in point {
+                res.push_str(&*format!(
+                    "
+    point.insert({}u128, {});",
+                    a, b
+                ));
+            }
 
-    if codes.len() > 0 {
+            res.push_str(&*format!(
+                "
+    state = {};",
+                codes.len(),
+            ));
+        }
+        if !codes.last().unwrap().is_empty() {
+            codes.push(Vec::new());
+        }
+
+        for c in code {
+            match c.get_area() {
+                Area::Val {
+                    type_: _,
+                    left: _,
+                    right: _,
+                } => {
+                    if !codes.last().unwrap().is_empty() {
+                        codes.push(vec![c.clone()]);
+                    } else {
+                        codes.last_mut().unwrap().push(c.clone());
+                    }
+                    codes.push(Vec::new());
+                }
+                Area::Nil => {
+                    codes.last_mut().unwrap().push(c.clone());
+                }
+            }
+        }
+
+        if codes.last().unwrap().is_empty() {
+            codes.pop().unwrap();
+        }
+
         res.push_str(&*format!(
             "
     while state < {} {{",

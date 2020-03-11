@@ -380,6 +380,8 @@ pub trait State {
 
     fn push_code(&mut self, code: Self::CodeType) -> usize;
 
+    fn get_all_code(&self) -> Vec<Self::CodeType>;
+
     fn set_point(&mut self, id: u128, loc: usize);
 
     fn get_point(&self, id: u128) -> Option<usize>;
@@ -463,6 +465,10 @@ impl State for OptState {
         self.code.len() - 1
     }
 
+    fn get_all_code(&self) -> Vec<Self::CodeType> {
+        self.code.clone()
+    }
+
     fn set_point(&mut self, id: u128, loc: usize) {
         self.point.insert(id, loc);
     }
@@ -543,6 +549,10 @@ impl State for UnOptState {
     fn push_code(&mut self, code: Self::CodeType) -> usize {
         self.code.push(code);
         self.code.len() - 1
+    }
+
+    fn get_all_code(&self) -> Vec<Self::CodeType> {
+        self.code.clone()
     }
 
     fn set_point(&mut self, id: u128, loc: usize) {
