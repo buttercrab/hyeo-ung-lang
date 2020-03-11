@@ -18,11 +18,9 @@
 [Hyeo-ung Programming Language](https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069) compiler written in rust.
 (Developing)
 
-### **VERSION 0.1.0 beta released**
-
 # How to install
 
-One of these commands **must** be executed.
+One of these commands **must** be executed; or install [v0.1.0 beta](https://github.com/buttercrab/hyeo-ung-lang/releases/tag/v0.1.0-beta).
 
 ## Build from source
 
