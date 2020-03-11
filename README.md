@@ -50,22 +50,17 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 
 # Features
 
-## `hyeong`
+1. `hyeong`
+  Runs interpreter
 
-Runs interpreter
+2. `hyeong build FILE -O2 -o output_file`
+  Builds hyeong code to binary file, can optimize hyeong code
 
-## `hyeong build FILE -O2 -o output_file`
+3. `hyeong check FILE`
+  Check FILE and print each command 
 
-Builds hyeong code to binary file, can optimize hyeong code
+4. `hyeong debug FILE`
+  Debug file line by line, breakpoints, going previous
 
-## `hyeong check FILE`
-
-Check FILE and print each command 
-
-## `hyeong debug FILE`
-
-Debug file line by line, breakpoints, going previous
-
-## `hyeong run FILE -O2`
-
-Runs directly without making binary file
+5. `hyeong run FILE -O2`
+  Runs directly without making binary file
