@@ -13,8 +13,8 @@ IF NOT EXIST %USERPROFILE%\.hyeong\hyeong-build (
  cd %USERPROFILE%\.hyeong && cargo new hyeong-build --vcs none
 )
 
-COPY %USERPROFILE%\.hyeong\hyeong\src\number.rs %USERPROFILE%\.hyeong\hyeong-build\src\number.rs
-copy %USERPROFILE%\.hyeong\hyeong\src\big_number.rs %USERPROFILE%\.hyeong\hyeong-build\src\big_number.rs
+COPY \y %USERPROFILE%\.hyeong\hyeong\src\number.rs %USERPROFILE%\.hyeong\hyeong-build\src\number.rs
+copy \y %USERPROFILE%\.hyeong\hyeong\src\big_number.rs %USERPROFILE%\.hyeong\hyeong-build\src\big_number.rs
 echo pub mod big_number;pub mod number; > %USERPROFILE%\.hyeong\hyeong-build\src\lib.rs
 
 echo [01;36m==^> test build for building hyeong code[0m
