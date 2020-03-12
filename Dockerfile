@@ -1,4 +1,4 @@
 FROM rust
 
-RUN curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh" | /bin/bash
+RUN bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh")
 ENV PATH="${PATH}:~/.hyeong/hyeong/target/release"
