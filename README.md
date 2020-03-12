@@ -22,8 +22,28 @@
 <a href="https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069">Original Gist</a>
 </p>
 
-[Hyeo-ung Programming Language](https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069) compiler written in rust.
-(Developing)
+# Features
+
+More explanation on [Document](https://github.com/buttercrab/hyeo-ung-lang/wiki/Document).
+
+```
+hyeong 0.1.0-beta
+Hyeo-ung programming language tool
+
+USAGE:
+    hyeong [SUBCOMMAND]
+
+FLAGS:
+    -h, --help       Prints help information
+    -V, --version    Prints version information
+
+SUBCOMMANDS:
+    build    Compiles hyeong code
+    check    Parse your code and check if you are right
+    debug    Debug your code command by command
+    help     Prints this message or the help of the given subcommand(s)
+    run      Run hyeong code directly
+```
 
 # How to install
 
@@ -52,20 +72,3 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 ```shell script
 bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.sh")
 ```
-
-# Features
-
-1. `hyeong`
-  Runs interpreter
-
-2. `hyeong build FILE -O2 -o output_file`
-  Builds hyeong code to binary file, can optimize hyeong code
-
-3. `hyeong check FILE`
-  Check FILE and print each command 
-
-4. `hyeong debug FILE`
-  Debug file line by line, breakpoints, going previous
-
-5. `hyeong run FILE -O2`
-  Runs directly without making binary file
