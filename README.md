@@ -1,9 +1,10 @@
 <h1 align="center">Hyeo-ung Programming Language</h1>
 
 <p align="center">
-<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Document">Document</a>
-<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/How-to-Install">Install</a>
-<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Language-Tutorial">Tutorial</a>
+<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Document">Document</a> | 
+<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/How-to-Install">Install</a> | 
+<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Language-Tutorial">Tutorial</a> | 
+<a href="https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069">Original Gist</a>
 </p>
 
 <p align="center">
