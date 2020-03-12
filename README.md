@@ -1,13 +1,6 @@
 <h1 align="center">Hyeo-ung Programming Language</h1>
 
 <p align="center">
-<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Document">Document</a> | 
-<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/How-to-Install">Install</a> | 
-<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Language-Tutorial">Tutorial</a> | 
-<a href="https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069">Original Gist</a>
-</p>
-
-<p align="center">
 <a href="https://travis-ci.com/buttercrab/hyeo-ung-lang">
 <img alt="Travis CI" src="https://img.shields.io/travis/com/buttercrab/hyeo-ung-lang?style=flat-square"/>
 </a>
@@ -20,6 +13,13 @@
 <a href="https://github.com/buttercrab/hyeo-ung-lang/blob/master/LICENSE">
 <img alt="License" src="https://img.shields.io/github/license/buttercrab/hyeo-ung-lang?style=flat-square"/>
 </a>
+</p>
+
+<p align="center">
+<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Document">Document</a> | 
+<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/How-to-Install">Install</a> | 
+<a href="https://github.com/buttercrab/hyeo-ung-lang/wiki/Language-Tutorial">Tutorial</a> | 
+<a href="https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069">Original Gist</a>
 </p>
 
 [Hyeo-ung Programming Language](https://gist.github.com/xnuk/d9f883ede568d97caa158255e4b4d069) compiler written in rust.
