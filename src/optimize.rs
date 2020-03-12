@@ -21,7 +21,6 @@ where
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;
     let mut exec_count = 0;
-
     while cur_loc < length {
         if exec_count >= 100 {
             return (state_clone, false);
