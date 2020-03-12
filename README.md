@@ -26,7 +26,7 @@ One of these commands **must** be executed; or install [v0.1.0 beta](https://git
 
 1. Windows
 ```cmd
-cmd /C curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.cmd" | cmd
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.cmd" | cmd
 ```
 
 2. Mac, Linux
@@ -38,7 +38,7 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 
 1. Windows
 ```cmd
-cmd /C curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.cmd" | cmd
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.cmd" | cmd
 ```
 
 2. Mac, Linux
