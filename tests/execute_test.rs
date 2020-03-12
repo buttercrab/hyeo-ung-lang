@@ -52,4 +52,9 @@ mod execute_test {
     fn execute_test06() {
         helper_function("형. 흣..", "", "", "1");
     }
+
+    #[test]
+    fn execute_test07() {
+        helper_function("형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.", "", "4", "");
+    }
 }
