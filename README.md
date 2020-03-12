@@ -24,7 +24,7 @@
 
 # Features
 
-More explanation on [Document](https://github.com/buttercrab/hyeo-ung-lang/wiki/Document).
+More explanation on [Documentation](https://github.com/buttercrab/hyeo-ung-lang/wiki/Documentation).
 
 ```
 hyeong 0.1.0-beta
