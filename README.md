@@ -31,7 +31,7 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 
 2. Mac, Linux
 ```shell script
-curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh" | /bin/bash
+bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh")
 ```
 
 ## Install without build (don't install binary)
@@ -43,7 +43,7 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 
 2. Mac, Linux
 ```shell script
-curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.sh" | /bin/bash
+bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.sh")
 ```
 
 # Features
