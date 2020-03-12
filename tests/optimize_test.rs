@@ -68,16 +68,11 @@ mod optimize_test {
 
     #[test]
     fn optimize_test06() {
-        helper_function("형. 흑. 항..", "", "", "", 2);
-    }
-
-    #[test]
-    fn optimize_test07() {
         helper_function("형. 흣..", "", "", "1", 2);
     }
 
     #[test]
-    fn optimize_test08() {
+    fn optimize_test07() {
         helper_function("형 형 흣
         흑💘!💘 흑...! 하앙... 혀엉... .. 하앗... 흑!?! 흑... 혀어어 어어어 어엉... ... 흣... . 하앙... 흑 혀엉... .. 흣... . 하앙 흑...! 흑?💘?
         흑...! 항... . 혀엉... .. 흡... . 하앗...
@@ -89,7 +84,7 @@ mod optimize_test {
     }
 
     #[test]
-    fn optimize_test09() {
+    fn optimize_test08() {
         helper_function("형. 흣... 항.", "", "1", "", 2);
     }
 }
