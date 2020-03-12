@@ -107,4 +107,10 @@ mod optimize_test {
     fn optimize_test12() {
         helper_function("형. 흣... 흑.", "", "1", "", 2);
     }
+
+    #[test]
+    fn optimize_test13() {
+        helper_function("형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.", "", "4", "", 2);
+    }
 }
+
