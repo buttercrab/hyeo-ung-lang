@@ -2,18 +2,22 @@ use crate::code;
 use crate::code::{Area, Code};
 use crate::number::Num;
 
+/// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
     std::iter::repeat(' ').take(value * 4).collect::<String>()
 }
 
+/// Makes print function from string to print
 fn fn_print(indent: usize, s: String) -> String {
     format!("\n{}print!({:?});", make_indent(indent), s)
 }
 
+/// Makes eprint function from string to print
 fn fn_eprint(indent: usize, s: String) -> String {
     format!("\n{}eprint!({:?});", make_indent(indent), s)
 }
 
+/// Makes string literal of vector from vector of `Num`
 fn vec_to_str(v: &Vec<Num>) -> String {
     let mut res = String::new();
     for i in v {
@@ -22,6 +26,7 @@ fn vec_to_str(v: &Vec<Num>) -> String {
     res
 }
 
+/// Makes the code from command.
 fn command(indent: usize, c: &impl Code) -> String {
     String::from(format!(
         "{}{}",
@@ -111,6 +116,31 @@ fn command(indent: usize, c: &impl Code) -> String {
     ))
 }
 
+/// Makes code from area.
+/// Since area consist of binary tree,
+/// we used match and recursively put content inside.
+/// (Didn't used recursive function)
+///
+/// # Example
+///
+/// Area: `?💘!`
+///
+/// Code:
+/// ```ignore
+/// match stack.pop(cur).partial_cmp(&Num::from_num("SOME_NUMBER")) {
+///     Some(std::cmp::Ordering::Less) => {
+///     }
+///     _ => {
+///         match stack.pop(cur).partial_cmp(&Num::from_num("SOME_NUMBER")) {
+///             Some(std::cmp::Ordering::Equal => {
+///                 // code about 💘
+///             }
+///             _ => {
+///             }
+///         }
+///     }
+/// }
+/// ```
 fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
     let mut st = vec![(a, &Area::Nil, false)];
     let mut res = String::new();
@@ -182,6 +212,41 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
     }
 }
 
+/// Makes rust code from parsed hyeong code.
+/// It splits codes into states.
+/// Then, go through states deciding where to go next.
+/// Since match is comparing linearly by each value,
+/// It makes binary if-else statement to minimize the comparision.
+/// So, in each movement, it would take `O(log S)`.
+///
+/// # Examples
+///
+/// Example of some output
+///
+/// ```ignore
+/// // init_code
+///
+/// fn main() {
+///     // init_code
+///
+///     state = 0;
+///     while state < length {
+///         if state < 2 {
+///             if state < 1 {
+///
+///             } else {
+///
+///             }
+///         } else {
+///             if state < 3 {
+///
+///             } else {
+///
+///             }
+///         }
+///     }
+/// }
+/// ```
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
 where
     T: code::State,
