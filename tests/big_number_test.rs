@@ -177,8 +177,6 @@ mod big_number_test {
         let b = BigNum::new(31);
         let c = &a / &b;
 
-        // warn: this number is different from rust
-        // this is valid when remainder is always pos
         assert_eq!(BigNum::new(-1234 / 31), c);
     }
 
@@ -207,18 +205,14 @@ mod big_number_test {
     fn from_string_test04() {
         let a = BigNum::from_string("1234!".to_string());
 
-        if let Result::Err(Error::ParseError) = a {
-            assert!(true);
-        }
+        assert!(matches!(a, Result::Err(Error::ParseError)));
     }
 
     #[test]
     fn from_string_test05() {
         let a = BigNum::from_string_base("1234".to_string(), 100);
 
-        if let Result::Err(Error::BaseSizeError(100)) = a {
-            assert!(true);
-        }
+        assert!(matches!(a, Result::Err(Error::BaseSizeError(100))));
     }
 
     #[test]
@@ -240,9 +234,7 @@ mod big_number_test {
         let a = BigNum::new(1234);
         let b = a.to_string_base(100);
 
-        if let Result::Err(Error::BaseSizeError(100)) = b {
-            assert!(true);
-        }
+        assert!(matches!(b, Result::Err(Error::BaseSizeError(100))));
     }
 
     #[test]
@@ -258,9 +250,7 @@ mod big_number_test {
         let a = BigNum::new(1234);
         let b = BigNum::new(-4321);
 
-        if let Option::Some(Ordering::Greater) = a.partial_cmp(&b) {
-            assert!(true);
-        }
+        assert!(matches!(a.partial_cmp(&b), Option::Some(Ordering::Greater)));
     }
 
     #[test]
@@ -268,9 +258,7 @@ mod big_number_test {
         let a = BigNum::new(-1234);
         let b = BigNum::new(4321);
 
-        if let Option::Some(Ordering::Less) = a.partial_cmp(&b) {
-            assert!(true);
-        }
+        assert!(matches!(a.partial_cmp(&b), Option::Some(Ordering::Less)));
     }
 
     #[test]
@@ -278,20 +266,20 @@ mod big_number_test {
         let a = BigNum::new(-1234);
         let b = BigNum::new(-4321);
 
-        if let Option::Some(Ordering::Greater) = a.partial_cmp(&b) {
-            assert!(true);
-        }
+        assert!(matches!(a.partial_cmp(&b), Option::Some(Ordering::Greater)));
     }
 
     #[test]
     fn to_int_test01() {
         let a = BigNum::new(1234);
+
         assert_eq!(1234, a.to_int());
     }
 
     #[test]
     fn to_int_test02() {
         let a = BigNum::new(4294967296);
+
         assert_eq!(0, a.to_int());
     }
 }
