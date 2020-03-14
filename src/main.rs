@@ -7,6 +7,7 @@ use hyeong::{build, code, debug, execute, interpreter, io, optimize};
 use std::path::Path;
 use std::process::Command;
 
+#[cfg_attr(tarpaulin, skip)]
 fn main() {
     let matches = App::new("hyeong")
         .version("0.1.0-beta")

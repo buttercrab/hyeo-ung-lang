@@ -58,6 +58,7 @@ pub struct CustomReader {
 }
 
 impl ReadLine for std::io::Stdin {
+    #[cfg_attr(tarpaulin, skip)]
     fn read_line_(&mut self) -> String {
         let mut res = String::new();
         handle_error(self.read_line(&mut res));
@@ -66,6 +67,7 @@ impl ReadLine for std::io::Stdin {
 }
 
 impl ReadLine for CustomReader {
+    #[cfg_attr(tarpaulin, skip)]
     fn read_line_(&mut self) -> String {
         if self.buf.len() == self.idx {
             String::from("")
@@ -109,6 +111,7 @@ fn check_file(file: &str) -> bool {
     file.rsplit(".").next() == Some("hyeong")
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn read_line() -> String {
     read_line_from(&mut std::io::stdin())
 }
@@ -124,32 +127,39 @@ pub fn handle_error<T>(res: Result<T, impl Error>) -> T {
     }
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_error(err: impl Error) -> ! {
     println!("[{}] {:?}", "error".red(), err);
     process::exit(1);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_error_string(err: &str) -> ! {
     println!("[{}] {}", "error".red(), err);
     process::exit(1);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_error_no_exit(err: impl Error) {
     println!("[{}] {:?}", "error".red(), err);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_error_str_no_exit(err: &str) {
     println!("[{}] {}", "error".red(), err);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_log(msg: &str) {
     println!("{} {}", "====> ".blue(), msg);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_warn(msg: &str) {
     println!("[{}] {}", "warn".yellow(), msg);
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn print_note(msg: &str) {
     println!("[{}] {}", "note".bright_cyan(), msg);
 }
@@ -181,6 +191,7 @@ pub fn get_build_path() -> String {
     }
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn execute_command_stdout(windows: &str, linux: &str) {
     print!(
         "{}",
@@ -195,6 +206,7 @@ pub fn execute_command_stdout(windows: &str, linux: &str) {
     );
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn execute_command_stderr(windows: &str, linux: &str) {
     print!(
         "{}",

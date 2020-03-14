@@ -7,6 +7,7 @@ use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
