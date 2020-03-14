@@ -67,7 +67,6 @@ impl ReadLine for std::io::Stdin {
 }
 
 impl ReadLine for CustomReader {
-    #[cfg_attr(tarpaulin, skip)]
     fn read_line_(&mut self) -> String {
         if self.buf.len() == self.idx {
             String::from("")
