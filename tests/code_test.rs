@@ -102,4 +102,69 @@ mod code_test {
         let t = format!("{:?}",state);
         assert_eq!(t, "current stack: 3\nstack 3: [1]\n");
     }
+
+    #[test]
+    fn un_opt_state_test05() {
+        let parsed = &parse::parse("형..💖 항..💖".to_string())[0];
+        let mut ipt = io::CustomReader::new("".to_string());
+        let mut out = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut err = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut state = code::UnOptState::new();
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        let t = state.get_all_point()[0];
+        assert_eq!(t, (37,0));
+    }
+
+    #[test]
+    fn un_opt_state_test06() {
+        let parsed = &parse::parse("형..💖 항..💖".to_string())[0];
+        let mut ipt = io::CustomReader::new("".to_string());
+        let mut out = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut err = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut state = code::UnOptState::new();
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        let t = format!("{:?}",state);
+        assert_eq!(t, "current stack: 3\nstack 3: [2]\n");
+    }
+
+    #[test]
+    fn opt_state_test01() {
+        let un_opt_code = parse::parse("흑 하앙...".to_string());
+        let mut ipt = io::CustomReader::new("1 2".to_string());
+        let mut out = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut err = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut un_opt_state = code::UnOptState::new();
+        let (mut opt_state, mut opt_code) = optimize::optimize(un_opt_code, 2);
+        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]);
+        let t1 = (opt_state.get_all_stack_index()[1], opt_state.stack_size());
+        let t2 = (1,5);
+        assert_eq!(t1, t2);
+    }
+
+    #[test]
+    fn opt_state_test02() {
+        let un_opt_code = parse::parse("흑 하앙...".to_string());
+        let mut ipt = io::CustomReader::new("1 2".to_string());
+        let mut out = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut err = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut un_opt_state = code::UnOptState::new();
+        let (mut opt_state, mut opt_code) = optimize::optimize(un_opt_code, 2);
+        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]);
+        let t = opt_state.get_all_code()[0].get_type();
+        assert_eq!(t, 5);
+    }
+
+    #[test]
+    fn opt_state_test03() {
+        let un_opt_code = parse::parse("형..💖 항..💖".to_string());
+        let mut ipt = io::CustomReader::new("".to_string());
+        let mut out = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut err = io::CustomWriter::new(|_| Result::Ok(()));
+        let mut un_opt_state = code::UnOptState::new();
+        let (mut opt_state, mut opt_code) = optimize::optimize(un_opt_code, 1);
+        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]);
+        let t1 = opt_state.get_all_point()[0];
+        let t2 = (37, 0);
+        assert_eq!(t1, t2);
+    }
 }
