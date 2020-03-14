@@ -7,8 +7,8 @@
 | file             | impl | test | doc |
 |------------------|:----:|:----:|:---:|
 | `big_number.rs`  |✅     |✅     |✅    |
+| `build.rs`       |✅     |      |✅    |
 | `code.rs`        |✅     |      |     |
-| `compile.rs`     |      |      |     |
 | `debug.rs`       |✅     |      |     |
 | `execute.rs`     |✅     |      |     |
 | `interpreter.rs` |✅     |      |     |

@@ -124,6 +124,8 @@ where
     }
 }
 
+/// `Area` to string in debug mode
+/// it builds the string as it iterates post-order
 fn area_to_string_debug(s: &mut String, area: &Area) {
     match area {
         Area::Val {
@@ -145,6 +147,21 @@ fn area_to_string_debug(s: &mut String, area: &Area) {
 }
 
 impl fmt::Debug for Area {
+    /// `Area` to string in debug mode
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::code::Area;
+    ///
+    /// let a = Area::Val {
+    ///     type_: 0,
+    ///     left: Box::new(Area::new(2)),
+    ///     right: Box::new(Area::Nil),
+    /// };
+    ///
+    /// assert_eq!("?♥_", format!("{:?}", a));
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = String::new();
         area_to_string_debug(&mut s, self);
@@ -152,6 +169,8 @@ impl fmt::Debug for Area {
     }
 }
 
+/// `Area` to string in formatting
+/// it builds the string as it iterates infix-order.
 fn area_to_string_display(s: &mut String, area: &Area) {
     match area {
         Area::Val {
@@ -179,6 +198,21 @@ fn area_to_string_display(s: &mut String, area: &Area) {
 }
 
 impl fmt::Display for Area {
+    /// `Area` to string in formatting
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::code::Area;
+    ///
+    /// let a = Area::Val {
+    ///     type_: 0,
+    ///     left: Box::new(Area::new(2)),
+    ///     right: Box::new(Area::Nil),
+    /// };
+    ///
+    /// assert_eq!("[♥]?[_]", format!("{}", a));
+    /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = String::new();
         area_to_string_display(&mut s, self);
@@ -186,6 +220,10 @@ impl fmt::Display for Area {
     }
 }
 
+/// Code trait
+///
+/// It defines methods that code structure needs.
+/// [UnOptCode](struct.UnOptCode.html) and [OptCode](struct.OptCode.html) use this trait.
 pub trait Code {
     fn get_type(&self) -> u8;
 
@@ -196,10 +234,31 @@ pub trait Code {
     fn get_area(&self) -> &Area;
 
     fn get_area_count(&self) -> usize;
-
-    fn clone(&self) -> Self;
 }
 
+/// structure for optimized code
+///
+/// It contains a single command.
+/// It can be used for level 1, 2 optimization.
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::code::{OptCode, Area, Code};
+///
+/// let a = OptCode::new(
+///     0,
+///     10,
+///     10,
+///     20,
+///     Area::new(3)
+/// );
+///
+/// assert_eq!(0, a.get_type());
+/// assert_eq!(10, a.get_hangul_count());
+/// assert_eq!(10, a.get_dot_count());
+/// assert_eq!(20, a.get_area_count());
+/// ```
 #[derive(Clone)]
 pub struct OptCode {
     type_: u8,
@@ -210,6 +269,26 @@ pub struct OptCode {
 }
 
 impl OptCode {
+    /// Makes new `OptCode`
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use hyeong::code::{OptCode, Area, Code};
+    ///
+    /// let a = OptCode::new(
+    ///     0,
+    ///     10,
+    ///     10,
+    ///     20,
+    ///     Area::new(3)
+    /// );
+    ///
+    /// assert_eq!(0, a.get_type());
+    /// assert_eq!(10, a.get_hangul_count());
+    /// assert_eq!(10, a.get_dot_count());
+    /// assert_eq!(20, a.get_area_count());
+    /// ```
     pub fn new(
         type_: u8,
         hangul_count: usize,
@@ -247,18 +326,15 @@ impl Code for OptCode {
     fn get_area_count(&self) -> usize {
         self.area_count
     }
-
-    fn clone(&self) -> OptCode {
-        OptCode {
-            type_: self.type_,
-            hangul_count: self.hangul_count,
-            dot_count: self.dot_count,
-            area_count: self.area_count,
-            area: self.area.clone(),
-        }
-    }
 }
 
+/// structure for optimized code
+///
+/// # Examples
+///
+/// ```
+///
+/// ```
 #[derive(Clone)]
 pub struct UnOptCode {
     // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
@@ -346,21 +422,10 @@ impl Code for UnOptCode {
     fn get_area_count(&self) -> usize {
         self.hangul_count * self.dot_count
     }
-
-    fn clone(&self) -> UnOptCode {
-        UnOptCode {
-            type_: self.type_,
-            hangul_count: self.hangul_count,
-            dot_count: self.dot_count,
-            loc: self.loc.clone(),
-            area: self.area.clone(),
-            code: self.code.clone(),
-        }
-    }
 }
 
 pub trait State {
-    type CodeType: Code;
+    type CodeType: Code + Clone;
 
     fn get_all_stack_index(&self) -> Vec<usize>;
 
