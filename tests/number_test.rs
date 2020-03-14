@@ -9,9 +9,7 @@ mod number_test {
         let a = Num::nan();
         let b = Num::one();
 
-        if let Option::None = a.partial_cmp(&b) {
-            assert!(true);
-        }
+        assert!(matches!(a.partial_cmp(&b), Option::None));
     }
 
     #[test]
@@ -19,9 +17,7 @@ mod number_test {
         let a = Num::one();
         let b = Num::one();
 
-        if let Option::Some(Ordering::Equal) = a.partial_cmp(&b) {
-            assert!(true);
-        }
+        assert!(matches!(a.partial_cmp(&b), Option::Some(Ordering::Equal)));
     }
 
     #[test]
@@ -29,9 +25,7 @@ mod number_test {
         let a = Num::zero();
         let b = Num::one();
 
-        if let Option::Some(Ordering::Less) = a.partial_cmp(&b) {
-            assert!(true);
-        }
+        assert!(matches!(a.partial_cmp(&b), Option::Some(Ordering::Less)));
     }
 
     #[test]

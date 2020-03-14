@@ -920,7 +920,7 @@ impl PartialOrd for BigNum {
             if other.pos {
                 true
             } else {
-                !BigNum::less_core(&other.val, &self.val)
+                BigNum::less_core(&other.val, &self.val)
             }
         } {
             Option::Some(Ordering::Less)
