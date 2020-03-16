@@ -1,14 +1,13 @@
 #!/bin/bash
 
-printf "\e[01;36m==> cloning repo to ~/.hyeong/hyeong\e[0m \n"
-git clone https://github.com/buttercrab/hyeo-ung-lang ~/.hyeong/hyeong || (cd ~/.hyeong/hyeong && git pull)
+mkdir -p ~/.hyeong
 
 printf "\n\e[01;36m==> making directory for building hyeong code\e[0m \n"
 if [ ! -d "$HOME/.hyeong/hyeong-build/" ]; then
   cd ~/.hyeong && cargo new hyeong-build --vcs none
 fi
-cp ~/.hyeong/hyeong/src/number.rs ~/.hyeong/hyeong-build/src/
-cp ~/.hyeong/hyeong/src/big_number.rs ~/.hyeong/hyeong-build/src/
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/number.rs" > ~/.hyeong/hyeong-build/src/number.rs
+curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/big_number.rs" > ~/.hyeong/hyeong-build/src/big_number.rs
 printf "pub mod big_number;\npub mod number;" > ~/.hyeong/hyeong-build/src/lib.rs
 
 printf "\n\e[01;36m==> test build for building hyeong code\e[0m \n"
