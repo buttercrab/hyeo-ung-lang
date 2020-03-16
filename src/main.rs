@@ -111,6 +111,8 @@ fn main() {
                         .default_value("all"),
                 ),
         )
+        .subcommand(App::new("install").about("Install hyeong before build (need once)"))
+        .subcommand(App::new("uninstall").about("Uninstall hyeong before build"))
         .get_matches();
 
     if let Some(ref matches) = matches.subcommand_matches("build") {
@@ -233,6 +235,26 @@ fn main() {
                 state = execute::execute(&mut stdin(), &mut stdout, &mut stderr, state, &code);
             }
         }
+    } else if let Some(ref _m) = matches.subcommand_matches("install") {
+        io::print_log("installing hyeong");
+        io::execute_command_stderr("", "\
+        mkdir -p ~/.hyeong;\
+        cd ~/.hyeong && cargo new hyeong-build --vcs none --color always;\
+        curl \"https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/number.rs\" > ~/.hyeong/hyeong-build/src/number.rs;\
+        curl \"https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/big_number.rs\" > ~/.hyeong/hyeong-build/src/big_number.rs;\
+        printf \"pub mod big_number;\npub mod number;\" > ~/.hyeong/hyeong-build/src/lib.rs");
+        io::print_log("test build");
+        io::execute_command_stderr(
+            "",
+            "\
+        cargo build --manifest-path=\"$HOME\"/.hyeong/hyeong-build/Cargo.toml --release --color always",
+        );
+        io::print_log("done!");
+        io::print_note("to uninstall, run `hyeong uninstall`");
+    } else if let Some(ref _m) = matches.subcommand_matches("uninstall") {
+        io::print_log("uninstalling hyeong");
+        io::execute_command_stdout("", "rm -rf ~/.hyeong");
+        io::print_log("done!");
     } else {
         interpreter::run();
     }

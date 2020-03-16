@@ -150,7 +150,7 @@ pub fn print_error_str_no_exit(err: &str) {
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn print_log(msg: &str) {
-    println!("{} {}", "====> ".blue(), msg);
+    println!("{} {}", "====> ".blue(), msg.bold());
 }
 
 #[cfg_attr(tarpaulin, skip)]

@@ -47,9 +47,16 @@ SUBCOMMANDS:
 
 # How to install
 
-One of these commands **must** be executed; or install [v0.1.0 beta](https://github.com/buttercrab/hyeo-ung-lang/releases/tag/v0.1.0-beta).
+## Homebrew
+
+```shell script
+brew install buttercrab/tools/hyeo-ung-lang
+hyeong install
+```
 
 ## Build from source
+
+Followings doesn't need to execute `hyeong install`
 
 1. Windows
 ```cmd
@@ -59,16 +66,4 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 2. Mac, Linux
 ```shell script
 bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh")
-```
-
-## Install without build (don't install binary)
-
-1. Windows
-```cmd
-curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.cmd" | cmd
-```
-
-2. Mac, Linux
-```shell script
-bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_without_build.sh")
 ```
