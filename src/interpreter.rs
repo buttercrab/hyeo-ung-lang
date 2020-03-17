@@ -1,17 +1,16 @@
+use crate::state::UnOptState;
+use crate::{execute, io, parse};
+use colored::Colorize;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
-use colored::Colorize;
-
-use crate::{code, execute, io, parse};
-
 #[cfg_attr(tarpaulin, skip)]
 pub fn run() -> ! {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
-    let mut state = code::UnOptState::new();
+    let mut state = UnOptState::new();
 
     ctrlc::set_handler(move || {
         if r.load(Ordering::SeqCst) {
@@ -60,7 +59,7 @@ pub fn run() -> ! {
             }
 
             "clear" => {
-                state = code::UnOptState::new();
+                state = UnOptState::new();
             }
 
             "help" => {

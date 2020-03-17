@@ -1,10 +1,10 @@
-use std::collections::HashMap;
-
-use crate::code::{Code, State};
+use crate::code::{Code, OptCode, UnOptCode};
 use crate::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::io::ReadLine;
 use crate::number::Num;
-use crate::{code, io};
+use crate::state::{OptState, State};
+use crate::{area, io};
+use std::collections::HashMap;
 use std::io::{stdin, Write};
 
 fn opt_execute<T>(
@@ -15,7 +15,7 @@ fn opt_execute<T>(
     code: &T::CodeType,
 ) -> (T, bool)
 where
-    T: code::State + Clone,
+    T: State + Clone,
 {
     let state_clone = state.clone();
     let mut cur_loc = state.push_code((*code).clone());
@@ -113,7 +113,7 @@ where
         }
 
         cur_stack = state.current_stack();
-        let area_type = match code::calc(code.get_area(), code.get_area_count(), || {
+        let area_type = match area::calc(code.get_area(), code.get_area_count(), || {
             if cur_stack <= 2 {
                 Option::None
             } else {
@@ -153,9 +153,9 @@ where
     (state, true)
 }
 
-pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Vec<code::OptCode>) {
+pub fn optimize(code: Vec<UnOptCode>, level: usize) -> (OptState, Vec<OptCode>) {
     let mut size = 0usize;
-    let mut opt_code_vec: Vec<code::OptCode> = Vec::new();
+    let mut opt_code_vec: Vec<OptCode> = Vec::new();
 
     if level >= 3 {
         io::print_error_string(&*format!("optimize level {} is not supported", level));
@@ -199,7 +199,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
             let opt_area = un_opt_code.get_area().clone();
 
             if opt_type_ == 0 || un_opt_code.get_dot_count() <= 3 {
-                opt_code_vec.push(code::OptCode::new(
+                opt_code_vec.push(OptCode::new(
                     opt_type_,
                     opt_hangul_count,
                     opt_dot_count,
@@ -212,7 +212,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
                     *temp = max;
                 }
                 opt_dot_count = *temp;
-                opt_code_vec.push(code::OptCode::new(
+                opt_code_vec.push(OptCode::new(
                     opt_type_,
                     opt_hangul_count,
                     opt_dot_count,
@@ -225,7 +225,7 @@ pub fn optimize(code: Vec<code::UnOptCode>, level: usize) -> (code::OptState, Ve
         size = max + 1;
     }
 
-    let mut state = code::OptState::new(size);
+    let mut state = OptState::new(size);
 
     if level >= 2 {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));

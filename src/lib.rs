@@ -1,3 +1,4 @@
+pub mod area;
 pub mod big_number;
 pub mod build;
 pub mod code;
@@ -8,3 +9,4 @@ pub mod io;
 pub mod number;
 pub mod optimize;
 pub mod parse;
+pub mod state;

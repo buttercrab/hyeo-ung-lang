@@ -1,12 +1,11 @@
+use crate::code::UnOptCode;
+use crate::parse;
+use colored::Colorize;
 use std::error::Error;
 use std::fs::File;
 use std::io::{Read, Write};
-use std::{env, process};
-
-use colored::Colorize;
-
-use crate::{code, parse};
 use std::process::Command;
+use std::{env, process};
 
 pub struct CustomWriter<T>
 where
@@ -87,7 +86,7 @@ impl CustomReader {
     }
 }
 
-pub fn read_file(file: &str) -> Vec<code::UnOptCode> {
+pub fn read_file(file: &str) -> Vec<UnOptCode> {
     if !check_file(file) {
         print_error_string("only file with .hyeong supported");
     }

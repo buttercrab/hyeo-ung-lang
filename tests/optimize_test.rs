@@ -1,6 +1,6 @@
 ﻿#[cfg(test)]
 mod optimize_test {
-    use hyeong::code::State;
+    use hyeong::state::State;
     use hyeong::{execute, io, optimize, parse};
     use std::io::Write;
 
@@ -85,7 +85,13 @@ mod optimize_test {
 
     #[test]
     fn optimize_test08() {
-        helper_function("형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.", "", "4", "", 2);
+        helper_function(
+            "형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.",
+            "",
+            "4",
+            "",
+            2,
+        );
     }
 
     #[test]
@@ -113,4 +119,3 @@ mod optimize_test {
         helper_function("형. 흣... 흑 흑.", "", "1", "", 2);
     }
 }
-

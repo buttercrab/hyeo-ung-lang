@@ -1,5 +1,6 @@
-use crate::code::{State, UnOptCode};
-use crate::{code, execute, io};
+use crate::code::UnOptCode;
+use crate::state::{State, UnOptState};
+use crate::{execute, io};
 use colored::Colorize;
 use std::collections::HashSet;
 use std::io::{stdin, stdout, Write};
@@ -11,7 +12,7 @@ use std::sync::Arc;
 pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
-    let mut state = code::UnOptState::new();
+    let mut state = UnOptState::new();
 
     ctrlc::set_handler(move || {
         if r.load(Ordering::SeqCst) {

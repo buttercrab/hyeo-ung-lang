@@ -1,8 +1,7 @@
+use crate::big_number::BigNum;
 use std::cmp::Ordering;
 use std::mem::swap;
 use std::{fmt, ops};
-
-use crate::big_number::BigNum;
 
 /// `Num` for rational number handling
 /// - Using two `BigNum` for denominator and numerator.
@@ -15,7 +14,7 @@ use crate::big_number::BigNum;
 /// use hyeong::number::Num;
 ///
 /// let a = Num::from_num(10);
-/// let mut  b = Num::from_num(3);
+/// let mut b = Num::from_num(3);
 /// b.flip();
 ///
 /// let c = &a * &b;
@@ -212,7 +211,7 @@ impl Num {
     /// assert_eq!("-12", Num::from_string("-12".to_string()).to_string());
     /// ```
     pub fn from_string(mut s: String) -> Num {
-        if s == "너무 커엇..." {
+        if s == "너무 커엇...".to_string() {
             Num::nan()
         } else {
             let neg = s.starts_with('-');

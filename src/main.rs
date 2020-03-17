@@ -1,9 +1,7 @@
-use std::io::{stderr, stdin, stdout, Write};
-
 use clap::*;
-
-use hyeong::code::State;
-use hyeong::{build, code, debug, execute, interpreter, io, optimize};
+use hyeong::state::{State, UnOptState};
+use hyeong::{build, debug, execute, interpreter, io, optimize};
+use std::io::{stderr, stdin, stdout, Write};
 use std::path::Path;
 use std::process::Command;
 
@@ -133,7 +131,7 @@ fn main() {
             io::print_log("compiling to rust");
             build::build_source(state, &opt_code, level)
         } else {
-            let state = code::UnOptState::new();
+            let state = UnOptState::new();
             io::print_log("compiling to rust");
             build::build_source(state, &un_opt_code, 0)
         };
@@ -229,7 +227,7 @@ fn main() {
                 state = execute::execute(&mut stdin(), &mut stdout, &mut stderr, state, &code);
             }
         } else {
-            let mut state = code::UnOptState::new();
+            let mut state = UnOptState::new();
             io::print_log("running code");
             for code in un_opt_code {
                 state = execute::execute(&mut stdin(), &mut stdout, &mut stderr, state, &code);

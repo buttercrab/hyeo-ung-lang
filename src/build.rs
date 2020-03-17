@@ -1,6 +1,7 @@
-use crate::code;
-use crate::code::{Area, Code};
+use crate::area::Area;
+use crate::code::Code;
 use crate::number::Num;
+use crate::state::State;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
@@ -249,7 +250,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
 /// ```
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
 where
-    T: code::State,
+    T: State,
 {
     let opt = level != 0;
     let mut res = String::from(format!(

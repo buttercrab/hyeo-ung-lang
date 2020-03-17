@@ -1,10 +1,10 @@
-use std::io::Write;
-use std::process;
-
 use crate::code::Code;
 use crate::io::ReadLine;
 use crate::number::Num;
-use crate::{code, io};
+use crate::state::State;
+use crate::{area, io};
+use std::io::Write;
+use std::process;
 
 pub fn push_stack_wrap<T>(
     out: &mut impl Write,
@@ -13,7 +13,7 @@ pub fn push_stack_wrap<T>(
     idx: usize,
     num: Num,
 ) where
-    T: code::State,
+    T: State,
 {
     match idx {
         1 => {
@@ -44,7 +44,7 @@ pub fn pop_stack_wrap<T>(
     idx: usize,
 ) -> Num
 where
-    T: code::State,
+    T: State,
 {
     match idx {
         0 => {
@@ -78,7 +78,7 @@ pub fn execute_one<T>(
     cur_loc: usize,
 ) -> (T, usize)
 where
-    T: code::State,
+    T: State,
 {
     let code = (*state.get_code(cur_loc)).clone();
     let mut cur_stack = state.current_stack();
@@ -152,7 +152,7 @@ where
     }
 
     cur_stack = state.current_stack();
-    let area_type = code::calc(code.get_area(), code.get_area_count(), || {
+    let area_type = area::calc(code.get_area(), code.get_area_count(), || {
         Option::Some(pop_stack_wrap(ipt, out, err, &mut state, cur_stack))
     })
     .unwrap();
@@ -187,7 +187,7 @@ pub fn execute<T>(
     code: &T::CodeType,
 ) -> T
 where
-    T: code::State,
+    T: State,
 {
     let mut cur_loc = state.push_code((*code).clone());
     let length = cur_loc + 1;

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod execute_test {
-    use hyeong::code::UnOptState;
+    use hyeong::state::UnOptState;
     use hyeong::{execute, io, parse};
 
     fn helper_function(code: &str, stdin: &str, stdout: &str, stderr: &str) {
@@ -55,6 +55,11 @@ mod execute_test {
 
     #[test]
     fn execute_test07() {
-        helper_function("형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.", "", "4", "");
+        helper_function(
+            "형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.",
+            "",
+            "4",
+            "",
+        );
     }
 }
