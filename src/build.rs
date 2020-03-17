@@ -121,27 +121,6 @@ fn command(indent: usize, c: &impl Code) -> String {
 /// Since area consist of binary tree,
 /// we used match and recursively put content inside.
 /// (Didn't used recursive function)
-///
-/// # Example
-///
-/// Area: `?💘!`
-///
-/// Code:
-/// ```ignore
-/// match stack.pop(cur).partial_cmp(&Num::from_num("SOME_NUMBER")) {
-///     Some(std::cmp::Ordering::Less) => {
-///     }
-///     _ => {
-///         match stack.pop(cur).partial_cmp(&Num::from_num("SOME_NUMBER")) {
-///             Some(std::cmp::Ordering::Equal => {
-///                 // code about 💘
-///             }
-///             _ => {
-///             }
-///         }
-///     }
-/// }
-/// ```
 fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
     let mut st = vec![(a, &Area::Nil, false)];
     let mut res = String::new();
@@ -219,35 +198,6 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
 /// Since match is comparing linearly by each value,
 /// It makes binary if-else statement to minimize the comparision.
 /// So, in each movement, it would take `O(log S)`.
-///
-/// # Examples
-///
-/// Example of some output
-///
-/// ```ignore
-/// // init_code
-///
-/// fn main() {
-///     // init_code
-///
-///     state = 0;
-///     while state < length {
-///         if state < 2 {
-///             if state < 1 {
-///
-///             } else {
-///
-///             }
-///         } else {
-///             if state < 3 {
-///
-///             } else {
-///
-///             }
-///         }
-///     }
-/// }
-/// ```
 pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
 where
     T: State,

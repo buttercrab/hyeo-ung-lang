@@ -28,12 +28,12 @@ use std::fmt;
 /// # Examples
 ///
 /// ```
-/// use hyeong::code;
+/// use hyeong::area::Area;
 ///
-/// let a = code::Area::Val {
+/// let a = Area::Val {
 ///     type_: 0,
-///     left: Box::new(code::Area::new(2)),
-///     right: Box::new(code::Area::Nil),
+///     left: Box::new(Area::new(2)),
+///     right: Box::new(Area::Nil),
 /// };
 ///
 /// assert_eq!("[♥]?[_]", format!("{}", a));
@@ -54,9 +54,9 @@ impl Area {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::code;
+    /// use hyeong::area::Area;
     ///
-    /// let a = code::Area::new(10);
+    /// let a = Area::new(10);
     /// ```
     pub fn new(type_: u8) -> Area {
         Area::Val {
