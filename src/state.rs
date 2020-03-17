@@ -51,6 +51,17 @@ pub trait State {
     fn get_latest_loc(&self) -> Option<usize>;
 }
 
+/// State structure for optimized code
+///
+/// It can be used for level 1, 2 optimization
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::state::OptState;
+///
+///
+/// ```
 #[derive(Clone)]
 pub struct OptState {
     stack: Vec<Vec<Num>>,

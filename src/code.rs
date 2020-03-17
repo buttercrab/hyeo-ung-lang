@@ -123,7 +123,7 @@ impl Code for OptCode {
 /// use hyeong::area::Area;
 ///
 /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
-/// assert_eq!("1:2 형_1_2 : _", a.to_string());
+/// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
 /// ```
 #[derive(Clone)]
 pub struct UnOptCode {
