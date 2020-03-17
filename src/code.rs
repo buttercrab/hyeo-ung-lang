@@ -93,22 +93,27 @@ impl OptCode {
 }
 
 impl Code for OptCode {
+    /// Return type of code
     fn get_type(&self) -> u8 {
         self.type_
     }
 
+    /// Return hangul count of code
     fn get_hangul_count(&self) -> usize {
         self.hangul_count
     }
 
+    /// Return dot count of code
     fn get_dot_count(&self) -> usize {
         self.dot_count
     }
 
+    /// Return Area of code
     fn get_area(&self) -> &Area {
         &self.area
     }
 
+    /// Return area count of code
     fn get_area_count(&self) -> usize {
         self.area_count
     }

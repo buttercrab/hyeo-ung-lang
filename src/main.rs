@@ -7,9 +7,9 @@ use std::process::Command;
 
 #[cfg_attr(tarpaulin, skip)]
 fn main() {
-    let matches = App::new("hyeong")
-        .version("0.1.0-beta")
-        .about("Hyeo-ung programming language tool")
+    let matches = App::new("Hyeong")
+        .version("0.1.0")
+        .about("hyeo-ung programming language tool")
         .subcommand(
             App::new("build")
                 .about("Compiles hyeong code")
@@ -24,7 +24,7 @@ fn main() {
                     Arg::with_name("optimize")
                         .value_name("optimize")
                         .takes_value(true)
-                        .short('O')
+                        .short("O")
                         .long("optimize")
                         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize")
                         .default_value("2"),
@@ -33,7 +33,7 @@ fn main() {
                     Arg::with_name("output")
                         .value_name("output")
                         .takes_value(true)
-                        .short('o')
+                        .short("o")
                         .long("output")
                         .help("binary output file (filename by default)"),
                 )
@@ -41,7 +41,7 @@ fn main() {
                     Arg::with_name("warning")
                         .value_name("warning")
                         .takes_value(true)
-                        .short('W')
+                        .short("W")
                         .long("warn")
                         .help("warning level (0/none: no warning, 1/all: all warning")
                         .default_value("all"),
@@ -72,7 +72,7 @@ fn main() {
                     Arg::with_name("from")
                         .value_name("from")
                         .takes_value(true)
-                        .short('f')
+                        .short("f")
                         .long("from")
                         .help("place to start debugging from")
                         .default_value("0"),
@@ -92,7 +92,7 @@ fn main() {
                     Arg::with_name("optimize")
                         .value_name("optimize")
                         .takes_value(true)
-                        .short('O')
+                        .short("O")
                         .long("optimize")
                         .help(
                             "optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)",
@@ -103,7 +103,7 @@ fn main() {
                     Arg::with_name("warning")
                         .value_name("warning")
                         .takes_value(true)
-                        .short('W')
+                        .short("W")
                         .long("warn")
                         .help("warning level (0/none: no warning, 1/all: all warning")
                         .default_value("all"),
