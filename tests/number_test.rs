@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod number_test {
-    use std::cmp::Ordering;
-
     use hyeong::number::Num;
+    use std::cmp::Ordering;
 
     #[test]
     fn compare_test01() {

@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod big_number_test {
-    use std::cmp::Ordering;
-
     use hyeong::big_number::{BigNum, Error};
+    use std::cmp::Ordering;
 
     #[test]
     fn add_test01() {
