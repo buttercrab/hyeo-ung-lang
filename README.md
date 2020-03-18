@@ -49,7 +49,13 @@ SUBCOMMANDS:
 
 # How to install
 
-## Homebrew
+## Prerequisite
+
+**Rust should be installed.**
+
+If you don't have rust installed, you can install rust by [this](https://www.rust-lang.org/tools/install).
+
+## Brew
 
 ```shell script
 brew install buttercrab/tools/hyeong
@@ -60,6 +66,7 @@ hyeong install
 
 Followings doesn't need to execute `hyeong install`
 
+### Script file
 1. Windows
 ```cmd
 curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.cmd" | cmd
@@ -70,7 +77,7 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh")
 ```
 
-3. Make
+### Make
 ```shell script
 git clone https://github.com/buttercrab/hyeo-ung-lang.git
 cd hyeo-ung-lang
