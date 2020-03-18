@@ -52,7 +52,7 @@ SUBCOMMANDS:
 ## Homebrew
 
 ```shell script
-brew install buttercrab/tools/hyeo-ung-lang
+brew install buttercrab/tools/hyeong
 hyeong install
 ```
 
@@ -68,4 +68,27 @@ curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_
 2. Mac, Linux
 ```shell script
 bash <(curl "https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/install_hyeong.sh")
+```
+
+3. Make
+```shell script
+git clone https://github.com/buttercrab/hyeo-ung-lang.git
+cd hyeo-ung-lang
+make install
+```
+
+Add to your `PATH` to use.
+
+## Uninstall
+
+First,
+
+```shell script
+hyeong uninstall
+```
+
+Then if brew,
+
+```shell script
+brew uninstall hyeong
 ```
