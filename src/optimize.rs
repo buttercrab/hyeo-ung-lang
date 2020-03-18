@@ -7,6 +7,7 @@ use crate::{area, io};
 use std::collections::HashMap;
 use std::io::{stdin, Write};
 
+/// Optimization helper function for level 2 optimization
 fn opt_execute<T>(
     ipt: &mut impl ReadLine,
     out: &mut impl Write,
@@ -153,6 +154,29 @@ where
     (state, true)
 }
 
+/// Optimization function
+///
+/// ## Level 1
+///
+/// In level 1, it analyzes the hyeong code and collect only used index of stack.
+/// Then, re-number the indices not to make `HashMap`; using `Vec`
+///
+/// ## Level 2
+///
+/// In level 2, it runs code until it gets input, terminates, or too much loop.
+/// So, `Hello, World!` code compiles to `print!("Hello, World!")` when unused code is removed.
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::{optimize, parse};
+/// use hyeong::state::State;
+///
+/// let a = parse::parse("형... 항.".to_string());
+/// let (mut s, c) = optimize::optimize(a, 2);
+///
+/// assert_eq!("3", s.get_stack(1).iter().map(|x| x.to_string()).collect::<Vec<_>>().join(""))
+/// ```
 pub fn optimize(code: Vec<UnOptCode>, level: usize) -> (OptState, Vec<OptCode>) {
     let mut size = 0usize;
     let mut opt_code_vec: Vec<OptCode> = Vec::new();

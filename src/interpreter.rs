@@ -6,6 +6,10 @@ use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
+/// Interpreter
+///
+/// It gets code line by line and executes.
+/// Prints stdout and stderr separately.
 #[cfg_attr(tarpaulin, skip)]
 pub fn run() -> ! {
     let running = Arc::new(AtomicBool::new(true));

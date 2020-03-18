@@ -5,6 +5,28 @@ use std::io::{stderr, stdin, stdout, Write};
 use std::path::Path;
 use std::process::Command;
 
+/// Main function of this program
+///
+/// ```text
+/// Hyeong 0.1.0
+/// hyeo-ung programming language tool
+///
+/// USAGE:
+///     hyeong [SUBCOMMAND]
+///
+/// FLAGS:
+///     -h, --help       Prints help information
+///     -V, --version    Prints version information
+///
+/// SUBCOMMANDS:
+///     build        Compiles hyeong code
+///     check        Parse your code and check if you are right
+///     debug        Debug your code command by command
+///     help         Prints this message or the help of the given subcommand(s)
+///     install      Install hyeong before build (need once)
+///     run          Run hyeong code directly
+///     uninstall    Uninstall hyeong before build
+/// ```
 #[cfg_attr(tarpaulin, skip)]
 fn main() {
     let matches = App::new("Hyeong")

@@ -8,6 +8,17 @@ use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 
+/// Debug function
+///
+/// It works like interpreter but accepting commands below.
+/// 1. break(b)       show breakpoints");
+/// 2. break(b) NUM   set/unset breakpoint on NUM");
+/// 3. exit           Exit debugger");
+/// 4. help(h)        Print this");
+/// 5. next(n)        goto next command");
+/// 6. state(s)       print state status");
+/// 7. previous(p)    move to previous state");
+/// 8. run(r)         run until breakpoint");
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
     let running = Arc::new(AtomicBool::new(true));

@@ -6,6 +6,25 @@ use crate::{area, io};
 use std::io::Write;
 use std::process;
 
+/// Wrapper function for pushing to stack
+/// This is needed because stack no 1, 2 has different behavior
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::execute;
+/// use hyeong::io::CustomWriter;
+/// use hyeong::number::Num;
+/// use hyeong::state::UnOptState;
+///
+/// let mut a = CustomWriter::new(|_| Result::Ok(()));
+/// let mut b = CustomWriter::new(|_| Result::Ok(()));
+/// let mut s = UnOptState::new();
+///
+/// execute::push_stack_wrap(&mut a, &mut b, &mut s, 1, Num::from_num(-1));
+///
+/// assert_eq!("1", a.to_string());
+/// ```
 pub fn push_stack_wrap<T>(
     out: &mut impl Write,
     err: &mut impl Write,
@@ -36,6 +55,24 @@ pub fn push_stack_wrap<T>(
     }
 }
 
+/// Wrapper function for popping from stack
+/// This is needed because stack no 0, 1, 2 has different behavior
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::execute;
+/// use hyeong::io::{CustomReader, CustomWriter};
+/// use hyeong::state::UnOptState;
+///
+/// let mut a = CustomReader::new("0".to_string());
+/// let mut b = CustomWriter::new(|_| Result::Ok(()));
+/// let mut c = CustomWriter::new(|_| Result::Ok(()));
+/// let mut s = UnOptState::new();
+///
+/// let n = execute::pop_stack_wrap(&mut a, &mut b, &mut c, &mut s, 0);
+/// assert_eq!("48", n.to_string());
+/// ```
 pub fn pop_stack_wrap<T>(
     ipt: &mut impl ReadLine,
     out: &mut impl Write,
@@ -70,6 +107,25 @@ where
     }
 }
 
+/// Executes only one line of code and return next position of code
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::{execute, parse};
+/// use hyeong::io::{CustomReader, CustomWriter};
+/// use hyeong::state::{UnOptState, State};
+///
+/// let mut a = CustomReader::new("0".to_string());
+/// let mut b = CustomWriter::new(|_| Result::Ok(()));
+/// let mut c = CustomWriter::new(|_| Result::Ok(()));
+/// let mut s = UnOptState::new();
+/// let t = parse::parse("형...".to_string());
+/// s.push_code(t[0].clone());
+///
+/// let (mut s, _) = execute::execute_one(&mut a, &mut b, &mut c, s, 0);
+/// assert_eq!("3", s.get_stack(3)[0].to_string());
+/// ```
 pub fn execute_one<T>(
     ipt: &mut impl ReadLine,
     out: &mut impl Write,
@@ -179,6 +235,24 @@ where
     (state, cur_loc + 1)
 }
 
+/// Execute from new code until needs new code or finish
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::{execute, parse};
+/// use hyeong::io::{CustomReader, CustomWriter};
+/// use hyeong::state::{UnOptState, State};
+///
+/// let mut a = CustomReader::new("0".to_string());
+/// let mut b = CustomWriter::new(|_| Result::Ok(()));
+/// let mut c = CustomWriter::new(|_| Result::Ok(()));
+/// let mut s = UnOptState::new();
+/// let t = parse::parse("형...".to_string());
+///
+/// let mut s = execute::execute(&mut a, &mut b, &mut c, s, &t[0]);
+/// assert_eq!("3", s.get_stack(3)[0].to_string());
+/// ```
 pub fn execute<T>(
     ipt: &mut impl ReadLine,
     out: &mut impl Write,
