@@ -65,8 +65,10 @@ hyeong install
 ## Docker
 
 ```shell script
-docker run buttercrab/hyeong
+docker run -it buttercrab/hyeong /bin/bash
 ```
+
+Then, `hyeong` to execute.
 
 ## Build from source
 
