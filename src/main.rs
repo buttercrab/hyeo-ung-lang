@@ -259,7 +259,11 @@ fn main() {
         io::print_log("installing hyeong");
         io::execute_command_stderr(
             "\
-            ",
+            mkdir %USERPROFILE%\\.hyeong\n\
+            cd %USERPROFILE%\\.hyeong && cargo new hyeong-build --vcs none\n\
+            curl \"https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/number.rs\" > %USERPROFILE%\\.hyeong\\hyeong-build\\src\\number.rs;\
+            curl \"https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/big_number.rs\" > %USERPROFILE%\\.hyeong\\hyeong-build\\src\\big_number.rs;\
+            echo pub mod big_number;pub mod number; > %USERPROFILE%\\.hyeong\\hyeong-build\\src\\lib.rs",
             "\
             mkdir -p ~/.hyeong;\
             cd ~/.hyeong && cargo new hyeong-build --vcs none --color always;\
@@ -270,7 +274,7 @@ fn main() {
         io::print_log("test build");
         io::execute_command_stderr(
             "\
-            ",
+            cargo build --manifest-path=%USERPROFILE%\\.hyeong\\hyeong-build\\Cargo.toml --release",
             "\
             cargo build --manifest-path=\"$HOME\"/.hyeong/hyeong-build/Cargo.toml --release --color always",
         );
@@ -278,7 +282,7 @@ fn main() {
         io::print_note("to uninstall, run `hyeong uninstall`");
     } else if let Some(ref _m) = matches.subcommand_matches("uninstall") {
         io::print_log("uninstalling hyeong");
-        io::execute_command_stdout("", "rm -rf ~/.hyeong");
+        io::execute_command_stdout("rmdir /S %USERPROFILE%\\.hyeong", "rm -rf ~/.hyeong");
         io::print_log("done!");
     } else {
         interpreter::run();
