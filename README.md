@@ -62,6 +62,12 @@ brew install buttercrab/tools/hyeong
 hyeong install
 ```
 
+## Docker
+
+```shell script
+docker run buttercrab/hyeong
+```
+
 ## Build from source
 
 Followings doesn't need to execute `hyeong install`
