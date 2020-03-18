@@ -2,6 +2,8 @@ CARGO = ~/.cargo/bin/cargo
 
 install:
 	$(CARGO) build --release
+	mkdir -p bin
+	cp target/release/hyeong bin/hyeong
 	mkdir -p ~/.hyeong
 	cd ~/.hyeong && $(CARGO) new hyeong-build --vcs none
 	cp src/number.rs ~/.hyeong/hyeong-build/src/
