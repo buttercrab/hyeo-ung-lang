@@ -166,10 +166,15 @@ fn main() {
         );
         io::print_log("moving binary to current directory");
         if cfg!(target_os = "windows") {
-            io::handle_error(Command::new("cmd").arg("/C").arg(format!(
-                "copy %USERPROFILE%\\.hyeong\\hyeong-build\\target\\release\\hyeong-build.exe {}.exe",
-                output_file
-            )).output())
+            io::handle_error(
+                Command::new("cmd")
+                    .arg("/C")
+                    .arg(format!(
+                        "copy %USERPROFILE%\\.hyeong\\hyeong-build\\target\\release\\hyeong-build.exe {}.exe",
+                        output_file
+                    ))
+                    .output()
+            )
         } else {
             io::handle_error(
                 Command::new("bash")
@@ -251,7 +256,7 @@ fn main() {
             cd ~/.hyeong && cargo new hyeong-build --vcs none --color always;\
             curl \"https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/number.rs\" > ~/.hyeong/hyeong-build/src/number.rs;\
             curl \"https://raw.githubusercontent.com/buttercrab/hyeo-ung-lang/master/src/big_number.rs\" > ~/.hyeong/hyeong-build/src/big_number.rs;\
-            printf \"pub mod big_number;\npub mod number;\" > ~/.hyeong/hyeong-build/src/lib.rs"
+            printf \"pub mod big_number;\npub mod number;\" > ~/.hyeong/hyeong-build/src/lib.rs",
         );
         io::print_log("test build");
         io::execute_command_stderr(
