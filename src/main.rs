@@ -58,15 +58,6 @@ fn main() {
                         .short("o")
                         .long("output")
                         .help("binary output file (filename by default)"),
-                )
-                .arg(
-                    Arg::with_name("warning")
-                        .value_name("warning")
-                        .takes_value(true)
-                        .short("W")
-                        .long("warn")
-                        .help("warning level (0/none: no warning, 1/all: all warning")
-                        .default_value("all"),
                 ),
         )
         .subcommand(
@@ -120,15 +111,6 @@ fn main() {
                             "optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)",
                         )
                         .default_value("2"),
-                )
-                .arg(
-                    Arg::with_name("warning")
-                        .value_name("warning")
-                        .takes_value(true)
-                        .short("W")
-                        .long("warn")
-                        .help("warning level (0/none: no warning, 1/all: all warning")
-                        .default_value("all"),
                 ),
         )
         .subcommand(App::new("install").about("Install hyeong before build (need once)"))
