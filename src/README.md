@@ -13,7 +13,7 @@
 | `debug.rs`       |✅     |❌     |✅    |
 | `execute.rs`     |✅     |✅     |✅    |
 | `interpreter.rs` |✅     |❌     |✅    |
-| `io.rs`          |✅     |      |✅    |
+| `io.rs`          |✅     |✅     |✅    |
 | `lib.rs`         |✅     |❌     |❌    |
 | `main.rs`        |✅     |❌     |✅    |
 | `number.rs`      |✅     |✅     |✅    |
