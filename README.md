@@ -70,7 +70,7 @@ brew install buttercrab/tools/hyeong
 hyeong install
 ```
 
-# Cargo
+## Cargo
 
 ```shell script
 cargo install hyeong
