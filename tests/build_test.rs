@@ -1,5 +1,5 @@
 ﻿#[cfg(test)]
-mod io_test {
+mod build_test {
     use hyeong::{build, optimize, io, parse};
     use hyeong::state::{State, UnOptState};
     use std::io::Write;
@@ -27,9 +27,8 @@ mod io_test {
         }    
     }
 
-    fn helper_function2(source: &str, output_file: &str, build_path: &str) {
+    fn helper_function2(source: &str, build_path: &str) {
         if !Path::new(&*build_path.to_string()).exists() {
-            io::print_log("making temporary crate");
             io::execute_command_stderr(
                 &*format!(
                     "cargo new {} --color always --vcs none",
@@ -52,52 +51,47 @@ mod io_test {
                 build_path.to_string()
             ),
         );
-        if cfg!(target_os = "windows") {
-            io::handle_error(process::Command::new("cmd").arg("/C").arg(format!(
-                "copy {}\\target\\release\\hyeong-build.exe {}.exe",
-                build_path.to_string(),output_file.to_string()
-            )).output())
-        } else {
-            io::handle_error(
-                process::Command::new("bash")
-                    .arg("-c")
-                    .arg(format!(
-                        "cp {}/target/release/hyeong-build {}",
-                        build_path.to_string(),output_file.to_string()
-                    ))
-                    .output(),
-            )
-        };
     }
 
     #[test]
     fn build_test01() {
         let source = helper_function1("형.. 흣.", 0);
-        let output_file = "examples\\build_test01\\build_test01";
+        io::execute_command("cd %USERPROFILE%\\.hyeong\\test\\test1 && cargo new hyeong-build --vcs none","cd ~/.hyeong/test/test1 && cargo new hyeong-build --vcs none");
+        io::execute_command("COPY /y %USERPROFILE%\\.hyeong\\hyeong\\src\\number.rs %USERPROFILE%\\.hyeong\\test\\test1\\hyeong-build\\src\\number.rs","cp ~/.hyeong/hyeong/src/number.rs ~/.hyeong/test/test1/hyeong-build/src/");
+        io::execute_command("copy /y %USERPROFILE%\\.hyeong\\hyeong\\src\\big_number.rs %USERPROFILE%\\.hyeong\\test\\test1\\hyeong-build\\src\\big_number.rs","cp ~/.hyeong/hyeong/src/big_number.rs ~/.hyeong/test/test1/hyeong-build/src/");
+        io::execute_command("echo pub mod big_number;pub mod number; > %USERPROFILE%\\.hyeong\\test\\test1\\hyeong-build\\src\\lib.rs","printf \"pub mod big_number;\npub mod number;\" > ~/.hyeong/test/test1/src/hyeong-build/lib.rs");
         let build_path = if cfg!(target_os = "windows") {
-            env::var("USERPROFILE").unwrap() + "\\.hyeong\\build_test01\\hyeong-build"
+            env::var("USERPROFILE").unwrap() + "\\.hyeong\\test\\test1\\hyeong-build"
         } else {
-            env::var("HOME").unwrap() + "/.hyeong/build_test01/hyeong-build"
+            env::var("HOME").unwrap() + "/.hyeong/test/test1/hyeong-build/"
         };
-        helper_function2(&source, &output_file, &build_path);
-        let output = if cfg!(target_os = "windows") {
-            io::handle_error(process::Command::new("cmd").arg("/C").arg("examples\\build_test01\\build_test01.exe").output())
+        helper_function2(&source, &build_path);
+        /*let output = if cfg!(target_os = "windows") {
+            io::handle_error(process::Command::new("cmd").arg("/C").arg(build_path).output())
         } else {
             io::handle_error(
                 process::Command::new("bash")
                     .arg("-c")
-                    .arg("examples/build_test01/build_test01")
+                    .arg(build_path)
                     .output(),
             )
-        };
+        };*/
+        let output = io::handle_error(String::from_utf8(
+            io::handle_error(if cfg!(target_os = "windows") {
+                process::Command::new("cmd").arg("/C").arg(build_path).output()
+            } else {
+                process::Command::new("bash").arg("-c").arg(build_path).output()
+            })
+            .stdout
+        ));
         let mut outstr = "".to_string();
-        for i in output.stdout {
+        for i in output.bytes() {
             outstr.push_str(&(i as u8 as char).to_string());
         }
         assert_eq!("2",outstr);
     }
 
-    #[test]
+   /* #[test]
     fn build_test02() {
         let source = helper_function1("혀어어어어어어어엉........ 핫. 혀엉..... 흑... 하앗... 흐윽... 형.  하앙.혀엉.... 하앙... 흐윽... 항. 항. 형... 하앙. 흐으윽... 형... 흡... 혀엉..하아아앗. 혀엉.. 흡... 흐읍... 형.. 하앗. 하아앙... 형... 하앙... 흐윽...혀어어엉.. 하앙. 항. 형... 하앙. 혀엉.... 하앙. 흑... 항. 형... 흡  하앗. 
         혀엉..... 흑. 흣", 1);
@@ -177,6 +171,6 @@ mod io_test {
             outstr.push_str(&(i as u8 as char).to_string());
         }
         assert_eq!("4",outstr);
-    }
+    }*/
 
 }

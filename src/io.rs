@@ -317,3 +317,12 @@ pub fn execute_command_stderr(windows: &str, linux: &str) {
         ))
     );
 }
+
+#[cfg_attr(tarpaulin, skip)]
+pub fn execute_command(windows: &str, linux: &str) {
+    if cfg!(target_os = "windows") {
+        Command::new("cmd").arg("/C").arg(windows).output();
+    } else {
+        Command::new("bash").arg("-c").arg(linux).output();
+    }
+}
