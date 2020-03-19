@@ -70,6 +70,13 @@ brew install buttercrab/tools/hyeong
 hyeong install
 ```
 
+# Cargo
+
+```shell script
+cargo install hyeong
+hyeong install
+```
+
 ## Docker
 
 ```shell script
