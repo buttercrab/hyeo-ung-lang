@@ -12,11 +12,7 @@ use std::{error, fmt, ops};
 ///
 /// let a = BigNum::new(1234);
 ///
-/// assert!(if let Result::Err(Error::ParseError) = BigNum::from_string("random string".to_string()) {
-///     true
-/// } else {
-///     false
-/// });
+/// assert!(matches!(BigNum::from_string("random string".to_string()), Result::Err(Error::ParseError)));
 /// ```
 #[derive(Debug)]
 pub enum Error {
@@ -71,7 +67,10 @@ impl error::Error for Error {}
 /// let j = &a == &b;
 /// let k = &a < &b;
 ///
-/// println!("{}", a); // 10
+/// assert_eq!("10", format!("{}", a));
+/// assert_eq!("10", format!("{}", b));
+/// assert_eq!("10", format!("{}", c));
+/// assert_eq!("10", format!("{}", d));
 /// ```
 #[derive(Clone)]
 pub struct BigNum {
