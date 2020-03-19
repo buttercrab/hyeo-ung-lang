@@ -14,3 +14,7 @@ description = "Hyeo-ung Programming Language Compiler"
 clap = "2.33.0"
 colored = "1.9"
 ctrlc = { version = "3.0", features = ["termination"] }
+
+[[bin]]
+path = "src/main.rs"
+name = "hyeong"
