@@ -1,3 +1,6 @@
+<p align="center">
+<img alt="혀엉..." src="https://github.com/buttercrab/hyeo-ung-lang/raw/master/imgs/hyeong-light.png"/>
+</p>
 <h1 align="center">Hyeo-ung Programming Language</h1>
 
 <p align="center">
