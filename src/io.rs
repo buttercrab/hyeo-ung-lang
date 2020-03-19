@@ -226,7 +226,7 @@ pub fn print_error_str_no_exit(err: &str) {
 /// Print log
 #[cfg_attr(tarpaulin, skip)]
 pub fn print_log(msg: &str) {
-    println!("{} {}", "====> ".blue(), msg.bold());
+    println!("{} {}", "==>".blue(), msg.bold());
 }
 
 /// Print warning
