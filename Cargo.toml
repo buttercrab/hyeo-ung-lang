@@ -8,9 +8,14 @@ homepage = "https://github.com/buttercrab/hyeo-ung-lang"
 repository = "https://github.com/buttercrab/hyeo-ung-lang"
 description = "Hyeo-ung Programming Language Compiler"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[badges]
+travis-ci = { repository = "buttercrab/hyeo-ung-lang" }
 
 [dependencies]
 clap = "2.33.0"
 colored = "1.9"
 ctrlc = { version = "3.0", features = ["termination"] }
+
+[[bin]]
+path = "src/main.rs"
+name = "hyeong"

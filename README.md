@@ -35,7 +35,7 @@
 More explanation on [Documentation](https://github.com/buttercrab/hyeo-ung-lang/wiki/Documentation).
 
 ```
-Hyeong 0.1.0
+hyeong 0.1.0
 hyeo-ung programming language tool
 
 USAGE:
