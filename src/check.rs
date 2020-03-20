@@ -8,6 +8,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::input())
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn run(matches: &ArgMatches) {
     let file = matches.value_of("input").unwrap();
     let code = io::read_file(file);

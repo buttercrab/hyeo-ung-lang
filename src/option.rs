@@ -1,5 +1,6 @@
 use clap::Arg;
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn build_source<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("build-source")
         .value_name("build-source")
@@ -8,6 +9,7 @@ pub fn build_source<'a, 'b>() -> Arg<'a, 'b> {
         .help("set temporary build path")
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn color<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("color")
         .value_name("color")
@@ -17,6 +19,7 @@ pub fn color<'a, 'b>() -> Arg<'a, 'b> {
         .default_value("auto")
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn input<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("input")
         .value_name("FILE.hyeong")
@@ -25,6 +28,7 @@ pub fn input<'a, 'b>() -> Arg<'a, 'b> {
         .help("input file to compile")
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("optimize")
         .value_name("optimize")
@@ -35,6 +39,7 @@ pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
         .default_value("2")
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn output<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("output")
         .value_name("output")

@@ -11,6 +11,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::optimize())
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn run(matches: &ArgMatches) {
     let file = matches.value_of("input").unwrap();
     let un_opt_code = io::read_file(file);
