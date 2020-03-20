@@ -8,20 +8,20 @@
 |------------------|:----:|:----:|:---:|
 | `area.rs`        |✅     |✅     |✅    |
 | `big_number.rs`  |✅     |✅     |✅    |
-| `build.rs`       |      |      |     |
-| `check.rs`       |      |      |     |
+| `build.rs`       |      |❌     |     |
+| `check.rs`       |      |❌     |     |
 | `code.rs`        |✅     |✅     |✅    |
 | `compile.rs`     |✅     |✅     |✅    |
 | `debug.rs`       |      |❌     |     |
 | `execute.rs`     |✅     |✅     |✅    |
-| `init.rs`        |      |      |     |
+| `init.rs`        |      |❌     |     |
 | `interpreter.rs` |✅     |❌     |✅    |
 | `io.rs`          |✅     |✅     |✅    |
 | `lib.rs`         |✅     |❌     |❌    |
 | `main.rs`        |✅     |❌     |✅    |
 | `number.rs`      |✅     |✅     |✅    |
 | `optimize.rs`    |✅     |✅     |✅    |
-| `option.rs`      |      |      |     |
+| `option.rs`      |      |❌     |     |
 | `parse.rs`       |✅     |✅     |✅    |
-| `run.rs`         |      |      |     |
+| `run.rs`         |      |❌     |     |
 | `state.rs`       |✅     |✅     |✅    |
