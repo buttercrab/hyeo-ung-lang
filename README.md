@@ -57,12 +57,6 @@ SUBCOMMANDS:
 
 # How to install
 
-## Prerequisite
-
-**Rust should be installed.**
-
-If you don't have rust installed, you can install rust by [this](https://www.rust-lang.org/tools/install).
-
 ## Brew
 
 ```shell script
