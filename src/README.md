@@ -1,5 +1,7 @@
 # Hyeo-ung Source Files
 
+**all development is done**
+
 ## Status for each file
 
 ✅ for done, ❌ for omit, nothing for todo.
@@ -8,7 +10,7 @@
 |------------------|:----:|:----:|:---:|
 | `area.rs`        |✅     |✅     |✅    |
 | `big_number.rs`  |✅     |✅     |✅    |
-| `build.rs`       |✅     |      |✅    |
+| `build.rs`       |✅     |✅     |✅    |
 | `code.rs`        |✅     |✅     |✅    |
 | `debug.rs`       |✅     |❌     |✅    |
 | `execute.rs`     |✅     |✅     |✅    |

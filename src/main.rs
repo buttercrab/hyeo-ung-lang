@@ -8,7 +8,7 @@ use std::process::Command;
 /// Main function of this program
 ///
 /// ```text
-/// hyeong 0.1.0
+/// hyeong 0.1.1
 /// hyeo-ung programming language tool
 ///
 /// USAGE:
@@ -30,7 +30,7 @@ use std::process::Command;
 #[cfg_attr(tarpaulin, skip)]
 fn main() {
     let matches = App::new("hyeong")
-        .version("0.1.0")
+        .version("0.1.1")
         .about("hyeo-ung programming language tool")
         .subcommand(
             App::new("build")
