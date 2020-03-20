@@ -1,2 +1,6 @@
 .idea
 .vscode
+
+Cargo.lock
+target
+**.exe
