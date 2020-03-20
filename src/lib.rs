@@ -1,12 +1,17 @@
 pub mod area;
 pub mod big_number;
 pub mod build;
+pub mod check;
 pub mod code;
+pub mod compile;
 pub mod debug;
 pub mod execute;
+pub mod init;
 pub mod interpreter;
 pub mod io;
 pub mod number;
 pub mod optimize;
+pub mod option;
 pub mod parse;
+pub mod run;
 pub mod state;

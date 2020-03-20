@@ -1,12 +1,27 @@
 use crate::code::UnOptCode;
 use crate::state::{State, UnOptState};
-use crate::{execute, io};
+use crate::{execute, io, option};
+use clap::{App, ArgMatches};
 use colored::Colorize;
 use std::collections::HashSet;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+
+#[cfg_attr(tarpaulin, skip)]
+pub fn app<'a, 'b>() -> App<'a, 'b> {
+    App::new("debug")
+        .about("Debug your code command by command")
+        .arg(option::input())
+}
+
+pub fn run(matches: &ArgMatches) {
+    let file = matches.value_of("input").unwrap();
+    let code = io::read_file(file);
+    let from = io::handle_error(matches.value_of("from").unwrap().parse::<usize>());
+    debug(code, from);
+}
 
 /// Debug function
 ///
@@ -20,7 +35,7 @@ use std::sync::Arc;
 /// 7. previous(p)    move to previous state");
 /// 8. run(r)         run until breakpoint");
 #[cfg_attr(tarpaulin, skip)]
-pub fn run(code: Vec<UnOptCode>, from: usize) -> ! {
+pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
     let mut state = UnOptState::new();

@@ -1,7 +1,7 @@
 ﻿#[cfg(test)]
 mod build_test {
     use hyeong::state::UnOptState;
-    use hyeong::{build, io, optimize, parse};
+    use hyeong::{compile, io, optimize, parse};
     use std::env;
     use std::process::Command;
 
@@ -10,9 +10,9 @@ mod build_test {
         let un_opt_state = UnOptState::new();
         let source = if level >= 1 {
             let (opt_state, opt_code) = optimize::optimize(un_opt_code, level);
-            build::build_source(opt_state, &opt_code, level)
+            compile::build_source(opt_state, &opt_code, level)
         } else {
-            build::build_source(un_opt_state, &un_opt_code, level)
+            compile::build_source(un_opt_state, &un_opt_code, level)
         };
 
         let build_path = &*if cfg!(target_os = "windows") {
