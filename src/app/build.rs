@@ -19,7 +19,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 }
 
 #[cfg_attr(tarpaulin, skip)]
-pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
+pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     // parse
     let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
@@ -43,16 +43,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
         .join("hyeong-build/Cargo.toml")
         .exists()
     {
-        init::install_run(
-            stdout,
-            HyeongOption {
-                build_source: hy_opt.build_source.clone(),
-                color: hy_opt.color,
-                input: None,
-                optimize: 0,
-                output: None,
-            },
-        )?;
+        init::install_run(stdout, hy_opt)?;
     }
 
     // compile to binary

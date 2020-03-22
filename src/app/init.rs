@@ -20,7 +20,7 @@ pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
 }
 
 #[cfg_attr(tarpaulin, skip)]
-pub fn install_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
+pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "making dir for building hyeong")?;
     fs::create_dir_all(
         &hy_opt
@@ -88,7 +88,7 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", branch = \"dev
 }
 
 #[cfg_attr(tarpaulin, skip)]
-pub fn uninstall_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
+pub fn uninstall_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "removing dir")?;
     fs::remove_dir_all(hy_opt.build_source.as_ref().unwrap())?;
     Ok(())

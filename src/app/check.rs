@@ -1,4 +1,4 @@
-use crate::core::code::Code;
+use crate::core::code::{Code, UnOptCode};
 use crate::core::parse;
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
@@ -17,8 +17,21 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 }
 
 #[cfg_attr(tarpaulin, skip)]
-pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
+pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    print_un_opt_codes(
+        stdout,
+        hy_opt,
+        un_opt_code.iter().enumerate().collect::<Vec<_>>(),
+    )
+}
+
+#[cfg_attr(tarpaulin, skip)]
+pub fn print_un_opt_codes(
+    stdout: &mut StandardStream,
+    hy_opt: &HyeongOption,
+    code: Vec<(usize, &UnOptCode)>,
+) -> Result<(), Error> {
     let file_name = hy_opt
         .input
         .as_ref()
@@ -34,28 +47,27 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                 String::from("maybe the path is not correct"),
             )
         })?;
-    let mut cnt = 0;
-    let idx_len = un_opt_code.len().to_string().len();
+    let mut idx_len = 0usize;
     let mut file_len = 0usize;
 
-    for c in un_opt_code.iter() {
+    for (i, c) in code.iter() {
+        idx_len = max(idx_len, i.to_string().len());
+
         file_len = max(
             file_len,
             c.get_location().0.to_string().len() + c.get_location().1.to_string().len(),
         )
     }
 
-    for c in un_opt_code.iter() {
-        cnt += 1;
-
+    for (i, c) in code.iter() {
         stdout.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
-        write!(stdout, "{}", cnt)?;
+        write!(stdout, "{}", i)?;
         stdout.reset()?;
         write!(
             stdout,
             "{} | ",
             std::iter::repeat(' ')
-                .take(idx_len - cnt.to_string().len())
+                .take(idx_len - i.to_string().len())
                 .collect::<String>()
         )?;
 

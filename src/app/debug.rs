@@ -1,3 +1,4 @@
+use crate::app::check;
 use crate::core::execute;
 use crate::core::state::{State, UnOptState};
 use crate::util::error::Error;
@@ -30,7 +31,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 /// 7. previous(p)    move to previous state");
 /// 8. run(r)         run until breakpoint");
 #[cfg_attr(tarpaulin, skip)]
-pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
+pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
     let h = hy_opt.clone();
@@ -189,9 +190,13 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                         if parsed.len() < 2 {
                             let mut v = break_points.iter().collect::<Vec<_>>();
                             v.sort();
-                            for i in v {
-                                writeln!(stdout, "{}: {}", i, un_opt_code[*i].get_raw())?;
-                            }
+                            check::print_un_opt_codes(
+                                stdout,
+                                hy_opt,
+                                v.iter()
+                                    .map(|&i| (*i, &un_opt_code[*i]))
+                                    .collect::<Vec<_>>(),
+                            )?;
                             continue;
                         }
                         let num = match parsed[1].parse::<usize>() {
@@ -216,14 +221,14 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     "help" | "h" => {
-                        writeln!(stdout, "break(b)       show breakpoints")?;
-                        writeln!(stdout, "break(b) NUM   set/unset breakpoint on NUM")?;
-                        writeln!(stdout, "exit           Exit debugger")?;
-                        writeln!(stdout, "help(h)        Print this")?;
-                        writeln!(stdout, "next(n)        goto next command")?;
-                        writeln!(stdout, "state(s)       print state status")?;
-                        writeln!(stdout, "previous(p)    move to previous state")?;
-                        writeln!(stdout, "run(r)         run until breakpoint")?;
+                        writeln!(stdout, "[b] break       show breakpoints")?;
+                        writeln!(stdout, "[b] break NUM   set/unset breakpoint on NUM")?;
+                        writeln!(stdout, "exit            Exit debugger")?;
+                        writeln!(stdout, "[h] help        Print this")?;
+                        writeln!(stdout, "[n] next        goto next command")?;
+                        writeln!(stdout, "[s] state       print state status")?;
+                        writeln!(stdout, "[p] previous    move to previous state")?;
+                        writeln!(stdout, "[r] run         run until breakpoint")?;
                         continue;
                     }
 
@@ -246,5 +251,5 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
     out.flush().unwrap();
     err.flush().unwrap();
 
-    process::exit(0);
+    Ok(())
 }

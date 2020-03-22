@@ -19,7 +19,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 pub fn run(
     stdout: &mut StandardStream,
     stderr: &mut StandardStream,
-    hy_opt: HyeongOption,
+    hy_opt: &HyeongOption,
 ) -> Result<(), Error> {
     let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 

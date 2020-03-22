@@ -20,7 +20,7 @@ fn sub_main(
         let output = option::parse_output(matches, &input)?;
         build::run(
             stdout,
-            HyeongOption {
+            &HyeongOption {
                 build_source: Some(option::parse_build_path(matches)?),
                 color,
                 input: Some(input),
@@ -31,7 +31,7 @@ fn sub_main(
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
         check::run(
             stdout,
-            HyeongOption {
+            &HyeongOption {
                 build_source: None,
                 color,
                 input: Some(option::parse_input(matches)?),
@@ -42,7 +42,7 @@ fn sub_main(
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
         debug::run(
             stdout,
-            HyeongOption {
+            &HyeongOption {
                 build_source: None,
                 color,
                 input: Some(option::parse_input(matches)?),
@@ -54,7 +54,7 @@ fn sub_main(
         run::run(
             stdout,
             stderr,
-            HyeongOption {
+            &HyeongOption {
                 build_source: None,
                 color,
                 input: Some(option::parse_input(matches)?),
@@ -65,7 +65,7 @@ fn sub_main(
     } else if let Some(ref matches) = matches.subcommand_matches("install") {
         init::install_run(
             stdout,
-            HyeongOption {
+            &HyeongOption {
                 build_source: Some(option::parse_build_path(matches)?),
                 color,
                 input: None,
@@ -76,7 +76,7 @@ fn sub_main(
     } else if let Some(ref matches) = matches.subcommand_matches("uninstall") {
         init::uninstall_run(
             stdout,
-            HyeongOption {
+            &HyeongOption {
                 build_source: Some(option::parse_build_path(matches)?),
                 color,
                 input: None,
