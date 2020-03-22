@@ -93,7 +93,5 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
         hy_opt.output.as_ref().unwrap(),
     )?;
 
-    // done
-    io::print_log(stdout, "done!")?;
     Ok(())
 }

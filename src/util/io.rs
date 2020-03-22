@@ -170,7 +170,7 @@ pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnO
     let raw_code = read_file(path)?;
     print_log(stdout, format!("parsing {}", util::path_to_string(path)?))?;
     let un_opt_code = parse::parse(raw_code);
-    print_log(stdout, format!("⮑ total {} commands", un_opt_code.len()))?;
+    print_log(stdout, format!("⮑  total {} commands", un_opt_code.len()))?;
     Ok(un_opt_code)
 }
 
