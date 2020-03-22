@@ -3,7 +3,7 @@ use crate::util::option::HyeongOption;
 use crate::util::{io, option, util};
 use clap::App;
 use std::fs;
-use termcolor::{ColorChoice, StandardStream};
+use termcolor::{StandardStream, WriteColor};
 
 pub fn install_app<'a, 'b>() -> App<'a, 'b> {
     App::new("install")
@@ -19,8 +19,19 @@ pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
 
 pub fn install_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "making dir for building hyeong")?;
+    fs::create_dir_all(
+        &hy_opt
+            .build_source
+            .as_ref()
+            .unwrap()
+            .join("hyeong-build/src"),
+    )?;
     io::save_to_file(
-        &hy_opt.build_source.as_ref().unwrap().join("src/main.rs"),
+        &hy_opt
+            .build_source
+            .as_ref()
+            .unwrap()
+            .join("hyeong-build/src/main.rs"),
         String::from(
             "\
 use hyeong::number::Num;
@@ -33,12 +44,17 @@ fn main() {
         ),
     )?;
     io::save_to_file(
-        &hy_opt.build_source.as_ref().unwrap().join("Cargo.toml"),
+        &hy_opt
+            .build_source
+            .as_ref()
+            .unwrap()
+            .join("hyeong-build/Cargo.toml"),
         String::from(
             "\
 [package]
 name = \"hyeong-build\"
 version = \"0.1.0\"
+edition = \"2018\"
 
 [dependencies]
 hyeong = \"0.1.0\"
@@ -50,12 +66,17 @@ hyeong = \"0.1.0\"
         stdout,
         &*format!(
             "cargo build --manifest-path={} --release --color {}",
-            util::path_to_string(&hy_opt.build_source.as_ref().unwrap())?,
-            match hy_opt.color {
-                ColorChoice::Always => "always",
-                ColorChoice::AlwaysAnsi => "always",
-                ColorChoice::Auto => "auto",
-                ColorChoice::Never => "none",
+            util::path_to_string(
+                &hy_opt
+                    .build_source
+                    .as_ref()
+                    .unwrap()
+                    .join("hyeong-build/Cargo.toml")
+            )?,
+            if stdout.supports_color() {
+                "always"
+            } else {
+                "none"
             }
         ),
     )?;

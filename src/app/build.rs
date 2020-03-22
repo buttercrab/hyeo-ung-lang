@@ -6,7 +6,7 @@ use crate::util::option::HyeongOption;
 use crate::util::{io, option, util};
 use clap::App;
 use std::fs;
-use termcolor::{ColorChoice, StandardStream};
+use termcolor::{StandardStream, WriteColor};
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
@@ -63,12 +63,17 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
         stdout,
         &*format!(
             "cargo build --manifest-path={} --release --color {}",
-            util::path_to_string(&hy_opt.build_source.as_ref().unwrap())?,
-            match hy_opt.color {
-                ColorChoice::Always => "always",
-                ColorChoice::AlwaysAnsi => "always",
-                ColorChoice::Auto => "auto",
-                ColorChoice::Never => "none",
+            util::path_to_string(
+                &hy_opt
+                    .build_source
+                    .as_ref()
+                    .unwrap()
+                    .join("hyeong-build/Cargo.toml")
+            )?,
+            if stdout.supports_color() {
+                "always"
+            } else {
+                "none"
             }
         ),
     )?;
@@ -81,9 +86,9 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
             .as_ref()
             .unwrap()
             .join(if cfg!(windows) {
-                "target/release/hyeong-build.exe"
+                "hyeong-build/target/release/hyeong-build.exe"
             } else {
-                "target/release/hyeong-build"
+                "hyeong-build/target/release/hyeong-build"
             }),
         hy_opt.output.unwrap(),
     )?;
