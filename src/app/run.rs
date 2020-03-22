@@ -21,7 +21,7 @@ pub fn run(
     stderr: &mut StandardStream,
     hy_opt: HyeongOption,
 ) -> Result<(), Error> {
-    let un_opt_code = io::parse_file(stdout, &hy_opt.input.unwrap())?;
+    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
     if hy_opt.optimize >= 1 {
         io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;

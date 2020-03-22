@@ -21,7 +21,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
     // parse
-    let un_opt_code = io::parse_file(stdout, &hy_opt.input.unwrap())?;
+    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
     // optimize
     let rust_code = if hy_opt.optimize >= 1 {
@@ -90,7 +90,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
             } else {
                 "hyeong-build/target/release/hyeong-build"
             }),
-        hy_opt.output.unwrap(),
+        hy_opt.output.as_ref().unwrap(),
     )?;
 
     // done

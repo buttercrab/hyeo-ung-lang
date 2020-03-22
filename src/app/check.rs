@@ -14,7 +14,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
-    let un_opt_code = io::parse_file(stdout, &hy_opt.input.unwrap())?;
+    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
     for c in un_opt_code.iter() {
         println!("{}:{}", 1, c.to_string())
