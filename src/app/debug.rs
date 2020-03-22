@@ -72,7 +72,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
             stdout.set_color(ColorSpec::new().set_bold(true))?;
             write!(stdout, "stdout")?;
             stdout.reset()?;
-            write!(stdout, "] {}", x)?;
+            write!(stdout, "] {}\n", x)?;
             stdout.flush()?;
         }
 
@@ -86,7 +86,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
             stdout.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)))?;
             write!(stdout, "stderr")?;
             stdout.reset()?;
-            write!(stdout, "] {}", x)?;
+            write!(stdout, "] {}\n", x)?;
             stdout.flush()?;
         }
 
@@ -131,13 +131,19 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     "next" | "n" => {
                         let c = &un_opt_code[state_stack.last().unwrap().1];
 
-                        println!(
-                            "{}:{}|{} {}",
+                        write!(
+                            stdout,
+                            "{}:{}|{} ",
                             c.get_location().0,
                             c.get_location().1,
-                            state_stack.last().unwrap().1,
-                            c.get_raw() // .bright_blue()
-                        );
+                            state_stack.last().unwrap().1
+                        )?;
+                        stdout
+                            .set_color(ColorSpec::new().set_fg(Some(Color::Blue)).set_bold(true))?;
+                        write!(stdout, "{}", c.get_raw())?;
+                        stdout.reset()?;
+                        write!(stdout, "\n")?;
+                        stdout.flush()?;
 
                         state_stack.push(execute::execute_one(
                             &mut stdin(),
@@ -176,7 +182,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     "state" | "s" => {
-                        print!("{:?}", state_stack.last().unwrap().0);
+                        write!(stdout, "{:?}", state_stack.last().unwrap().0);
                     }
 
                     "break" | "b" => {
@@ -184,7 +190,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                             let mut v = break_points.iter().collect::<Vec<_>>();
                             v.sort();
                             for i in v {
-                                println!("{}: {}", i, un_opt_code[*i].get_raw());
+                                writeln!(stdout, "{}: {}", i, un_opt_code[*i].get_raw());
                             }
                             continue;
                         }
@@ -210,14 +216,14 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     "help" | "h" => {
-                        println!("break(b)       show breakpoints");
-                        println!("break(b) NUM   set/unset breakpoint on NUM");
-                        println!("exit           Exit debugger");
-                        println!("help(h)        Print this");
-                        println!("next(n)        goto next command");
-                        println!("state(s)       print state status");
-                        println!("previous(p)    move to previous state");
-                        println!("run(r)         run until breakpoint");
+                        writeln!(stdout, "break(b)       show breakpoints");
+                        writeln!(stdout, "break(b) NUM   set/unset breakpoint on NUM");
+                        writeln!(stdout, "exit           Exit debugger");
+                        writeln!(stdout, "help(h)        Print this");
+                        writeln!(stdout, "next(n)        goto next command");
+                        writeln!(stdout, "state(s)       print state status");
+                        writeln!(stdout, "previous(p)    move to previous state");
+                        writeln!(stdout, "run(r)         run until breakpoint");
                         continue;
                     }
 
@@ -230,7 +236,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     t => {
-                        println!("command \"{}\" not found", t);
+                        writeln!(stdout, "command \"{}\" not found", t);
                     }
                 }
             }
