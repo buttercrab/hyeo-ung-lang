@@ -36,7 +36,13 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
     };
 
     // install
-    if !hy_opt.build_source.as_ref().unwrap().exists() {
+    if !hy_opt
+        .build_source
+        .as_ref()
+        .unwrap()
+        .join("hyeong-build/Cargo.toml")
+        .exists()
+    {
         init::install_run(
             stdout,
             HyeongOption {
@@ -55,7 +61,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
             .build_source
             .as_ref()
             .unwrap()
-            .join("core-build/src/main.rs"),
+            .join("hyeong-build/src/main.rs"),
         rust_code,
     )?;
     io::print_log(stdout, "compiling rust code")?;
