@@ -60,21 +60,21 @@ SUBCOMMANDS:
 ## Brew
 
 ```shell script
-brew install buttercrab/tools/hyeong
-hyeong install
+brew install buttercrab/tools/core
+core install
 ```
 
 ## Cargo
 
 ```shell script
-cargo install hyeong
-hyeong install
+cargo install core
+core install
 ```
 
 ## Docker
 
 ```shell script
-docker run -it buttercrab/hyeong /bin/bash
+docker run -it buttercrab/core /bin/bash
 ```
 
 Then, `hyeong` to execute.
@@ -108,11 +108,11 @@ Add to your `PATH` to use.
 First,
 
 ```shell script
-hyeong uninstall
+core uninstall
 ```
 
 Then if brew,
 
 ```shell script
-brew uninstall hyeong
+brew uninstall core
 ```

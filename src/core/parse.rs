@@ -1,5 +1,5 @@
-use crate::area::Area;
-use crate::code::UnOptCode;
+use crate::core::area::Area;
+use crate::core::code::UnOptCode;
 
 pub(crate) const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
 const HEARTS: &'static [char] = &[
@@ -11,7 +11,7 @@ const HEARTS: &'static [char] = &[
 /// # Example
 ///
 /// ```
-/// use hyeong::parse;
+/// use hyeong::core::parse;
 ///
 /// assert_eq!(true, parse::is_hangul_syllable('가'));
 /// assert_eq!(true, parse::is_hangul_syllable('힣'));
@@ -100,7 +100,7 @@ pub fn is_hangul_syllable(c: char) -> bool {
 /// # Example
 ///
 /// ```
-/// use hyeong::parse;
+/// use hyeong::core::parse;
 ///
 /// let parsed = parse::parse("형...?💖?".to_string());
 ///

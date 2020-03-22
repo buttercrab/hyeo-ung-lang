@@ -7,8 +7,8 @@ use std::{error, fmt, ops};
 /// # Examples
 ///
 /// ```
-/// use hyeong::big_number::BigNum;
-/// use hyeong::big_number::Error;
+/// use hyeong::number::big_number::BigNum;
+/// use hyeong::number::big_number::Error;
 ///
 /// let a = BigNum::new(1234);
 ///
@@ -26,7 +26,7 @@ impl fmt::Display for Error {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::Error;
+    /// use hyeong::number::big_number::Error;
     ///
     /// assert_eq!("Parse Error", format!("{}", Error::ParseError));
     /// assert_eq!("Base Size Error: size = 100", format!("{}", Error::BaseSizeError(100)));
@@ -48,7 +48,7 @@ impl error::Error for Error {}
 /// # Examples
 ///
 /// ```
-/// use hyeong::big_number::BigNum;
+/// use hyeong::number::big_number::BigNum;
 ///
 /// // Ways to make 10
 /// let a = BigNum::new(10);
@@ -85,7 +85,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -114,7 +114,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::from_vec(vec![1234]);
     /// let b = BigNum::from_vec(vec![0, 1]);
@@ -134,7 +134,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::zero();
     ///
@@ -152,7 +152,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::one();
     ///
@@ -170,7 +170,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -187,7 +187,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::zero();
@@ -208,7 +208,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     ///
@@ -234,7 +234,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::from_string("12345678987654321".to_string()).unwrap();
     /// let b = BigNum::from_string("-98765432123456789".to_string()).unwrap();
@@ -267,7 +267,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::from_string_base("A".to_string(), 16).unwrap();
     /// let b = BigNum::from_string_base("-1010".to_string(), 2).unwrap();
@@ -316,7 +316,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -346,7 +346,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(10);
     /// let b = BigNum::new(-10);
@@ -569,7 +569,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let mut a = BigNum::new(1234);
     /// let mut b = BigNum::new(-4321);
@@ -596,7 +596,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -643,7 +643,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -691,7 +691,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -725,7 +725,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
@@ -759,7 +759,7 @@ impl BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
@@ -780,7 +780,7 @@ impl BigNum {
     /// # Example
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(18);
     /// let b = BigNum::new(24);
@@ -810,7 +810,7 @@ impl BigNum {
     /// # Example
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::neg(&a);
@@ -829,7 +829,7 @@ impl BigNum {
     /// # Example
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let mut b = BigNum::zero();
@@ -848,7 +848,7 @@ impl BigNum {
     /// # Example
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let mut b = BigNum::zero();
@@ -870,7 +870,7 @@ impl PartialEq for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(1234);
@@ -894,7 +894,7 @@ impl PartialOrd for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     /// use std::cmp::Ordering;
     ///
     /// let a = BigNum::new(1234);
@@ -935,7 +935,7 @@ impl fmt::Debug for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     ///
@@ -952,7 +952,7 @@ impl fmt::Display for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     ///
@@ -976,7 +976,7 @@ impl ops::Add<&BigNum> for &BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -999,7 +999,7 @@ impl ops::AddAssign<&BigNum> for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let mut a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -1025,7 +1025,7 @@ impl ops::Sub<&BigNum> for &BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -1048,7 +1048,7 @@ impl ops::SubAssign<&BigNum> for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let mut a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -1074,7 +1074,7 @@ impl ops::Mul<&BigNum> for &BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -1097,7 +1097,7 @@ impl ops::MulAssign<&BigNum> for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let mut a = BigNum::new(1234);
     /// let b = BigNum::new(-4321);
@@ -1130,7 +1130,7 @@ impl ops::Div<&BigNum> for &BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
@@ -1160,7 +1160,7 @@ impl ops::DivAssign<&BigNum> for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let mut a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
@@ -1193,7 +1193,7 @@ impl ops::Rem<&BigNum> for &BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
@@ -1223,7 +1223,7 @@ impl ops::RemAssign<&BigNum> for BigNum {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let mut a = BigNum::new(-1234);
     /// let b = BigNum::new(31);
@@ -1244,7 +1244,7 @@ impl ops::Neg for &BigNum {
     /// # Example
     ///
     /// ```
-    /// use hyeong::big_number::BigNum;
+    /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1234);
     ///

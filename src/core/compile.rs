@@ -1,7 +1,7 @@
-use crate::area::Area;
-use crate::code::Code;
-use crate::number::Num;
-use crate::state::State;
+use crate::core::area::Area;
+use crate::core::code::Code;
+use crate::core::state::State;
+use crate::number::number::Num;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
@@ -192,13 +192,13 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
     }
 }
 
-/// Makes rust code from parsed hyeong code.
+/// Makes rust code from parsed core code.
 /// It splits codes into states.
 /// Then, go through states deciding where to go next.
 /// Since match is comparing linearly by each value,
 /// It makes binary if-else statement to minimize the comparision.
 /// So, in each movement, it would take `O(log S)`.
-pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: usize) -> String
+pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: u8) -> String
 where
     T: State,
 {
@@ -207,8 +207,8 @@ where
         "{}{}{}{}{}{}{}{}{}",
         "\
 #![allow(warnings)]
-use hyeong_build::big_number::BigNum;
-use hyeong_build::number::Num;
+use core::big_number::BigNum;
+use core::number::Num;
 use std::collections::HashMap;
 
 struct Stack {

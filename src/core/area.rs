@@ -1,4 +1,5 @@
-use crate::number::Num;
+use crate::number::number::Num;
+use crate::util::error::Error;
 use std::cmp::Ordering;
 use std::fmt;
 
@@ -77,9 +78,9 @@ impl Area {
 /// let a = Area::new(10);
 /// assert_eq!(10, calc(&a, 1, || Option::Some(Num::one())).unwrap());
 /// ```
-pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Option<u8>
+pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Result<u8, Error>
 where
-    T: FnMut() -> Option<Num>,
+    T: FnMut() -> Result<Num, Error>,
 {
     let mut area = area;
 
@@ -88,32 +89,22 @@ where
             Area::Val { type_, left, right } => {
                 if *type_ == 0 {
                     let v = pop();
-                    area = match match v {
-                        Some(value) => value,
-                        None => return Option::None,
-                    }
-                    .partial_cmp(&Num::from_num(area_value as isize))
-                    {
+                    area = match v?.partial_cmp(&Num::from_num(area_value as isize)) {
                         Some(Ordering::Less) => left,
                         _ => right,
                     }
                 } else if *type_ == 1 {
                     let v = pop();
-                    area = match match v {
-                        Some(value) => value,
-                        None => return Option::None,
-                    }
-                    .partial_cmp(&Num::from_num(area_value as isize))
-                    {
+                    area = match v?.partial_cmp(&Num::from_num(area_value as isize)) {
                         Some(Ordering::Equal) => left,
                         _ => right,
                     }
                 } else {
-                    break Option::Some(*type_);
+                    break Ok(*type_);
                 }
             }
             Area::Nil => {
-                break Option::Some(0);
+                break Ok(0);
             }
         }
     }

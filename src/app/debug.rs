@@ -1,27 +1,21 @@
-use crate::code::UnOptCode;
-use crate::state::{State, UnOptState};
-use crate::{execute, io, option};
-use clap::{App, ArgMatches};
-use colored::Colorize;
+use crate::core::execute;
+use crate::core::state::{State, UnOptState};
+use crate::util::error::Error;
+use crate::util::option::HyeongOption;
+use crate::util::{io, option};
+use clap::App;
 use std::collections::HashSet;
-use std::io::{stdin, stdout, Write};
+use std::io::{stdin, Write};
 use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
+use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("debug")
         .about("Debug your code command by command")
         .arg(option::input())
-}
-
-#[cfg_attr(tarpaulin, skip)]
-pub fn run(matches: &ArgMatches) {
-    let file = matches.value_of("input").unwrap();
-    let code = io::read_file(file);
-    let from = io::handle_error(matches.value_of("from").unwrap().parse::<usize>());
-    debug(code, from);
 }
 
 /// Debug function
@@ -36,35 +30,50 @@ pub fn run(matches: &ArgMatches) {
 /// 7. previous(p)    move to previous state");
 /// 8. run(r)         run until breakpoint");
 #[cfg_attr(tarpaulin, skip)]
-pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
+pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
+    let h = hy_opt.clone();
     let mut state = UnOptState::new();
 
     ctrlc::set_handler(move || {
         if r.load(Ordering::SeqCst) {
             r.store(false, Ordering::SeqCst);
-            print!("\ntype \"exit\" to exit\n");
-            print!("{} ", ">".bright_red());
-            io::handle_error(stdout().flush());
+            let mut stdout = StandardStream::stdout(h.color);
+            write!(stdout, "\ntype \"exit\" to exit\n").unwrap();
+            stdout
+                .set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true))
+                .unwrap();
+            write!(stdout, ">").unwrap();
+            stdout.reset().unwrap();
+            write!(stdout, " ").unwrap();
+            stdout.flush().unwrap();
             r.store(true, Ordering::SeqCst);
         }
     })
     .expect("Error setting Ctrl-C handler");
 
-    io::print_log("running in debug mode");
+    io::print_log(stdout, "running in debug mode")?;
 
-    for c in &code {
+    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+
+    for c in &un_opt_code {
         state.push_code(c.clone());
     }
 
     let mut is_running = false;
     let mut break_points = HashSet::new();
-    break_points.insert(from);
+    break_points.insert(0);
 
     let mut out = io::CustomWriter::new(|x| {
         if !x.is_empty() {
-            println!("[{}] {}", "stdout".bold(), x);
+            let mut stdout = StandardStream::stdout(hy_opt.color);
+            write!(stdout, "[")?;
+            stdout.set_color(ColorSpec::new().set_bold(true))?;
+            write!(stdout, "stdout")?;
+            stdout.reset()?;
+            write!(stdout, "] {}", x)?;
+            stdout.flush()?;
         }
 
         Result::Ok(())
@@ -72,7 +81,13 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
 
     let mut err = io::CustomWriter::new(|x| {
         if !x.is_empty() {
-            println!("[{}] {}", "stderr".bold().bright_red(), x);
+            let mut stdout = StandardStream::stdout(hy_opt.color);
+            write!(stdout, "[")?;
+            stdout.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)))?;
+            write!(stdout, "stderr")?;
+            stdout.reset()?;
+            write!(stdout, "] {}", x)?;
+            stdout.flush()?;
         }
 
         Result::Ok(())
@@ -80,7 +95,7 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
 
     let mut state_stack = vec![(state, 0)];
 
-    while state_stack.last().unwrap().1 < code.len() {
+    while state_stack.last().unwrap().1 < un_opt_code.len() {
         if is_running {
             if break_points.contains(&state_stack.last().unwrap().1) {
                 out.flush().unwrap();
@@ -93,17 +108,20 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
                     &mut err,
                     state_stack.last().unwrap().0.clone(),
                     state_stack.last().unwrap().1,
-                ));
+                )?);
             }
         } else {
             loop {
-                print!("{} ", ">".bright_red());
-                io::handle_error(stdout().flush());
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true))?;
+                write!(stdout, ">")?;
+                stdout.reset()?;
+                write!(stdout, " ")?;
+                stdout.flush()?;
                 running.store(true, Ordering::SeqCst);
-                let input = io::read_line();
+                let input = io::read_line()?;
                 running.store(false, Ordering::SeqCst);
 
-                if input == "" {
+                if input == String::from("") {
                     process::exit(0);
                 }
 
@@ -111,14 +129,14 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
 
                 match parsed[0] {
                     "next" | "n" => {
-                        let c = &code[state_stack.last().unwrap().1];
+                        let c = &un_opt_code[state_stack.last().unwrap().1];
 
                         println!(
                             "{}:{}|{} {}",
                             c.get_location().0,
                             c.get_location().1,
                             state_stack.last().unwrap().1,
-                            c.get_raw().bright_blue()
+                            c.get_raw() // .bright_blue()
                         );
 
                         state_stack.push(execute::execute_one(
@@ -127,7 +145,7 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
                             &mut err,
                             state_stack.last().unwrap().0.clone(),
                             state_stack.last().unwrap().1,
-                        ));
+                        )?);
 
                         out.flush().unwrap();
                         err.flush().unwrap();
@@ -138,9 +156,9 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
                     "previous" | "p" => {
                         if state_stack.len() > 1 {
                             state_stack.pop();
-                            io::print_log("moved back");
+                            io::print_log(stdout, "moved back")?;
                         } else {
-                            io::print_error_str_no_exit("cannot go back");
+                            io::print_error_str_no_exit(stdout, "can't go back");
                         }
                     }
 
@@ -151,7 +169,7 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
                             &mut err,
                             state_stack.last().unwrap().0.clone(),
                             state_stack.last().unwrap().1,
-                        ));
+                        )?);
 
                         is_running = true;
                         break;
@@ -166,28 +184,28 @@ pub fn debug(code: Vec<UnOptCode>, from: usize) -> ! {
                             let mut v = break_points.iter().collect::<Vec<_>>();
                             v.sort();
                             for i in v {
-                                println!("{}: {}", i, code[*i].get_raw());
+                                println!("{}: {}", i, un_opt_code[*i].get_raw());
                             }
                             continue;
                         }
                         let num = match parsed[1].parse::<usize>() {
                             Ok(t) => t,
                             Err(e) => {
-                                io::print_error_no_exit(e);
+                                io::print_error_no_exit(stdout, Error::from(e, String::from("")));
                                 continue;
                             }
                         };
-                        if num > code.len() {
-                            io::print_error_str_no_exit("number exceeds the range");
+                        if num > un_opt_code.len() {
+                            io::print_error_str_no_exit(stdout, "number exceeds the range");
                             continue;
                         }
 
                         if !break_points.contains(&num) {
                             break_points.insert(num);
-                            io::print_log(&*format!("set breakpoint on line {}", num));
+                            io::print_log(stdout, &*format!("set breakpoint on line {}", num))?;
                         } else {
                             break_points.remove(&num);
-                            io::print_log(&*format!("unset breakpoint on line {}", num));
+                            io::print_log(stdout, &*format!("unset breakpoint on line {}", num))?;
                         }
                     }
 

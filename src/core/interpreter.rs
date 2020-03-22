@@ -1,6 +1,7 @@
-use crate::state::UnOptState;
-use crate::{execute, io, parse};
-use colored::Colorize;
+use crate::core::state::UnOptState;
+use crate::core::{execute, parse};
+use crate::util::error::Error;
+use crate::util::io;
 use std::io::{stdin, stdout, Write};
 use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -11,7 +12,7 @@ use std::sync::Arc;
 /// It gets code line by line and executes.
 /// Prints stdout and stderr separately.
 #[cfg_attr(tarpaulin, skip)]
-pub fn run() -> ! {
+pub fn run() -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
     let mut state = UnOptState::new();
@@ -20,8 +21,8 @@ pub fn run() -> ! {
         if r.load(Ordering::SeqCst) {
             r.store(false, Ordering::SeqCst);
             print!("\ntype \"흑.하앙...\" or \"exit\" to exit\n");
-            print!("{} ", ">".bright_blue());
-            io::handle_error(stdout().flush());
+            print!("{} ", ">"); // .bright_blue());
+            stdout().flush().unwrap();
             r.store(true, Ordering::SeqCst);
         }
     })
@@ -31,19 +32,19 @@ pub fn run() -> ! {
     println!("type help for help");
 
     loop {
-        print!("{} ", ">".bright_blue());
-        io::handle_error(stdout().flush());
+        print!("{} ", ">"); // .bright_blue());
+        stdout().flush()?;
         running.store(true, Ordering::SeqCst);
-        let input = io::read_line();
+        let input = io::read_line()?;
         running.store(false, Ordering::SeqCst);
 
-        if input == "" {
+        if input == String::from("") {
             process::exit(0);
         }
 
         let mut out = io::CustomWriter::new(|x| {
             if !x.is_empty() {
-                println!("[{}] {}", "stdout".bold(), x);
+                println!("[{}] {}", "stdout" /*.bold()*/, x);
             }
 
             Result::Ok(())
@@ -51,7 +52,7 @@ pub fn run() -> ! {
 
         let mut err = io::CustomWriter::new(|x| {
             if !x.is_empty() {
-                println!("[{}] {}", "stderr".bold().bright_red(), x);
+                println!("[{}] {}", "stderr" /*.bold().bright_red()*/, x);
             }
 
             Result::Ok(())
@@ -81,7 +82,7 @@ pub fn run() -> ! {
             _ => {
                 let code = parse::parse(input);
                 for c in code.iter() {
-                    state = execute::execute(&mut stdin(), &mut out, &mut err, state, c);
+                    state = execute::execute(&mut stdin(), &mut out, &mut err, state, c)?;
                 }
             }
         }

@@ -1,7 +1,6 @@
-use crate::area;
-use crate::area::Area;
-use crate::parse;
-use colored::Colorize;
+use crate::core::area;
+use crate::core::area::Area;
+use crate::core::parse;
 use std::fmt;
 
 /// Code trait
@@ -170,7 +169,7 @@ impl UnOptCode {
     pub fn to_string(&self) -> String {
         format!(
             "{} {}_{}_{} : {}",
-            (&*format!("{}:{}", self.loc.0, self.loc.1)).yellow(),
+            (&*format!("{}:{}", self.loc.0, self.loc.1)), // .yellow(),
             parse::COMMANDS[self.type_ as usize],
             self.hangul_count,
             self.dot_count,
