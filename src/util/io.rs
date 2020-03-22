@@ -123,6 +123,11 @@ impl ReadLine for CustomReader {
     }
 }
 
+/// Read line from `ReadLine`
+pub fn read_line_from(input: &mut impl ReadLine) -> Result<String, Error> {
+    input.read_line_()
+}
+
 impl CustomReader {
     /// Make new `CustomReader`
     ///
@@ -172,17 +177,6 @@ pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnO
     let un_opt_code = parse::parse(raw_code);
     print_log(stdout, format!("⮑  total {} commands", un_opt_code.len()))?;
     Ok(un_opt_code)
-}
-
-/// Read line from stdin
-#[cfg_attr(tarpaulin, skip)]
-pub fn read_line() -> Result<String, Error> {
-    read_line_from(&mut std::io::stdin())
-}
-
-/// Read line from `ReadLine`
-pub fn read_line_from(input: &mut impl ReadLine) -> Result<String, Error> {
-    input.read_line_()
 }
 
 /// If `res` is Err, it prints error and exit

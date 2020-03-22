@@ -35,7 +35,7 @@ pub fn run() -> Result<(), Error> {
         print!("{} ", ">"); // .bright_blue());
         stdout().flush()?;
         running.store(true, Ordering::SeqCst);
-        let input = io::read_line()?;
+        let input = io::read_line_from(&mut std::io::stdin())?;
         running.store(false, Ordering::SeqCst);
 
         if input == String::from("") {

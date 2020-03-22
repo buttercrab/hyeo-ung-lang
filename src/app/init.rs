@@ -5,18 +5,21 @@ use clap::App;
 use std::fs;
 use termcolor::{StandardStream, WriteColor};
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn install_app<'a, 'b>() -> App<'a, 'b> {
     App::new("install")
         .about("Install hyeong before build (need once)")
         .arg(option::build_path())
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
     App::new("uninstall")
         .about("Uninstall hyeong temporary build path")
         .arg(option::build_path())
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn install_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "making dir for building hyeong")?;
     fs::create_dir_all(
@@ -84,6 +87,7 @@ hyeong = \"0.1.0\"
     Ok(())
 }
 
+#[cfg_attr(tarpaulin, skip)]
 pub fn uninstall_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "removing dir")?;
     fs::remove_dir_all(hy_opt.build_source.as_ref().unwrap())?;
