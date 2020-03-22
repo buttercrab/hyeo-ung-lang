@@ -5,17 +5,17 @@ use std::path::PathBuf;
 use termcolor::ColorChoice;
 
 #[cfg_attr(tarpaulin, skip)]
-pub fn build_source<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("build-source")
-        .value_name("build-source")
+pub fn build_path<'a, 'b>() -> Arg<'a, 'b> {
+    Arg::with_name("build-path")
+        .value_name("build-path")
         .takes_value(true)
-        .long("build-source")
+        .long("build-path")
         .help("set temporary build path")
 }
 
 #[cfg_attr(tarpaulin, skip)]
-pub fn parse_build_source(matches: &ArgMatches) -> std::io::Result<PathBuf> {
-    if let Some(t) = matches.value_of("build-source") {
+pub fn parse_build_path(matches: &ArgMatches) -> std::io::Result<PathBuf> {
+    if let Some(t) = matches.value_of("build-path") {
         let p = PathBuf::from(t);
         if !p.is_absolute() {
             let mut abs = env::current_dir()?;

@@ -3,6 +3,7 @@ use crate::core::parse;
 use crate::util::error::Error;
 use crate::util::util;
 use std::ffi::OsStr;
+use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufRead, BufReader, ErrorKind, Read, Write};
 use std::path::PathBuf;
@@ -167,9 +168,9 @@ pub fn read_file(path: &PathBuf) -> Result<String, Error> {
 
 pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnOptCode>, Error> {
     let raw_code = read_file(path)?;
-    print_log(stdout, &*format!("parsing {}", util::path_to_string(path)?))?;
+    print_log(stdout, format!("parsing {}", util::path_to_string(path)?))?;
     let un_opt_code = parse::parse(raw_code);
-    print_log(stdout, &*format!("⮑ total {} commands", un_opt_code.len()))?;
+    print_log(stdout, format!("⮑ total {} commands", un_opt_code.len()))?;
     Ok(un_opt_code)
 }
 
@@ -214,7 +215,10 @@ pub fn print_error(w: &mut StandardStream, err: Error) -> ! {
 
 /// Print error string and terminate
 #[cfg_attr(tarpaulin, skip)]
-pub fn print_error_str(w: &mut StandardStream, err: &str) -> ! {
+pub fn print_error_str<S>(w: &mut StandardStream, err: S) -> !
+where
+    S: Display,
+{
     print_error_str_no_exit(w, err);
     process::exit(1);
 }
@@ -222,12 +226,15 @@ pub fn print_error_str(w: &mut StandardStream, err: &str) -> ! {
 /// Print error
 #[cfg_attr(tarpaulin, skip)]
 pub fn print_error_no_exit(w: &mut StandardStream, err: Error) {
-    print_error_str_no_exit(w, &*format!("{:?}", err));
+    print_error_str_no_exit(w, format!("{:?}", err));
 }
 
 /// Print error string
 #[cfg_attr(tarpaulin, skip)]
-pub fn print_error_str_no_exit(w: &mut StandardStream, err: &str) {
+pub fn print_error_str_no_exit<S>(w: &mut StandardStream, err: S)
+where
+    S: Display,
+{
     write!(w, "[").unwrap();
     w.set_color(ColorSpec::new().set_fg(Some(Color::Red)))
         .unwrap();
@@ -242,7 +249,10 @@ pub fn print_error_str_no_exit(w: &mut StandardStream, err: &str) {
 
 /// Print log
 #[cfg_attr(tarpaulin, skip)]
-pub fn print_log(w: &mut StandardStream, msg: &str) -> Result<(), Error> {
+pub fn print_log<S>(w: &mut StandardStream, msg: S) -> Result<(), Error>
+where
+    S: Display,
+{
     w.set_color(ColorSpec::new().set_fg(Some(Color::Blue)))?;
     write!(w, "==>")?;
     w.reset()?;
@@ -256,7 +266,10 @@ pub fn print_log(w: &mut StandardStream, msg: &str) -> Result<(), Error> {
 
 /// Print note
 #[cfg_attr(tarpaulin, skip)]
-pub fn print_note(w: &mut StandardStream, msg: &str) -> Result<(), Error> {
+pub fn print_note<S>(w: &mut StandardStream, msg: S) -> Result<(), Error>
+where
+    S: Display,
+{
     write!(w, "[")?;
     w.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
     write!(w, "note")?;

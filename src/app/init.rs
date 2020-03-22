@@ -8,13 +8,13 @@ use termcolor::{StandardStream, WriteColor};
 pub fn install_app<'a, 'b>() -> App<'a, 'b> {
     App::new("install")
         .about("Install hyeong before build (need once)")
-        .arg(option::build_source())
+        .arg(option::build_path())
 }
 
 pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
     App::new("uninstall")
         .about("Uninstall hyeong temporary build path")
-        .arg(option::build_source())
+        .arg(option::build_path())
 }
 
 pub fn install_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
@@ -80,7 +80,6 @@ hyeong = \"0.1.0\"
             }
         ),
     )?;
-    io::print_log(stdout, "done!")?;
     io::print_note(stdout, "to uninstall, run `hyeong uninstall`")?;
     Ok(())
 }
@@ -88,6 +87,5 @@ hyeong = \"0.1.0\"
 pub fn uninstall_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "removing dir")?;
     fs::remove_dir_all(hy_opt.build_source.as_ref().unwrap())?;
-    io::print_log(stdout, "done!")?;
     Ok(())
 }

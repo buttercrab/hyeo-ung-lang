@@ -12,7 +12,7 @@ use termcolor::{StandardStream, WriteColor};
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("build")
         .about("Compiles core code")
-        .arg(option::build_source())
+        .arg(option::build_path())
         .arg(option::input())
         .arg(option::optimize())
         .arg(option::output())
@@ -25,7 +25,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
 
     // optimize
     let rust_code = if hy_opt.optimize >= 1 {
-        io::print_log(stdout, &*format!("optimizing to level {}", hy_opt.optimize))?;
+        io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;
         let (state, code) = optimize::optimize(un_opt_code, hy_opt.optimize)?;
         io::print_log(stdout, "compiling to rust")?;
         compile::build_source(state, &code, hy_opt.optimize)

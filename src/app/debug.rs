@@ -202,10 +202,10 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
 
                         if !break_points.contains(&num) {
                             break_points.insert(num);
-                            io::print_log(stdout, &*format!("set breakpoint on line {}", num))?;
+                            io::print_log(stdout, format!("set breakpoint on line {}", num))?;
                         } else {
                             break_points.remove(&num);
-                            io::print_log(stdout, &*format!("unset breakpoint on line {}", num))?;
+                            io::print_log(stdout, format!("unset breakpoint on line {}", num))?;
                         }
                     }
 

@@ -27,7 +27,7 @@ fn sub_main(
         build::run(
             stdout,
             HyeongOption {
-                build_source: Some(option::parse_build_source(matches)?),
+                build_source: Some(option::parse_build_path(matches)?),
                 color,
                 input: Some(input),
                 optimize: option::parse_optimize(matches)?,
@@ -72,7 +72,7 @@ fn sub_main(
         init::install_run(
             stdout,
             HyeongOption {
-                build_source: Some(option::parse_build_source(matches)?),
+                build_source: Some(option::parse_build_path(matches)?),
                 color,
                 input: None,
                 optimize: 0,
@@ -83,7 +83,7 @@ fn sub_main(
         init::uninstall_run(
             stdout,
             HyeongOption {
-                build_source: Some(option::parse_build_source(matches)?),
+                build_source: Some(option::parse_build_path(matches)?),
                 color,
                 input: None,
                 optimize: 0,

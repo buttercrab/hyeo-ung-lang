@@ -24,7 +24,7 @@ pub fn run(
     let un_opt_code = io::parse_file(stdout, &hy_opt.input.unwrap())?;
 
     if hy_opt.optimize >= 1 {
-        io::print_log(stdout, &*format!("optimizing to level {}", hy_opt.optimize))?;
+        io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;
         let (mut state, opt_code) = optimize::optimize(un_opt_code, hy_opt.optimize)?;
         io::print_log(stdout, "running code")?;
 
