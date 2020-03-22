@@ -59,7 +59,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
         rust_code,
     )?;
     io::print_log(stdout, "compiling rust code")?;
-    io::execute_command_stderr(
+    util::execute_command_stderr(
         stdout,
         &*format!(
             "cargo build --manifest-path={} --release --color {}",

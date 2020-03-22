@@ -92,29 +92,29 @@ fn sub_main(
 /// Main function of this program
 ///
 /// ```text
-/// core 0.1.1-dev
+/// hyeong 0.1.1-dev
 /// hyeo-ung programming language tool
 ///
 /// USAGE:
-///     core [SUBCOMMAND]
+///     hyeong [SUBCOMMAND]
 ///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
 ///
 /// SUBCOMMANDS:
-///     build        Compiles core code
+///     build        Compiles hyeong code
 ///     check        Parse your code and check if you are right
 ///     debug        Debug your code command by command
 ///     help         Prints this message or the help of the given subcommand(s)
-///     install      Install core before build (need once)
-///     run          Run core code directly
-///     uninstall    Uninstall core before build
+///     install      Install hyeong before build (need once)
+///     run          Run hyeong code directly
+///     uninstall    Uninstall hyeong before build
 /// ```
 #[cfg_attr(tarpaulin, skip)]
 #[cfg(not(feature = "number"))]
 fn main() {
-    let matches = App::new("core")
+    let matches = App::new("hyeong")
         .version("0.1.1-dev")
         .about("hyeo-ung programming language tool")
         .arg(option::color())

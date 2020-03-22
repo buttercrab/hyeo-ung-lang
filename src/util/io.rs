@@ -5,10 +5,9 @@ use crate::util::util;
 use std::ffi::OsStr;
 use std::fmt::Display;
 use std::fs::File;
-use std::io::{BufRead, BufReader, ErrorKind, Read, Write};
+use std::io::{ErrorKind, Read, Write};
 use std::path::PathBuf;
 use std::process;
-use std::process::{Command, Stdio};
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// Custom writer structure for redirecting output.
@@ -281,88 +280,4 @@ pub fn save_to_file(path: &PathBuf, content: String) -> Result<(), Error> {
     let mut file = File::create(path)?;
     file.write(content.as_bytes())?;
     Ok(())
-}
-
-/// Execute command only
-#[cfg_attr(tarpaulin, skip)]
-pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(), Error> {
-    let mut cmd = if cfg!(target_os = "windows") {
-        Command::new("cmd")
-            .arg("/C")
-            .arg(command)
-            .stdout(Stdio::piped())
-            .spawn()?
-    } else {
-        Command::new("bash")
-            .arg("-c")
-            .arg(command)
-            .stdout(Stdio::piped())
-            .spawn()?
-    };
-
-    let stdout = cmd.stdout.as_mut().unwrap();
-    let stdout_reader = BufReader::new(stdout);
-
-    for line in stdout_reader.lines() {
-        write!(w, "{}\n", line?)?;
-    }
-
-    let e = cmd.wait()?;
-
-    if e.success() {
-        Ok(())
-    } else {
-        match e.code() {
-            Some(code) => Err(Error::new(
-                format!("command {} failed with exit code {}", command, code),
-                String::from(""),
-            )),
-            None => Err(Error::new(
-                format!("command {} terminated by signal", command),
-                String::from(""),
-            )),
-        }
-    }
-}
-
-/// Execute command only
-#[cfg_attr(tarpaulin, skip)]
-pub fn execute_command_stderr(w: &mut StandardStream, command: &str) -> Result<(), Error> {
-    let mut cmd = if cfg!(target_os = "windows") {
-        Command::new("cmd")
-            .arg("/C")
-            .arg(command)
-            .stderr(Stdio::piped())
-            .spawn()?
-    } else {
-        Command::new("bash")
-            .arg("-c")
-            .arg(command)
-            .stderr(Stdio::piped())
-            .spawn()?
-    };
-
-    let stdout = cmd.stderr.as_mut().unwrap();
-    let stdout_reader = BufReader::new(stdout);
-
-    for line in stdout_reader.lines() {
-        write!(w, "{}\n", line?)?;
-    }
-
-    let e = cmd.wait()?;
-
-    if e.success() {
-        Ok(())
-    } else {
-        match e.code() {
-            Some(code) => Err(Error::new(
-                format!("command {} failed with exit code {}", command, code),
-                String::from(""),
-            )),
-            None => Err(Error::new(
-                format!("command {} terminated by signal", command),
-                String::from(""),
-            )),
-        }
-    }
 }

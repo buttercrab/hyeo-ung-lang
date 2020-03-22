@@ -37,7 +37,7 @@ pub fn install_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<
             .join("hyeong-build/src/main.rs"),
         String::from(
             "\
-use hyeong::number::Num;
+use hyeong::number::number::Num;
 
 fn main() {
     let a = Num::from_num(10);
@@ -60,12 +60,12 @@ version = \"0.1.0\"
 edition = \"2018\"
 
 [dependencies]
-hyeong = \"0.1.0\"
+hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", branch = \"dev\", features = [\"number\"] }
 ",
         ),
     )?;
-    io::print_log(stdout, "test build")?;
-    io::execute_command_stderr(
+    io::print_log(stdout, "test pre-build")?;
+    util::execute_command_stderr(
         stdout,
         &*format!(
             "cargo build --manifest-path={} --release --color {}",

@@ -182,7 +182,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     "state" | "s" => {
-                        write!(stdout, "{:?}", state_stack.last().unwrap().0);
+                        write!(stdout, "{:?}", state_stack.last().unwrap().0)?;
                     }
 
                     "break" | "b" => {
@@ -190,7 +190,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                             let mut v = break_points.iter().collect::<Vec<_>>();
                             v.sort();
                             for i in v {
-                                writeln!(stdout, "{}: {}", i, un_opt_code[*i].get_raw());
+                                writeln!(stdout, "{}: {}", i, un_opt_code[*i].get_raw())?;
                             }
                             continue;
                         }
@@ -216,14 +216,14 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     "help" | "h" => {
-                        writeln!(stdout, "break(b)       show breakpoints");
-                        writeln!(stdout, "break(b) NUM   set/unset breakpoint on NUM");
-                        writeln!(stdout, "exit           Exit debugger");
-                        writeln!(stdout, "help(h)        Print this");
-                        writeln!(stdout, "next(n)        goto next command");
-                        writeln!(stdout, "state(s)       print state status");
-                        writeln!(stdout, "previous(p)    move to previous state");
-                        writeln!(stdout, "run(r)         run until breakpoint");
+                        writeln!(stdout, "break(b)       show breakpoints")?;
+                        writeln!(stdout, "break(b) NUM   set/unset breakpoint on NUM")?;
+                        writeln!(stdout, "exit           Exit debugger")?;
+                        writeln!(stdout, "help(h)        Print this")?;
+                        writeln!(stdout, "next(n)        goto next command")?;
+                        writeln!(stdout, "state(s)       print state status")?;
+                        writeln!(stdout, "previous(p)    move to previous state")?;
+                        writeln!(stdout, "run(r)         run until breakpoint")?;
                         continue;
                     }
 
@@ -236,7 +236,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
                     }
 
                     t => {
-                        writeln!(stdout, "command \"{}\" not found", t);
+                        writeln!(stdout, "command \"{}\" not found", t)?;
                     }
                 }
             }

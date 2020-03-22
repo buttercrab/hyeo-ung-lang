@@ -41,19 +41,19 @@ pub fn color<'a, 'b>() -> Arg<'a, 'b> {
         .value_name("color")
         .takes_value(true)
         .long("color")
-        .help("whether prints color (none, auto, always)")
+        .help("whether prints color (never, auto, always)")
         .default_value("auto")
 }
 
 #[cfg_attr(tarpaulin, skip)]
 pub fn parse_color(matches: &ArgMatches) -> Result<ColorChoice, Error> {
     match matches.value_of("color").unwrap() {
-        "none" => Ok(ColorChoice::Never),
+        "never" => Ok(ColorChoice::Never),
         "auto" => Ok(ColorChoice::Auto),
         "always" => Ok(ColorChoice::Always),
         t => Err(Error::new(
             format!("color has no option {}", t),
-            String::from("options are: (none, auto, always)"),
+            String::from("options are: (never, auto, always)"),
         )),
     }
 }
