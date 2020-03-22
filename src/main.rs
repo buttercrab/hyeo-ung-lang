@@ -1,15 +1,9 @@
 #[cfg(not(feature = "number"))]
 use clap::{App, ArgMatches};
 #[cfg(not(feature = "number"))]
-use hyeong::app::{build, check, debug, init, run};
+use hyeong::app::{build, check, debug, init, interpreter, run};
 #[cfg(not(feature = "number"))]
-use hyeong::core::interpreter;
-#[cfg(not(feature = "number"))]
-use hyeong::util::error::Error;
-#[cfg(not(feature = "number"))]
-use hyeong::util::option::HyeongOption;
-#[cfg(not(feature = "number"))]
-use hyeong::util::{io, option};
+use hyeong::util::{error::Error, io, option, option::HyeongOption};
 #[cfg(not(feature = "number"))]
 use termcolor::{ColorChoice, StandardStream};
 
