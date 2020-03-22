@@ -29,7 +29,7 @@ use std::fmt;
 /// # Examples
 ///
 /// ```
-/// use hyeong::area::Area;
+/// use hyeong::core::area::Area;
 ///
 /// let a = Area::Val {
 ///     type_: 0,
@@ -55,7 +55,7 @@ impl Area {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::area::Area;
+    /// use hyeong::core::area::Area;
     ///
     /// let a = Area::new(10);
     /// ```
@@ -72,11 +72,11 @@ impl Area {
 ///
 /// # Examples
 /// ```
-/// use hyeong::number::Num;
-/// use hyeong::area::{Area, calc};
+/// use hyeong::number::number::Num;
+/// use hyeong::core::area::{Area, calc};
 ///
 /// let a = Area::new(10);
-/// assert_eq!(10, calc(&a, 1, || Option::Some(Num::one())).unwrap());
+/// assert_eq!(10, calc(&a, 1, || Result::Ok(Num::one())).unwrap());
 /// ```
 pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Result<u8, Error>
 where
@@ -138,7 +138,7 @@ impl fmt::Debug for Area {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::area::Area;
+    /// use hyeong::core::area::Area;
     ///
     /// let a = Area::Val {
     ///     type_: 0,
@@ -189,7 +189,7 @@ impl fmt::Display for Area {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::area::Area;
+    /// use hyeong::core::area::Area;
     ///
     /// let a = Area::Val {
     ///     type_: 0,

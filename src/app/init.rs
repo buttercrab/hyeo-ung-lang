@@ -7,23 +7,23 @@ use termcolor::{ColorChoice, StandardStream};
 
 pub fn install_app<'a, 'b>() -> App<'a, 'b> {
     App::new("install")
-        .about("Install core before build (need once)")
+        .about("Install hyeong before build (need once)")
         .arg(option::build_source())
 }
 
 pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
     App::new("uninstall")
-        .about("Uninstall core temporary build path")
+        .about("Uninstall hyeong temporary build path")
         .arg(option::build_source())
 }
 
 pub fn install_run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Error> {
-    io::print_log(stdout, "making dir for building core")?;
+    io::print_log(stdout, "making dir for building hyeong")?;
     io::save_to_file(
         &hy_opt.build_source.as_ref().unwrap().join("src/main.rs"),
         String::from(
             "\
-use core::number::Num;
+use hyeong::number::Num;
 
 fn main() {
     let a = Num::from_num(10);
@@ -37,11 +37,11 @@ fn main() {
         String::from(
             "\
 [package]
-name = \"core-build\"
+name = \"hyeong-build\"
 version = \"0.1.0\"
 
 [dependencies]
-core = \"0.1.0\"
+hyeong = \"0.1.0\"
 ",
         ),
     )?;
@@ -60,7 +60,7 @@ core = \"0.1.0\"
         ),
     )?;
     io::print_log(stdout, "done!")?;
-    io::print_note(stdout, "to uninstall, run `core uninstall`")?;
+    io::print_note(stdout, "to uninstall, run `hyeong uninstall`")?;
     Ok(())
 }
 

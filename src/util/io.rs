@@ -21,7 +21,7 @@ use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 /// let mut  a = CustomWriter::new(|_| Result::Ok(()));
 ///
 /// a.write_all("Hello, World!".as_bytes()).unwrap();
-/// assert_eq!("Hello, World!", a.to_string());
+/// assert_eq!("Hello, World!", a.to_string().unwrap());
 /// ```
 pub struct CustomWriter<T>
 where
@@ -62,7 +62,7 @@ where
     /// let mut  a = CustomWriter::new(|_| Result::Ok(()));
     ///
     /// a.write_all("Hello, World!".as_bytes()).unwrap();
-    /// assert_eq!("Hello, World!", a.to_string());
+    /// assert_eq!("Hello, World!", a.to_string().unwrap());
     /// ```
     pub fn new(func: T) -> CustomWriter<T> {
         CustomWriter {
@@ -92,7 +92,7 @@ pub trait ReadLine {
 ///
 /// let mut a = CustomReader::new("Hello, World!".to_string());
 ///
-/// assert_eq!("Hello, World!", a.read_line_());
+/// assert_eq!("Hello, World!", a.read_line_().unwrap());
 /// ```
 pub struct CustomReader {
     buf: Vec<String>,
@@ -132,7 +132,7 @@ impl CustomReader {
     ///
     /// let mut a = CustomReader::new("Hello, World!".to_string());
     ///
-    /// assert_eq!("Hello, World!", a.read_line_());
+    /// assert_eq!("Hello, World!", a.read_line_().unwrap());
     /// ```
     pub fn new(s: String) -> CustomReader {
         CustomReader {
@@ -190,9 +190,9 @@ pub fn read_line_from(input: &mut impl ReadLine) -> Result<String, Error> {
 /// # Examples
 ///
 /// ```
-/// use std::io::Error;
 /// use termcolor::{StandardStream, ColorChoice};
 /// use hyeong::util::io;
+/// use hyeong::util::error::Error;
 ///
 /// let a = Result::<i32, Error>::Ok(1);
 ///

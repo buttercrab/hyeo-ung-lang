@@ -14,18 +14,18 @@ use std::process;
 /// # Examples
 ///
 /// ```
-/// use hyeong::execute;
-/// use hyeong::io::CustomWriter;
-/// use hyeong::number::Num;
-/// use hyeong::state::UnOptState;
+/// use hyeong::util::io::CustomWriter;
+/// use hyeong::core::state::UnOptState;
+/// use hyeong::core::execute;
+/// use hyeong::number::number::Num;
 ///
 /// let mut a = CustomWriter::new(|_| Result::Ok(()));
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
 /// let mut s = UnOptState::new();
 ///
-/// execute::push_stack_wrap(&mut a, &mut b, &mut s, 1, Num::from_num(-1));
+/// execute::push_stack_wrap(&mut a, &mut b, &mut s, 1, Num::from_num(-1)).unwrap();
 ///
-/// assert_eq!("1", a.to_string());
+/// assert_eq!("1", a.to_string().unwrap());
 /// ```
 pub fn push_stack_wrap<T>(
     out: &mut impl Write,
@@ -63,16 +63,16 @@ where
 /// # Examples
 ///
 /// ```
-/// use hyeong::execute;
-/// use hyeong::io::{CustomReader, CustomWriter};
-/// use hyeong::state::UnOptState;
+/// use hyeong::util::io::{CustomReader, CustomWriter};
+/// use hyeong::core::state::UnOptState;
+/// use hyeong::core::execute;
 ///
 /// let mut a = CustomReader::new("0".to_string());
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
 /// let mut c = CustomWriter::new(|_| Result::Ok(()));
 /// let mut s = UnOptState::new();
 ///
-/// let n = execute::pop_stack_wrap(&mut a, &mut b, &mut c, &mut s, 0);
+/// let n = execute::pop_stack_wrap(&mut a, &mut b, &mut c, &mut s, 0).unwrap();
 /// assert_eq!("48", n.to_string());
 /// ```
 pub fn pop_stack_wrap<T>(
@@ -115,7 +115,7 @@ where
 ///
 /// ```
 /// use hyeong::util::io::{CustomReader, CustomWriter};
-/// use hyeong::core::state::UnOptState;
+/// use hyeong::core::state::{UnOptState, State};
 /// use hyeong::core::{parse, execute};
 ///
 /// let mut a = CustomReader::new("0".to_string());
@@ -125,7 +125,7 @@ where
 /// let t = parse::parse("형...".to_string());
 /// s.push_code(t[0].clone());
 ///
-/// let (mut s, _) = execute::execute_one(&mut a, &mut b, &mut c, s, 0);
+/// let (mut s, _) = execute::execute_one(&mut a, &mut b, &mut c, s, 0).unwrap();
 /// assert_eq!("3", s.get_stack(3)[0].to_string());
 /// ```
 pub fn execute_one<T>(
@@ -241,9 +241,9 @@ where
 /// # Examples
 ///
 /// ```
-/// use hyeong::{execute, parse};
-/// use hyeong::io::{CustomReader, CustomWriter};
-/// use hyeong::state::{UnOptState, State};
+/// use hyeong::core::{execute, parse};
+/// use hyeong::util::io::{CustomReader, CustomWriter};
+/// use hyeong::core::state::{UnOptState, State};
 ///
 /// let mut a = CustomReader::new("0".to_string());
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
@@ -251,7 +251,7 @@ where
 /// let mut s = UnOptState::new();
 /// let t = parse::parse("형...".to_string());
 ///
-/// let mut s = execute::execute(&mut a, &mut b, &mut c, s, &t[0]);
+/// let mut s = execute::execute(&mut a, &mut b, &mut c, s, &t[0]).unwrap();
 /// assert_eq!("3", s.get_stack(3)[0].to_string());
 /// ```
 pub fn execute<T>(

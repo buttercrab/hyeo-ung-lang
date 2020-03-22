@@ -27,8 +27,8 @@ pub trait Code {
 /// # Examples
 ///
 /// ```
-/// use hyeong::code::{OptCode, Code};
-/// use hyeong::area::Area;
+/// use hyeong::core::code::{OptCode, Code};
+/// use hyeong::core::area::Area;
 ///
 /// let a = OptCode::new(
 ///     0,
@@ -58,8 +58,8 @@ impl OptCode {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::code::{OptCode, Code};
-    /// use hyeong::area::Area;
+    /// use hyeong::core::code::{OptCode, Code};
+    /// use hyeong::core::area::Area;
     ///
     /// let a = OptCode::new(
     ///     0,
@@ -123,8 +123,8 @@ impl Code for OptCode {
 /// # Examples
 ///
 /// ```
-/// use hyeong::code::UnOptCode;
-/// use hyeong::area::Area;
+/// use hyeong::core::code::UnOptCode;
+/// use hyeong::core::area::Area;
 ///
 /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
 /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
@@ -194,8 +194,8 @@ impl fmt::Debug for UnOptCode {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::code::UnOptCode;
-    /// use hyeong::area::Area;
+    /// use hyeong::core::code::UnOptCode;
+    /// use hyeong::core::area::Area;
     ///
     /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
     /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));

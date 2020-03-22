@@ -10,7 +10,7 @@ use termcolor::StandardStream;
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("run")
-        .about("Run core code directly")
+        .about("Run hyeong code directly")
         .arg(option::input())
         .arg(option::optimize())
 }

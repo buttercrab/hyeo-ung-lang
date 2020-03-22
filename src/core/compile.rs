@@ -192,7 +192,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
     }
 }
 
-/// Makes rust code from parsed core code.
+/// Makes rust code from parsed hyeong code.
 /// It splits codes into states.
 /// Then, go through states deciding where to go next.
 /// Since match is comparing linearly by each value,
@@ -207,8 +207,8 @@ where
         "{}{}{}{}{}{}{}{}{}",
         "\
 #![allow(warnings)]
-use core::big_number::BigNum;
-use core::number::Num;
+use hyeong::number::big_number::BigNum;
+use hyeong::number::number::Num;
 use std::collections::HashMap;
 
 struct Stack {

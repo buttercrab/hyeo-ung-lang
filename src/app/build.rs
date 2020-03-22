@@ -81,9 +81,9 @@ pub fn run(stdout: &mut StandardStream, hy_opt: HyeongOption) -> Result<(), Erro
             .as_ref()
             .unwrap()
             .join(if cfg!(windows) {
-                "target/release/core-build.exe"
+                "target/release/hyeong-build.exe"
             } else {
-                "target/release/core-build"
+                "target/release/hyeong-build"
             }),
         hy_opt.output.unwrap(),
     )?;
