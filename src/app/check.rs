@@ -23,6 +23,8 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
         stdout,
         hy_opt,
         un_opt_code.iter().enumerate().collect::<Vec<_>>(),
+        Color::Cyan,
+        false,
     )
 }
 
@@ -31,6 +33,8 @@ pub fn print_un_opt_codes(
     stdout: &mut StandardStream,
     hy_opt: &HyeongOption,
     code: Vec<(usize, &UnOptCode)>,
+    color: Color,
+    raw: bool,
 ) -> Result<(), Error> {
     let file_name = hy_opt
         .input
@@ -60,7 +64,7 @@ pub fn print_un_opt_codes(
     }
 
     for (i, c) in code.iter() {
-        stdout.set_color(ColorSpec::new().set_fg(Some(Color::Cyan)))?;
+        stdout.set_color(ColorSpec::new().set_fg(Some(color)))?;
         write!(stdout, "{}", i)?;
         stdout.reset()?;
         write!(
@@ -92,14 +96,18 @@ pub fn print_un_opt_codes(
                 .collect::<String>()
         )?;
 
-        writeln!(
-            stdout,
-            "{}_{}_{} {}",
-            parse::COMMANDS[c.get_type() as usize],
-            c.get_hangul_count(),
-            c.get_dot_count(),
-            c.get_area()
-        )?;
+        if raw {
+            writeln!(stdout, "{}", c.get_raw())?;
+        } else {
+            writeln!(
+                stdout,
+                "{}_{}_{} {}",
+                parse::COMMANDS[c.get_type() as usize],
+                c.get_hangul_count(),
+                c.get_dot_count(),
+                c.get_area()
+            )?;
+        }
     }
 
     Ok(())

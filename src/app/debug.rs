@@ -132,19 +132,13 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                     "next" | "n" => {
                         let c = &un_opt_code[state_stack.last().unwrap().1];
 
-                        write!(
+                        check::print_un_opt_codes(
                             stdout,
-                            "{}:{}|{} ",
-                            c.get_location().0,
-                            c.get_location().1,
-                            state_stack.last().unwrap().1
+                            hy_opt,
+                            vec![(state_stack.last().unwrap().1, c)],
+                            Color::Cyan,
+                            true,
                         )?;
-                        stdout
-                            .set_color(ColorSpec::new().set_fg(Some(Color::Blue)).set_bold(true))?;
-                        write!(stdout, "{}", c.get_raw())?;
-                        stdout.reset()?;
-                        write!(stdout, "\n")?;
-                        stdout.flush()?;
 
                         state_stack.push(execute::execute_one(
                             &mut stdin(),
@@ -188,6 +182,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
 
                     "break" | "b" => {
                         if parsed.len() < 2 {
+                            io::print_log(stdout, "printing breakpoints")?;
                             let mut v = break_points.iter().collect::<Vec<_>>();
                             v.sort();
                             check::print_un_opt_codes(
@@ -196,6 +191,8 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                                 v.iter()
                                     .map(|&i| (*i, &un_opt_code[*i]))
                                     .collect::<Vec<_>>(),
+                                Color::Red,
+                                true,
                             )?;
                             continue;
                         }
@@ -241,7 +238,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                     }
 
                     t => {
-                        writeln!(stdout, "command \"{}\" not found", t)?;
+                        io::print_error_str_no_exit(stdout, format!("command \"{}\" not found", t));
                     }
                 }
             }
