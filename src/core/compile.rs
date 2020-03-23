@@ -289,7 +289,7 @@ impl Stack {
     fn push(&mut self, idx: usize, num: Num) {
         if idx == 1 {
             if num.is_pos() {
-                print!(\"{}\", num.floor().to_int() as u8 as char);
+                print!(\"{}\", std::char::from_u32(num.floor().to_int()).unwrap());
             } else {
                 print!(\"{}\", -&num);
             }
@@ -297,7 +297,7 @@ impl Stack {
         }
         if idx == 2 {
             if num.is_pos() {
-                eprint!(\"{}\", num.floor().to_int() as u8 as char);
+                eprint!(\"{}\", std::char::from_u32(num.floor().to_int()).unwrap());
             } else {
                 eprint!(\"{}\", -&num);
             }
