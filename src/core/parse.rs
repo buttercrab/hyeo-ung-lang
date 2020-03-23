@@ -102,7 +102,7 @@ pub fn is_hangul_syllable(c: char) -> bool {
 /// ```
 /// use hyeong::core::parse;
 ///
-/// let parsed = parse::parse("형...?💖?".to_string());
+/// let parsed = parse::parse(String::from("형...?💖?"));
 ///
 /// assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"?_?💖_\"", format!("{:?}", parsed[0]));
 /// ```

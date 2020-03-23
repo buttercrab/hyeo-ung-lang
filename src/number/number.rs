@@ -206,12 +206,12 @@ impl Num {
     /// ```
     /// use hyeong::number::number::Num;
     ///
-    /// assert_eq!("10/3", Num::from_string("10/3".to_string()).to_string());
-    /// assert_eq!("너무 커엇...", Num::from_string("너무 커엇...".to_string()).to_string());
-    /// assert_eq!("-12", Num::from_string("-12".to_string()).to_string());
+    /// assert_eq!("10/3", Num::from_string(String::from("10/3")).to_string());
+    /// assert_eq!("너무 커엇...", Num::from_string(String::from("너무 커엇...")).to_string());
+    /// assert_eq!("-12", Num::from_string(String::from("-12")).to_string());
     /// ```
     pub fn from_string(mut s: String) -> Num {
-        if s == "너무 커엇...".to_string() {
+        if s == String::from("너무 커엇...") {
             Num::nan()
         } else {
             let neg = s.starts_with('-');

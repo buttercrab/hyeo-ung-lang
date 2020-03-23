@@ -125,7 +125,7 @@ impl Code for OptCode {
 /// use hyeong::core::code::UnOptCode;
 /// use hyeong::core::area::Area;
 ///
-/// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
+/// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
 /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
 /// ```
 #[derive(Clone)]
@@ -184,7 +184,7 @@ impl fmt::Debug for UnOptCode {
     /// use hyeong::core::code::UnOptCode;
     /// use hyeong::core::area::Area;
     ///
-    /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
+    /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
     /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

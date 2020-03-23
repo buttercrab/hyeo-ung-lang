@@ -224,7 +224,7 @@ impl Stack {
         if opt {
             format!("vec![Vec::new(); {}]", state.stack_size())
         } else {
-            "HashMap::new()".to_string()
+            String::from("HashMap::new()")
         },
         ",
         }
@@ -387,7 +387,7 @@ fn main() {
     last = Option::{};",
                 match state.get_latest_loc() {
                     Some(v) => format!("Some({})", v),
-                    None => "None".to_string(),
+                    None => String::from("None"),
                 }
             ));
 

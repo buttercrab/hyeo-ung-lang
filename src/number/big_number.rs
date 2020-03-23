@@ -12,7 +12,7 @@ use std::{error, fmt, ops};
 ///
 /// let a = BigNum::new(1234);
 ///
-/// assert!(matches!(BigNum::from_string("random string".to_string()), Result::Err(Error::ParseError)));
+/// assert!(matches!(BigNum::from_string(String::from("random string")), Result::Err(Error::ParseError)));
 /// ```
 #[derive(Debug)]
 pub enum Error {
@@ -53,8 +53,8 @@ impl error::Error for Error {}
 /// // Ways to make 10
 /// let a = BigNum::new(10);
 /// let b = BigNum::from_vec(vec![10]);
-/// let c = BigNum::from_string("10".to_string()).unwrap();
-/// let d = BigNum::from_string_base("1010".to_string(), 2).unwrap();
+/// let c = BigNum::from_string(String::from("10")).unwrap();
+/// let d = BigNum::from_string_base(String::from("1010"), 2).unwrap();
 ///
 /// // Arithmetic operators
 /// let e = &a + &b;
@@ -236,8 +236,8 @@ impl BigNum {
     /// ```
     /// use hyeong::number::big_number::BigNum;
     ///
-    /// let a = BigNum::from_string("12345678987654321".to_string()).unwrap();
-    /// let b = BigNum::from_string("-98765432123456789".to_string()).unwrap();
+    /// let a = BigNum::from_string(String::from("12345678987654321")).unwrap();
+    /// let b = BigNum::from_string(String::from("-98765432123456789")).unwrap();
     ///
     /// assert_eq!("12345678987654321", a.to_string());
     /// assert_eq!("-98765432123456789", b.to_string());
@@ -269,8 +269,8 @@ impl BigNum {
     /// ```
     /// use hyeong::number::big_number::BigNum;
     ///
-    /// let a = BigNum::from_string_base("A".to_string(), 16).unwrap();
-    /// let b = BigNum::from_string_base("-1010".to_string(), 2).unwrap();
+    /// let a = BigNum::from_string_base(String::from("A"), 16).unwrap();
+    /// let b = BigNum::from_string_base(String::from("-1010"), 2).unwrap();
     ///
     /// assert_eq!("10", a.to_string());
     /// assert_eq!("-10", b.to_string());
@@ -380,7 +380,7 @@ impl BigNum {
         }
 
         if res.is_empty() {
-            res = "0".to_string();
+            res = String::from("0");
         }
 
         if !self.pos {

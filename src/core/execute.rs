@@ -67,7 +67,7 @@ where
 /// use hyeong::core::state::UnOptState;
 /// use hyeong::core::execute;
 ///
-/// let mut a = CustomReader::new("0".to_string());
+/// let mut a = CustomReader::new(String::from("0"));
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
 /// let mut c = CustomWriter::new(|_| Result::Ok(()));
 /// let mut s = UnOptState::new();
@@ -118,11 +118,11 @@ where
 /// use hyeong::core::state::{UnOptState, State};
 /// use hyeong::core::{parse, execute};
 ///
-/// let mut a = CustomReader::new("0".to_string());
+/// let mut a = CustomReader::new(String::from("0"));
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
 /// let mut c = CustomWriter::new(|_| Result::Ok(()));
 /// let mut s = UnOptState::new();
-/// let t = parse::parse("형...".to_string());
+/// let t = parse::parse(String::from("형..."));
 /// s.push_code(t[0].clone());
 ///
 /// let (mut s, _) = execute::execute_one(&mut a, &mut b, &mut c, s, 0).unwrap();
@@ -245,11 +245,11 @@ where
 /// use hyeong::util::io::{CustomReader, CustomWriter};
 /// use hyeong::core::state::{UnOptState, State};
 ///
-/// let mut a = CustomReader::new("0".to_string());
+/// let mut a = CustomReader::new(String::from("0"));
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
 /// let mut c = CustomWriter::new(|_| Result::Ok(()));
 /// let mut s = UnOptState::new();
-/// let t = parse::parse("형...".to_string());
+/// let t = parse::parse(String::from("형..."));
 ///
 /// let mut s = execute::execute(&mut a, &mut b, &mut c, s, &t[0]).unwrap();
 /// assert_eq!("3", s.get_stack(3)[0].to_string());

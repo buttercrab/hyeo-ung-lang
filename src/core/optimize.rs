@@ -174,7 +174,7 @@ where
 /// use hyeong::core::{parse, optimize};
 /// use hyeong::core::state::State;
 ///
-/// let a = parse::parse("형... 항.".to_string());
+/// let a = parse::parse(String::from("형... 항."));
 /// let (mut s, c) = optimize::optimize(a, 2).unwrap();
 ///
 /// assert_eq!("3", s.get_stack(1).iter().map(|x| x.to_string()).collect::<Vec<_>>().join(""))

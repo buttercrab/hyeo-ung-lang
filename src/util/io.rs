@@ -90,7 +90,7 @@ pub trait ReadLine {
 /// ```
 /// use hyeong::util::io::{CustomReader, ReadLine};
 ///
-/// let mut a = CustomReader::new("Hello, World!".to_string());
+/// let mut a = CustomReader::new(String::from("Hello, World!"));
 ///
 /// assert_eq!("Hello, World!", a.read_line_().unwrap());
 /// ```
@@ -135,7 +135,7 @@ impl CustomReader {
     /// ```
     /// use hyeong::util::io::{CustomReader, ReadLine};
     ///
-    /// let mut a = CustomReader::new("Hello, World!".to_string());
+    /// let mut a = CustomReader::new(String::from("Hello, World!"));
     ///
     /// assert_eq!("Hello, World!", a.read_line_().unwrap());
     /// ```
