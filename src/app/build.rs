@@ -28,7 +28,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     // parse
-    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
     // optimize
     let rust_code = if hy_opt.optimize >= 1 {

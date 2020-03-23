@@ -1,7 +1,4 @@
-use crate::core::code::UnOptCode;
-use crate::core::parse;
 use crate::util::error::Error;
-use crate::util::util;
 use std::ffi::OsStr;
 use std::fmt::Display;
 use std::fs::File;
@@ -168,14 +165,6 @@ pub fn read_file(path: &PathBuf) -> Result<String, Error> {
             "Only .hyeong extension supported",
         ))?,
     }
-}
-
-pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnOptCode>, Error> {
-    let raw_code = read_file(path)?;
-    print_log(stdout, format!("parsing {}", util::path_to_string(path)?))?;
-    let un_opt_code = parse::parse(raw_code);
-    print_log(stdout, format!("⮑  total {} commands", un_opt_code.len()))?;
-    Ok(un_opt_code)
 }
 
 /// If `res` is Err, it prints error and exit

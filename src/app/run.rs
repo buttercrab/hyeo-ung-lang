@@ -2,7 +2,7 @@ use crate::core::state::{State, UnOptState};
 use crate::core::{execute, optimize};
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
-use crate::util::{io, option};
+use crate::util::{io, option, util};
 use clap::App;
 use std::io::Write;
 use termcolor::StandardStream;
@@ -21,7 +21,7 @@ pub fn run(
     stderr: &mut StandardStream,
     hy_opt: &HyeongOption,
 ) -> Result<(), Error> {
-    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
     if hy_opt.optimize >= 1 {
         io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;

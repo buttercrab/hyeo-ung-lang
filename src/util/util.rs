@@ -1,4 +1,7 @@
+use crate::core::code::UnOptCode;
+use crate::core::parse;
 use crate::util::error::Error;
+use crate::util::io;
 use std::io::Write;
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
@@ -12,6 +15,14 @@ pub fn path_to_string(path: &PathBuf) -> Result<String, Error> {
             "maybe the path is not correct",
         )
     })
+}
+
+pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnOptCode>, Error> {
+    let raw_code = io::read_file(path)?;
+    io::print_log(stdout, format!("parsing {}", path_to_string(path)?))?;
+    let un_opt_code = parse::parse(raw_code);
+    io::print_log(stdout, format!("⮑  total {} commands", un_opt_code.len()))?;
+    Ok(un_opt_code)
 }
 
 #[cfg_attr(tarpaulin, skip)]

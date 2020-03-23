@@ -3,7 +3,7 @@ use crate::core::execute;
 use crate::core::state::{State, UnOptState};
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
-use crate::util::{io, option};
+use crate::util::{io, option, util};
 use clap::App;
 use std::collections::HashSet;
 use std::io::{stdin, Write};
@@ -56,7 +56,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
 
     io::print_log(stdout, "running in debug mode")?;
 
-    let un_opt_code = io::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
 
     for c in &un_opt_code {
         state.push_code(c.clone());
