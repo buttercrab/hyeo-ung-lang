@@ -8,6 +8,7 @@ use std::cmp::max;
 use std::io::Write;
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
+/// App for check
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("check")
@@ -15,6 +16,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::input())
 }
 
+/// Runner for check
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
@@ -27,6 +29,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
     )
 }
 
+/// Main print function for `UnOptCode`
 #[cfg_attr(tarpaulin, skip)]
 pub fn print_un_opt_codes(
     stdout: &mut StandardStream,

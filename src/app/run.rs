@@ -7,6 +7,7 @@ use clap::App;
 use std::io::Write;
 use termcolor::StandardStream;
 
+/// App for run
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("run")
@@ -15,6 +16,11 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::optimize())
 }
 
+/// App for run
+///
+/// 1. parse code
+/// 2. optimize code
+/// 3. execute code
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(
     stdout: &mut StandardStream,

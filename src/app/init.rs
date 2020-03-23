@@ -5,6 +5,7 @@ use clap::App;
 use std::fs;
 use termcolor::{StandardStream, WriteColor};
 
+/// App for install
 #[cfg_attr(tarpaulin, skip)]
 pub fn install_app<'a, 'b>() -> App<'a, 'b> {
     App::new("install")
@@ -12,6 +13,7 @@ pub fn install_app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::build_path())
 }
 
+/// App for uninstall
 #[cfg_attr(tarpaulin, skip)]
 pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
     App::new("uninstall")
@@ -19,6 +21,13 @@ pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::build_path())
 }
 
+/// Runner for install
+///
+/// 1. if dir is not empty -> Error
+/// 2. create dir
+/// 3. create Cargo.toml
+/// 4. create main.rs
+/// 5. pre-compile
 #[cfg_attr(tarpaulin, skip)]
 pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     if hy_opt

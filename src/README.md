@@ -6,11 +6,11 @@
 
 | file                    | impl | test | doc |
 |-------------------------|:----:|:----:|:---:|
-| `app/build.rs`          |✅     |❌     |     |
-| `app/check.rs`          |✅     |❌     |     |
-| `app/debug.rs`          |✅     |❌     |     |
-| `app/init.rs`           |✅     |❌     |     |
-| `app/interpreter.rs`    |✅     |❌     |     |
+| `app/build.rs`          |✅     |❌     |✅    |
+| `app/check.rs`          |✅     |❌     |✅    |
+| `app/debug.rs`          |✅     |❌     |✅    |
+| `app/init.rs`           |✅     |❌     |✅    |
+| `app/interpreter.rs`    |✅     |❌     |✅    |
 | `app/run.rs`            |✅     |❌     |     |
 | `core/area.rs`          |✅     |✅     |✅    |
 | `core/code.rs`          |✅     |✅     |✅    |

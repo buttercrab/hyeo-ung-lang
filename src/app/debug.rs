@@ -12,6 +12,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
+/// App for debug
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("debug")
@@ -22,14 +23,14 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 /// Debug function
 ///
 /// It works like interpreter but accepting commands below.
-/// 1. break(b)       show breakpoints");
-/// 2. break(b) NUM   set/unset breakpoint on NUM");
-/// 3. exit           Exit debugger");
-/// 4. help(h)        Print this");
-/// 5. next(n)        goto next command");
-/// 6. state(s)       print state status");
-/// 7. previous(p)    move to previous state");
-/// 8. run(r)         run until breakpoint");
+/// 1. [b] break       show breakpoints
+/// 2. [b] break NUM   set/unset breakpoint on NUM
+/// 3. exit            Exit debugger
+/// 4. [h] help        Print this
+/// 5. [n] next        goto next command
+/// 6. [s] state       print state status
+/// 7. [p] previous    move to previous state
+/// 8. [r] run         run until breakpoint
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
