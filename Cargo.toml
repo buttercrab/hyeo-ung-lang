@@ -7,6 +7,11 @@ license = "MIT"
 homepage = "https://github.com/buttercrab/hyeo-ung-lang"
 repository = "https://github.com/buttercrab/hyeo-ung-lang"
 description = "Hyeo-ung Programming Language Compiler"
+include = [
+	"src/**/*",
+	"Cargo.toml",
+	"README.md"
+]
 
 [badges]
 travis-ci = { repository = "buttercrab/hyeo-ung-lang" }

@@ -152,19 +152,15 @@ pub fn read_file(path: &PathBuf) -> Result<String, Error> {
                 let mut buf = String::new();
                 let mut f = File::open(path)?;
                 f.read_to_string(&mut buf)?;
-                Ok(buf)
-            } else {
-                Err(std::io::Error::new(
-                    ErrorKind::InvalidInput,
-                    "Only .hyeong extension supported",
-                ))?
+                return Ok(buf);
             }
         }
-        _ => Err(std::io::Error::new(
-            ErrorKind::InvalidInput,
-            "Only .hyeong extension supported",
-        ))?,
+        _ => {}
     }
+    Err(std::io::Error::new(
+        ErrorKind::InvalidInput,
+        "Only .hyeong extension supported",
+    ))?
 }
 
 /// If `res` is Err, it prints error and exit

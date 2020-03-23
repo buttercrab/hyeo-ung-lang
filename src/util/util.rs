@@ -8,6 +8,16 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use termcolor::StandardStream;
 
+/// PathBuf to String helper function
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::util::util;
+/// use std::path::PathBuf;
+///
+/// assert_eq!("foo/bar.hyeong", util::path_to_string(&PathBuf::from("foo/bar.hyeong")).unwrap());
+/// ```
 pub fn path_to_string(path: &PathBuf) -> Result<String, Error> {
     path.clone().into_os_string().into_string().map_err(|_| {
         Error::new(
@@ -17,6 +27,20 @@ pub fn path_to_string(path: &PathBuf) -> Result<String, Error> {
     })
 }
 
+/// Read and parse file
+///
+/// # Examples
+///
+/// ```
+/// use termcolor::{StandardStream, ColorChoice};
+/// use hyeong::util::util;
+/// use std::path::PathBuf;
+///
+/// let mut s = StandardStream::stdout(ColorChoice::Auto);
+/// let c = util::parse_file(&mut s, &PathBuf::from("examples/hello_world/hello_world.hyeong")).unwrap();
+///
+/// assert_eq!(44, c.len());
+/// ```
 pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnOptCode>, Error> {
     let raw_code = io::read_file(path)?;
     io::print_log(stdout, format!("parsing {}", path_to_string(path)?))?;
@@ -25,6 +49,7 @@ pub fn parse_file(stdout: &mut StandardStream, path: &PathBuf) -> Result<Vec<UnO
     Ok(un_opt_code)
 }
 
+/// Execute command and stream stdout to `StandardStream`
 #[cfg_attr(tarpaulin, skip)]
 pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(), Error> {
     let mut cmd = if cfg!(target_os = "windows") {
@@ -66,6 +91,7 @@ pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(
     }
 }
 
+/// Execute command and stream stdout to `StandardStream`
 #[cfg_attr(tarpaulin, skip)]
 pub fn execute_command_stderr(w: &mut StandardStream, command: &str) -> Result<(), Error> {
     let mut cmd = if cfg!(target_os = "windows") {
