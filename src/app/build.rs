@@ -11,7 +11,7 @@ use termcolor::{StandardStream, WriteColor};
 #[cfg_attr(tarpaulin, skip)]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("build")
-        .about("Compiles core code")
+        .about("Compiles hyeong code")
         .arg(option::build_path())
         .arg(option::input())
         .arg(option::optimize())
