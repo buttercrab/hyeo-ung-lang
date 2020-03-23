@@ -40,14 +40,30 @@ where
     match idx {
         1 => {
             if num.is_pos() {
-                write!(out, "{}", num.floor().to_int() as u8 as char)?;
+                let n = num.floor().to_int();
+                write!(
+                    out,
+                    "{}",
+                    std::char::from_u32(n).ok_or(Error::new(
+                        "utf-8 encoding error",
+                        format!("number {} was not valid unicode", n)
+                    ))?
+                )?;
             } else {
                 write!(out, "{}", -&num)?;
             }
         }
         2 => {
             if num.is_pos() {
-                write!(err, "{}", num.floor().to_int() as u8 as char)?;
+                let n = num.floor().to_int();
+                write!(
+                    err,
+                    "{}",
+                    std::char::from_u32(n).ok_or(Error::new(
+                        "utf-8 encoding error",
+                        format!("number {} was not valid unicode", n)
+                    ))?
+                )?;
             } else {
                 write!(err, "{}", -&num)?;
             }
