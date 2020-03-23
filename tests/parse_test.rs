@@ -1,4 +1,3 @@
-/*
 #[cfg(test)]
 mod parse_test {
     use hyeong::core::parse;
@@ -199,4 +198,3 @@ mod parse_test {
         );
     }
 }
-*/

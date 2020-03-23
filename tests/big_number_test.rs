@@ -1,7 +1,7 @@
-/*
 #[cfg(test)]
 mod big_number_test {
     use hyeong::number::big_number::BigNum;
+    use hyeong::number::big_number::Error;
     use std::cmp::Ordering;
 
     #[test]
@@ -283,4 +283,3 @@ mod big_number_test {
         assert_eq!(0, a.to_int());
     }
 }
-*/
