@@ -1,4 +1,3 @@
-/*
 #[cfg(test)]
 mod execute_test {
     use hyeong::core::state::UnOptState;
@@ -13,11 +12,11 @@ mod execute_test {
         let mut state = UnOptState::new();
 
         for c in parsed {
-            state = execute::execute(&mut ipt, &mut out, &mut err, state, &c);
+            state = execute::execute(&mut ipt, &mut out, &mut err, state, &c).unwrap();
         }
 
-        assert_eq!(stdout.to_string(), out.to_string());
-        assert_eq!(stderr.to_string(), err.to_string());
+        assert_eq!(stdout.to_string(), out.to_string().unwrap());
+        assert_eq!(stderr.to_string(), err.to_string().unwrap());
     }
 
     #[test]
@@ -64,4 +63,4 @@ mod execute_test {
             "",
         );
     }
-}*/
+}

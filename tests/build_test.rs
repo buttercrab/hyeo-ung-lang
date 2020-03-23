@@ -1,102 +1,74 @@
-﻿/*#[cfg(test)]
+﻿#[cfg(test)]
 mod build_test {
+    use hyeong::app::init;
     use hyeong::core::state::UnOptState;
     use hyeong::core::{compile, optimize, parse};
-    use hyeong::util::io;
+    use hyeong::util::option::HyeongOption;
+    use hyeong::util::{io, util};
     use std::env;
+    use std::path::PathBuf;
     use std::process::Command;
+    use termcolor::{ColorChoice, StandardStream};
 
-    fn helper_function(name: &str, code: &str, level: usize) -> String {
+    fn helper_function(name: &str, code: &str, level: u8) -> String {
         let un_opt_code = parse::parse(code.to_string());
         let un_opt_state = UnOptState::new();
         let source = if level >= 1 {
-            let (opt_state, opt_code) = optimize::optimize(un_opt_code, level);
+            let (opt_state, opt_code) = optimize::optimize(un_opt_code, level).unwrap();
             compile::build_source(opt_state, &opt_code, level)
         } else {
             compile::build_source(un_opt_state, &un_opt_code, level)
         };
 
-        let build_path = &*if cfg!(target_os = "windows") {
-            format!(
-                "{}\\.core\\test\\{}\\core-build",
-                env::var("USERPROFILE").unwrap(),
-                name
-            )
+        let mut s = StandardStream::stdout(ColorChoice::Auto);
+        let mut p = if cfg!(target_os = "windows") {
+            PathBuf::from(&env::var("USERPROFILE").unwrap().replace("\\", "/"))
         } else {
-            format!(
-                "{}/.core/test/{}/core-build",
-                env::var("HOME").unwrap(),
-                name
-            )
+            PathBuf::from(&env::var("HOME").unwrap())
         };
+        p.push(format!(".hyeong/test/{}", name));
+        if !p.join("hyeong-build/Cargo.toml").exists() {
+            init::install_run(
+                &mut s,
+                &HyeongOption {
+                    build_source: Some(p.clone()),
+                    color: ColorChoice::Always,
+                    input: None,
+                    optimize: 0,
+                    output: None,
+                },
+            )
+            .unwrap();
+        }
+        p.push("hyeong-build");
 
-        io::execute_command(
-            &*format!("rmdir /S {}", build_path),
-            &*format!("rm -rf {}", build_path),
-        );
+        io::save_to_file(&p.join("src/main.rs"), source).unwrap();
 
-        io::execute_command(
-            &*format!("cargo new {} --vcs none", build_path),
-            &*format!("cargo new {} --vcs none", build_path),
-        );
-        io::execute_command(
-            &*format!("COPY /y src\\number.rs {}\\src\\number.rs", build_path),
-            &*format!("cp src/number.rs {}/src/", build_path),
-        );
-        io::execute_command(
+        util::execute_command_stdout(
+            &mut s,
             &*format!(
-                "COPY /y src\\big_number.rs {}\\src\\big_number.rs",
-                build_path
+                "cargo build --manifest-path={} --release",
+                util::path_to_string(&p.join("Cargo.toml")).unwrap()
             ),
-            &*format!("cp src/big_number.rs {}/src/", build_path),
-        );
-        io::execute_command(
-            &*format!(
-                "echo pub mod big_number;pub mod number; > {}\\src\\lib.rs",
-                build_path
-            ),
-            &*format!(
-                "printf \"pub mod big_number;\npub mod number;\" > {}/src/lib.rs",
-                build_path
-            ),
-        );
+        )
+        .unwrap();
 
-        io::save_to_file(
-            (build_path.to_string()
-                + if cfg!(target_os = "windows") {
-                    "\\src\\main.rs"
-                } else {
-                    "/src/main.rs"
-                })
-            .as_str(),
-            source,
-        );
-
-        io::execute_command(
-            &*format!(
-                "cargo build --manifest-path={}\\Cargo.toml --release",
-                build_path
-            ),
-            &*format!(
-                "cargo build --manifest-path={}/Cargo.toml --release",
-                build_path
-            ),
-        );
-
-        io::handle(String::from_utf8(
-            io::handle(if cfg!(target_os = "windows") {
-                Command::new("cmd")
-                    .arg("/C")
-                    .arg(&*format!("{}\\target\\release\\core-build.exe", build_path))
-                    .output()
-            } else {
-                Command::new("bash")
-                    .arg("-c")
-                    .arg(&*format!("{}/target/release/core-build", build_path))
-                    .output()
-            })
-            .stdout,
-        ))
+        String::from_utf8(
+            Command::new("bash")
+                .arg("-c")
+                .arg(
+                    &*util::path_to_string(&p.join(if cfg!(target_os = "windows") {
+                        "target/release/hyeong-build.exe"
+                    } else {
+                        "target/release/hyeong-build"
+                    }))
+                    .unwrap(),
+                )
+                .output()
+                .unwrap()
+                .stdout,
+        )
+        .unwrap()
     }
 
     #[test]
@@ -144,4 +116,3 @@ mod build_test {
         );
     }
 }
-*/

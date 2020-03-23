@@ -1,37 +1,37 @@
-﻿/*
-#[cfg(test)]
+﻿#[cfg(test)]
 mod optimize_test {
+    use hyeong::core::state::State;
     use hyeong::core::{execute, optimize, parse};
     use hyeong::util::io;
     use std::io::Write;
 
-    fn helper_function(code: &str, stdin: &str, stdout: &str, stderr: &str, level: usize) {
+    fn helper_function(code: &str, stdin: &str, stdout: &str, stderr: &str, level: u8) {
         let un_opt_code = parse::parse(code.to_string());
         let mut ipt = io::CustomReader::new(stdin.to_string());
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut out_str = String::from("");
         let mut err_str = String::from("");
-        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, level);
+        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, level).unwrap();
         if !opt_state.get_stack(1).is_empty() {
             for num in opt_state.get_stack(1).iter() {
                 out_str.push_str(&*format!("{}", num.floor().to_int() as u8 as char));
             }
-            io::handle(out.flush());
+            out.flush().unwrap();
             opt_state.get_stack(1).clear();
         }
         if !opt_state.get_stack(2).is_empty() {
             for num in opt_state.get_stack(2).iter() {
                 err_str.push_str(&*format!("{}", num.floor().to_int() as u8 as char));
             }
-            io::handle(err.flush());
+            err.flush().unwrap();
             opt_state.get_stack(2).clear();
         }
         for c in opt_code {
-            opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &c);
+            opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &c).unwrap();
         }
-        out_str.push_str(&out.to_string());
-        err_str.push_str(&err.to_string());
+        out_str.push_str(&out.to_string().unwrap());
+        err_str.push_str(&err.to_string().unwrap());
         assert_eq!(out_str, stdout.to_string());
         assert_eq!(err_str, stderr.to_string());
     }
@@ -120,4 +120,3 @@ mod optimize_test {
         helper_function("형. 흣... 흑 흑.", "", "1", "", 2);
     }
 }
-*/
