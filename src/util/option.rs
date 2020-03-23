@@ -42,7 +42,7 @@ pub fn color<'a, 'b>() -> Arg<'a, 'b> {
         .value_name("color")
         .takes_value(true)
         .long("color")
-        .help("whether prints color (never, auto, always)")
+        .help("whether prints color")
         .default_value("auto")
         .global(true)
         .possible_values(&["never", "auto", "always"])
@@ -55,10 +55,7 @@ pub fn parse_color(matches: &ArgMatches) -> Result<ColorChoice, Error> {
         "never" => Ok(ColorChoice::Never),
         "auto" => Ok(ColorChoice::Auto),
         "always" => Ok(ColorChoice::Always),
-        t => Err(Error::new(
-            format!("color has no option {}", t),
-            String::from("options are: (never, auto, always)"),
-        )),
+        _ => unreachable!(),
     }
 }
 
@@ -91,7 +88,7 @@ pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
         .takes_value(true)
         .short("O")
         .long("optimize")
-        .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)")
+        .help("optimize level")
         .default_value("2")
         .possible_values(&["0", "1", "2"])
         .multiple(false)
@@ -103,10 +100,7 @@ pub fn parse_optimize(matches: &ArgMatches) -> Result<u8, Error> {
         "0" => Ok(0),
         "1" => Ok(1),
         "2" => Ok(2),
-        t => Err(Error::new(
-            format!("optimize has no option {}", t),
-            String::from(""),
-        )),
+        _ => unreachable!(),
     }
 }
 

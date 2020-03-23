@@ -118,7 +118,7 @@ where
         cur_stack = state.current_stack();
         let area_type = match area::calc(code.get_area(), code.get_area_count(), || {
             if cur_stack <= 2 {
-                Err(Error::new(String::from(""), String::from("")))
+                Err(Error::new(String::from(""), ""))
             } else {
                 pop_stack_wrap(ipt, out, err, &mut state, cur_stack)
             }

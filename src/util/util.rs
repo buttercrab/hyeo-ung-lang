@@ -8,8 +8,8 @@ use termcolor::StandardStream;
 pub fn path_to_string(path: &PathBuf) -> Result<String, Error> {
     path.clone().into_os_string().into_string().map_err(|_| {
         Error::new(
-            String::from("error on OsString to String conversion"),
-            String::from("maybe the path is not correct"),
+            "error on OsString to String conversion",
+            "maybe the path is not correct",
         )
     })
 }
@@ -45,11 +45,11 @@ pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(
         match e.code() {
             Some(code) => Err(Error::new(
                 format!("command {} failed with exit code {}", command, code),
-                String::from(""),
+                "",
             )),
             None => Err(Error::new(
                 format!("command {} terminated by signal", command),
-                String::from(""),
+                "",
             )),
         }
     }
@@ -86,11 +86,11 @@ pub fn execute_command_stderr(w: &mut StandardStream, command: &str) -> Result<(
         match e.code() {
             Some(code) => Err(Error::new(
                 format!("command {} failed with exit code {}", command, code),
-                String::from(""),
+                "",
             )),
             None => Err(Error::new(
                 format!("command {} terminated by signal", command),
-                String::from(""),
+                "",
             )),
         }
     }

@@ -46,8 +46,8 @@ pub fn print_un_opt_codes(
         .into_string()
         .map_err(|_| {
             Error::new(
-                String::from("error on OsString to String conversion"),
-                String::from("maybe the path is not correct"),
+                "error on OsString to String conversion",
+                "maybe the path is not correct",
             )
         })?;
     let mut idx_len = 0usize;

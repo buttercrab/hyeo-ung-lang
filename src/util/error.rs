@@ -3,22 +3,38 @@ use std::fmt::{Debug, Display};
 use std::io::ErrorKind;
 use std::string::FromUtf8Error;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Error {
     msg: String,
     note: String,
 }
 
 impl Error {
-    pub fn new(msg: String, note: String) -> Error {
-        Error { msg, note }
+    pub fn new<A, B>(msg: A, note: B) -> Error
+    where
+        A: Into<String>,
+        B: Into<String>,
+    {
+        Error {
+            msg: msg.into(),
+            note: note.into(),
+        }
     }
 
-    pub fn from<T>(err: T, note: String) -> Error
+    pub fn from<T, S>(err: T, note: S) -> Error
     where
         T: Debug,
+        S: Into<String>,
     {
         Error::new(format!("{:?}", err), note)
+    }
+
+    pub fn get_msg(&self) -> String {
+        self.msg.clone()
+    }
+
+    pub fn get_note(&self) -> String {
+        self.note.clone()
     }
 }
 
@@ -28,23 +44,17 @@ impl Display for Error {
     }
 }
 
-impl Debug for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.msg)
-    }
-}
-
 impl std::error::Error for Error {}
 
 impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
-        Self::from(e, String::new())
+        Self::from(e, "")
     }
 }
 
 impl From<std::string::FromUtf8Error> for Error {
     fn from(e: FromUtf8Error) -> Self {
-        Self::from(e, String::new())
+        Self::from(e, "")
     }
 }
 

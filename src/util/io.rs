@@ -219,7 +219,11 @@ where
 /// Print error
 #[cfg_attr(tarpaulin, skip)]
 pub fn print_error_no_exit(w: &mut StandardStream, err: Error) {
-    print_error_str_no_exit(w, format!("{:?}", err));
+    print_error_str_no_exit(w, err.get_msg());
+    let note = err.get_note();
+    if !note.is_empty() {
+        print_note(w, err.get_note()).unwrap();
+    }
 }
 
 /// Print error string

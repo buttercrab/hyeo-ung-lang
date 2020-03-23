@@ -199,7 +199,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                         let num = match parsed[1].parse::<usize>() {
                             Ok(t) => t,
                             Err(e) => {
-                                io::print_error_no_exit(stdout, Error::from(e, String::from("")));
+                                io::print_error_no_exit(stdout, Error::from(e, ""));
                                 continue;
                             }
                         };
