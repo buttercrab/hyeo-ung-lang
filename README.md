@@ -64,14 +64,12 @@ SUBCOMMANDS:
 
 ```shell script
 brew install buttercrab/tools/hyeong
-hyeong install
 ```
 
 ## Cargo
 
 ```shell script
 cargo install hyeong
-hyeong install
 ```
 
 ## Docker
@@ -81,6 +79,10 @@ docker run -it buttercrab/hyeong /bin/bash
 ```
 
 Then, `hyeong` to execute.
+
+## Download Binary
+
+Go to [latest release](https://github.com/buttercrab/hyeo-ung-lang/releases/latest) to download.
 
 ## Build from source
 
