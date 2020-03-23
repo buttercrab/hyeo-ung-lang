@@ -4,24 +4,24 @@
 
 ✅ for done, ❌ for omit, nothing for todo.
 
-| file             | impl | test | doc |
-|------------------|:----:|:----:|:---:|
-| `area.rs`        |✅     |✅     |✅    |
-| `big_number.rs`  |✅     |✅     |✅    |
-| `build.rs`       |      |❌     |     |
-| `check.rs`       |      |❌     |     |
-| `code.rs`        |✅     |✅     |✅    |
-| `compile.rs`     |✅     |✅     |✅    |
-| `debug.rs`       |      |❌     |     |
-| `execute.rs`     |✅     |✅     |✅    |
-| `init.rs`        |      |❌     |     |
-| `interpreter.rs` |✅     |❌     |✅    |
-| `io.rs`          |✅     |✅     |✅    |
-| `lib.rs`         |✅     |❌     |❌    |
-| `main.rs`        |✅     |❌     |✅    |
-| `number.rs`      |✅     |✅     |✅    |
-| `optimize.rs`    |✅     |✅     |✅    |
-| `option.rs`      |      |❌     |     |
-| `parse.rs`       |✅     |✅     |✅    |
-| `run.rs`         |      |❌     |     |
-| `state.rs`       |✅     |✅     |✅    |
+| file                    | impl | test | doc |
+|-------------------------|:----:|:----:|:---:|
+| `app/build.rs`          |✅     |❌     |✅    |
+| `app/check.rs`          |✅     |❌     |✅    |
+| `app/debug.rs`          |✅     |❌     |✅    |
+| `app/init.rs`           |✅     |❌     |✅    |
+| `app/interpreter.rs`    |✅     |❌     |✅    |
+| `app/run.rs`            |✅     |❌     |     |
+| `core/area.rs`          |✅     |✅     |✅    |
+| `core/code.rs`          |✅     |✅     |✅    |
+| `core/compile.rs`       |✅     |✅     |✅    |
+| `core/execute.rs`       |✅     |✅     |✅    |
+| `core/optimize.rs`      |✅     |✅     |✅    |
+| `core/parse.rs`         |✅     |✅     |✅    |
+| `core/state.rs`         |✅     |✅     |✅    |
+| `number/big_number.rs`  |✅     |✅     |✅    |
+| `number/number.rs`      |✅     |✅     |✅    |
+| `util/error.rs`         |✅     |✅     |✅    |
+| `util/io.rs`            |✅     |✅     |✅    |
+| `util/option.rs`        |✅     |❌     |✅    |
+| `util/util.rs`          |✅     |✅     |✅    |

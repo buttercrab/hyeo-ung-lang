@@ -1,7 +1,5 @@
-use crate::area;
-use crate::area::Area;
-use crate::parse;
-use colored::Colorize;
+use crate::core::area;
+use crate::core::area::Area;
 use std::fmt;
 
 /// Code trait
@@ -28,8 +26,8 @@ pub trait Code {
 /// # Examples
 ///
 /// ```
-/// use hyeong::code::{OptCode, Code};
-/// use hyeong::area::Area;
+/// use hyeong::core::code::{OptCode, Code};
+/// use hyeong::core::area::Area;
 ///
 /// let a = OptCode::new(
 ///     0,
@@ -59,8 +57,8 @@ impl OptCode {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::code::{OptCode, Code};
-    /// use hyeong::area::Area;
+    /// use hyeong::core::code::{OptCode, Code};
+    /// use hyeong::core::area::Area;
     ///
     /// let a = OptCode::new(
     ///     0,
@@ -124,10 +122,10 @@ impl Code for OptCode {
 /// # Examples
 ///
 /// ```
-/// use hyeong::code::UnOptCode;
-/// use hyeong::area::Area;
+/// use hyeong::core::code::UnOptCode;
+/// use hyeong::core::area::Area;
 ///
-/// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
+/// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
 /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
 /// ```
 #[derive(Clone)]
@@ -166,18 +164,6 @@ impl UnOptCode {
         }
     }
 
-    /// Return string with information
-    pub fn to_string(&self) -> String {
-        format!(
-            "{} {}_{}_{} : {}",
-            (&*format!("{}:{}", self.loc.0, self.loc.1)).yellow(),
-            parse::COMMANDS[self.type_ as usize],
-            self.hangul_count,
-            self.dot_count,
-            self.area
-        )
-    }
-
     /// Return location
     pub fn get_location(&self) -> (usize, usize) {
         self.loc
@@ -195,10 +181,10 @@ impl fmt::Debug for UnOptCode {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::code::UnOptCode;
-    /// use hyeong::area::Area;
+    /// use hyeong::core::code::UnOptCode;
+    /// use hyeong::core::area::Area;
     ///
-    /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, "형..".to_string());
+    /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
     /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

@@ -1,9 +1,11 @@
-use crate::code::{Code, OptCode, UnOptCode};
-use crate::execute::{pop_stack_wrap, push_stack_wrap};
-use crate::io::ReadLine;
-use crate::number::Num;
-use crate::state::{OptState, State};
-use crate::{area, io};
+use crate::core::area;
+use crate::core::code::{Code, OptCode, UnOptCode};
+use crate::core::execute::{pop_stack_wrap, push_stack_wrap};
+use crate::core::state::{OptState, State};
+use crate::number::number::Num;
+use crate::util::error::Error;
+use crate::util::io;
+use crate::util::io::ReadLine;
 use std::collections::HashMap;
 use std::io::{stdin, Write};
 
@@ -14,7 +16,7 @@ fn opt_execute<T>(
     err: &mut impl Write,
     mut state: T,
     code: &T::CodeType,
-) -> (T, bool)
+) -> Result<(T, bool), Error>
 where
     T: State + Clone,
 {
@@ -24,7 +26,7 @@ where
     let mut exec_count = 0;
     while cur_loc < length {
         if exec_count >= 100 {
-            return (state_clone, false);
+            return Ok((state_clone, false));
         }
 
         let code = (*state.get_code(cur_loc)).clone();
@@ -39,27 +41,27 @@ where
                     cur_stack,
                     &Num::from_num(code.get_hangul_count() as isize)
                         * &Num::from_num(code.get_dot_count() as isize),
-                );
+                )?;
             }
             1 => {
                 let mut n = Num::zero();
                 for _ in 0..code.get_hangul_count() {
                     if cur_stack <= 2 {
-                        return (state_clone, false);
+                        return Ok((state_clone, false));
                     }
-                    n += &pop_stack_wrap(ipt, out, err, &mut state, cur_stack);
+                    n += &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
                 }
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
             }
             2 => {
                 let mut n = Num::one();
                 for _ in 0..code.get_hangul_count() {
                     if cur_stack <= 2 {
-                        return (state_clone, false);
+                        return Ok((state_clone, false));
                     }
-                    n *= &pop_stack_wrap(ipt, out, err, &mut state, cur_stack);
+                    n *= &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
                 }
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
             }
             3 => {
                 let mut n = Num::zero();
@@ -67,18 +69,18 @@ where
 
                 for _ in 0..code.get_hangul_count() {
                     if cur_stack <= 2 {
-                        return (state_clone, false);
+                        return Ok((state_clone, false));
                     }
-                    v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack));
+                    v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
                 }
 
                 for mut x in v {
                     x.minus();
                     n += &x;
-                    push_stack_wrap(out, err, &mut state, cur_stack, x);
+                    push_stack_wrap(out, err, &mut state, cur_stack, x)?;
                 }
 
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
             }
             4 => {
                 let mut n = Num::one();
@@ -86,29 +88,29 @@ where
 
                 for _ in 0..code.get_hangul_count() {
                     if cur_stack <= 2 {
-                        return (state_clone, false);
+                        return Ok((state_clone, false));
                     }
-                    v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack));
+                    v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
                 }
 
                 for mut x in v {
                     x.flip();
                     n *= &x;
-                    push_stack_wrap(out, err, &mut state, cur_stack, x);
+                    push_stack_wrap(out, err, &mut state, cur_stack, x)?;
                 }
 
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n);
+                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
             }
             // 5
             _ => {
                 if cur_stack <= 2 {
-                    return (state_clone, false);
+                    return Ok((state_clone, false));
                 }
-                let n = pop_stack_wrap(ipt, out, err, &mut state, cur_stack);
+                let n = pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
                 for _ in 0..code.get_hangul_count() {
-                    push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone());
+                    push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone())?;
                 }
-                push_stack_wrap(out, err, &mut state, cur_stack, n);
+                push_stack_wrap(out, err, &mut state, cur_stack, n)?;
                 state.set_current_stack(code.get_dot_count());
             }
         }
@@ -116,13 +118,13 @@ where
         cur_stack = state.current_stack();
         let area_type = match area::calc(code.get_area(), code.get_area_count(), || {
             if cur_stack <= 2 {
-                Option::None
+                Err(Error::new(String::from(""), ""))
             } else {
-                Option::Some(pop_stack_wrap(ipt, out, err, &mut state, cur_stack))
+                pop_stack_wrap(ipt, out, err, &mut state, cur_stack)
             }
         }) {
-            Some(value) => value,
-            None => return (state_clone, false),
+            Ok(value) => value,
+            Err(_) => return Ok((state_clone, false)),
         };
 
         if area_type != 0 {
@@ -151,7 +153,7 @@ where
         cur_loc += 1;
     }
 
-    (state, true)
+    Ok((state, true))
 }
 
 /// Optimization function
@@ -169,23 +171,17 @@ where
 /// # Examples
 ///
 /// ```
-/// use hyeong::{optimize, parse};
-/// use hyeong::state::State;
+/// use hyeong::core::{parse, optimize};
+/// use hyeong::core::state::State;
 ///
-/// let a = parse::parse("형... 항.".to_string());
-/// let (mut s, c) = optimize::optimize(a, 2);
+/// let a = parse::parse(String::from("형... 항."));
+/// let (mut s, c) = optimize::optimize(a, 2).unwrap();
 ///
 /// assert_eq!("3", s.get_stack(1).iter().map(|x| x.to_string()).collect::<Vec<_>>().join(""))
 /// ```
-pub fn optimize(code: Vec<UnOptCode>, level: usize) -> (OptState, Vec<OptCode>) {
+pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCode>), Error> {
     let mut size = 0usize;
     let mut opt_code_vec: Vec<OptCode> = Vec::new();
-
-    if level >= 3 {
-        io::print_error_string(&*format!("optimize level {} is not supported", level));
-    }
-
-    io::print_log(&*format!("optimizing to level {}", level));
 
     if level >= 1 {
         let mut dot_map: HashMap<usize, usize> = HashMap::new();
@@ -257,7 +253,7 @@ pub fn optimize(code: Vec<UnOptCode>, level: usize) -> (OptState, Vec<OptCode>) 
 
         let mut idx = opt_code_vec.len();
         for (i, opt_code) in opt_code_vec.iter().enumerate() {
-            let (new_state, next) = opt_execute(&mut stdin(), &mut out, &mut err, state, opt_code);
+            let (new_state, next) = opt_execute(&mut stdin(), &mut out, &mut err, state, opt_code)?;
             state = new_state;
             if !next {
                 idx = i;
@@ -267,18 +263,18 @@ pub fn optimize(code: Vec<UnOptCode>, level: usize) -> (OptState, Vec<OptCode>) 
         opt_code_vec = opt_code_vec[idx..].to_vec();
 
         state.get_stack(1).extend(
-            out.to_string()
+            out.to_string()?
                 .as_bytes()
                 .iter()
                 .map(|&x| Num::from_num(x as isize)),
         );
         state.get_stack(2).extend(
-            err.to_string()
+            err.to_string()?
                 .as_bytes()
                 .iter()
                 .map(|&x| Num::from_num(x as isize)),
         );
     }
 
-    (state, opt_code_vec)
+    Ok((state, opt_code_vec))
 }

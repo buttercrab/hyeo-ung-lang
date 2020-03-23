@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod parse_test {
-    use hyeong::parse;
+    use hyeong::core::parse;
 
     fn basic_test(code: &str, res: &str) {
         let t = format!("{:?}", parse::parse(code.to_string())[0]);

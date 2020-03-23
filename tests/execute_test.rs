@@ -1,7 +1,8 @@
 #[cfg(test)]
 mod execute_test {
-    use hyeong::state::UnOptState;
-    use hyeong::{execute, io, parse};
+    use hyeong::core::state::UnOptState;
+    use hyeong::core::{execute, parse};
+    use hyeong::util::io;
 
     fn helper_function(code: &str, stdin: &str, stdout: &str, stderr: &str) {
         let parsed = parse::parse(code.to_string());
@@ -11,11 +12,11 @@ mod execute_test {
         let mut state = UnOptState::new();
 
         for c in parsed {
-            state = execute::execute(&mut ipt, &mut out, &mut err, state, &c);
+            state = execute::execute(&mut ipt, &mut out, &mut err, state, &c).unwrap();
         }
 
-        assert_eq!(stdout.to_string(), out.to_string());
-        assert_eq!(stderr.to_string(), err.to_string());
+        assert_eq!(stdout.to_string(), out.to_string().unwrap());
+        assert_eq!(stderr.to_string(), err.to_string().unwrap());
     }
 
     #[test]

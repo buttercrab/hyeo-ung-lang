@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod number_test {
-    use hyeong::number::Num;
+    use hyeong::number::number::Num;
     use std::cmp::Ordering;
 
     #[test]

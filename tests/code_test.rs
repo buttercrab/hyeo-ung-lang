@@ -1,8 +1,9 @@
 ﻿#[cfg(test)]
 mod code_test {
-    use hyeong::code::Code;
-    use hyeong::state::{State, UnOptState};
-    use hyeong::{execute, io, optimize, parse};
+    use hyeong::core::code::Code;
+    use hyeong::core::state::{State, UnOptState};
+    use hyeong::core::{execute, optimize, parse};
+    use hyeong::util::io;
 
     #[test]
     fn area_test01() {
@@ -20,18 +21,6 @@ mod code_test {
             parse::parse("혀엉... 핫... 형..! 흑..".to_string())[2].get_area()
         );
         assert_eq!("!__", t);
-    }
-
-    #[test]
-    fn un_opt_code_to_string_test01() {
-        let t = format!("{:?}", parse::parse("형".to_string())[0].to_string());
-        assert_eq!("\"\\u{1b}[33m1:0\\u{1b}[0m 형_1_0 : _\"".to_string(), t);
-    }
-
-    #[test]
-    fn un_opt_code_to_string_test02() {
-        let t = format!("{:?}", parse::parse("하앗..".to_string())[0].to_string());
-        assert_eq!("\"\\u{1b}[33m1:0\\u{1b}[0m 핫_2_2 : _\"".to_string(), t);
     }
 
     #[test]
@@ -67,7 +56,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
-        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed).unwrap();
         let t1 = (state.get_all_stack_index()[0], state.stack_size());
         let t2 = (3, 1);
         assert_eq!(t1, t2);
@@ -80,7 +69,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
-        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed).unwrap();
         let t = format!("{:?}", state.get_all_code());
         assert_eq!(t, "[type: 0, cnt1: 1, cnt2: 1, area: \"_\"]")
     }
@@ -92,7 +81,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
-        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed).unwrap();
         let t = state.get_all_point().len();
         assert_eq!(t, 0);
     }
@@ -104,7 +93,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
-        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed).unwrap();
         let t = format!("{:?}", state);
         assert_eq!(t, "current stack: 3\nstack 3: [1]\n");
     }
@@ -116,7 +105,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
-        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed).unwrap();
         let t = state.get_all_point()[0];
         assert_eq!(t, (37, 0));
     }
@@ -128,7 +117,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
-        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed);
+        state = execute::execute(&mut ipt, &mut out, &mut err, state, parsed).unwrap();
         let t = format!("{:?}", state);
         assert_eq!(t, "current stack: 3\nstack 3: [2]\n");
     }
@@ -139,8 +128,9 @@ mod code_test {
         let mut ipt = io::CustomReader::new("1 2".to_string());
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
-        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 2);
-        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]);
+        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 2).unwrap();
+        opt_state =
+            execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
         let t1 = (opt_state.get_all_stack_index()[1], opt_state.stack_size());
         let t2 = (1, 5);
         assert_eq!(t1, t2);
@@ -152,8 +142,9 @@ mod code_test {
         let mut ipt = io::CustomReader::new("1 2".to_string());
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
-        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 2);
-        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]);
+        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 2).unwrap();
+        opt_state =
+            execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
         let t = opt_state.get_all_code()[0].get_type();
         assert_eq!(t, 5);
     }
@@ -164,8 +155,9 @@ mod code_test {
         let mut ipt = io::CustomReader::new("".to_string());
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
-        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 1);
-        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]);
+        let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 1).unwrap();
+        opt_state =
+            execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
         let t1 = opt_state.get_all_point()[0];
         let t2 = (37, 0);
         assert_eq!(t1, t2);

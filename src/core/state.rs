@@ -1,5 +1,5 @@
-use crate::code::{Code, OptCode, UnOptCode};
-use crate::number::Num;
+use crate::core::code::{Code, OptCode, UnOptCode};
+use crate::number::number::Num;
 use std::collections::HashMap;
 use std::fmt;
 
@@ -58,7 +58,7 @@ pub trait State {
 /// # Examples
 ///
 /// ```
-/// use hyeong::state::{OptState, State};
+/// use hyeong::core::state::{OptState, State};
 ///
 /// let a = OptState::new(10);
 /// assert_eq!(10, a.stack_size());
@@ -78,7 +78,7 @@ impl OptState {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::state::{OptState, State};
+    /// use hyeong::core::state::{OptState, State};
     ///
     /// let a = OptState::new(10);
     /// assert_eq!(10, a.stack_size());
@@ -194,7 +194,7 @@ impl State for OptState {
 /// # Examples
 ///
 /// ```
-/// use hyeong::state::UnOptState;
+/// use hyeong::core::state::UnOptState;
 ///
 /// let a = UnOptState::new();
 /// ```
@@ -213,7 +213,7 @@ impl UnOptState {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::state::UnOptState;
+    /// use hyeong::core::state::UnOptState;
     ///
     /// let a = UnOptState::new();
     /// ```
@@ -312,8 +312,8 @@ impl fmt::Debug for UnOptState {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::state::{UnOptState, State};
-    /// use hyeong::number::Num;
+    /// use hyeong::core::state::{UnOptState, State};
+    /// use hyeong::number::number::Num;
     ///
     /// let mut  a = UnOptState::new();
     /// a.push_stack(3, Num::one());
