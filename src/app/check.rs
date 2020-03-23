@@ -12,7 +12,6 @@ use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("check")
         .about("Parse your code and check if you are right")
-        .arg(option::color())
         .arg(option::input())
 }
 

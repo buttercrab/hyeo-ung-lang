@@ -79,7 +79,7 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", branch = \"dev
             if stdout.supports_color() {
                 "always"
             } else {
-                "none"
+                "never"
             }
         ),
     )?;

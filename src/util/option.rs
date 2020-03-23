@@ -11,6 +11,7 @@ pub fn build_path<'a, 'b>() -> Arg<'a, 'b> {
         .takes_value(true)
         .long("build-path")
         .help("set temporary build path")
+        .multiple(false)
 }
 
 #[cfg_attr(tarpaulin, skip)]
@@ -43,6 +44,9 @@ pub fn color<'a, 'b>() -> Arg<'a, 'b> {
         .long("color")
         .help("whether prints color (never, auto, always)")
         .default_value("auto")
+        .global(true)
+        .possible_values(&["never", "auto", "always"])
+        .multiple(false)
 }
 
 #[cfg_attr(tarpaulin, skip)]
@@ -65,6 +69,7 @@ pub fn input<'a, 'b>() -> Arg<'a, 'b> {
         .takes_value(true)
         .required(true)
         .help("input file to compile")
+        .multiple(false)
 }
 
 #[cfg_attr(tarpaulin, skip)]
@@ -88,6 +93,8 @@ pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
         .long("optimize")
         .help("optimize level (0: no optimize, 1: basic optimize, 2: hard optimize)")
         .default_value("2")
+        .possible_values(&["0", "1", "2"])
+        .multiple(false)
 }
 
 #[cfg_attr(tarpaulin, skip)]
@@ -111,6 +118,7 @@ pub fn output<'a, 'b>() -> Arg<'a, 'b> {
         .short("o")
         .long("output")
         .help("binary output file (filename by default)")
+        .multiple(false)
 }
 
 #[cfg_attr(tarpaulin, skip)]

@@ -70,7 +70,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
             if stdout.supports_color() {
                 "always"
             } else {
-                "none"
+                "never"
             }
         ),
     )?;
