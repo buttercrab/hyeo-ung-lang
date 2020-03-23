@@ -11,7 +11,7 @@
 | `app/debug.rs`          |✅     |❌     |✅    |
 | `app/init.rs`           |✅     |❌     |✅    |
 | `app/interpreter.rs`    |✅     |❌     |✅    |
-| `app/run.rs`            |✅     |❌     |     |
+| `app/run.rs`            |✅     |❌     |✅    |
 | `core/area.rs`          |✅     |✅     |✅    |
 | `core/code.rs`          |✅     |✅     |✅    |
 | `core/compile.rs`       |✅     |✅     |✅    |

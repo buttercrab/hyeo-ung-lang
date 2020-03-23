@@ -101,15 +101,18 @@ fn sub_main(
 /// Main function of this program
 ///
 /// ```text
-/// hyeong 0.1.1-dev
+/// hyeong 0.1.1
 /// hyeo-ung programming language tool
 ///
 /// USAGE:
-///     hyeong [SUBCOMMAND]
+///     hyeong [OPTIONS] [SUBCOMMAND]
 ///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
+///
+/// OPTIONS:
+///         --color <color>    whether prints color [default: auto]  [possible values: never, auto, always]
 ///
 /// SUBCOMMANDS:
 ///     build        Compiles hyeong code
@@ -118,13 +121,13 @@ fn sub_main(
 ///     help         Prints this message or the help of the given subcommand(s)
 ///     install      Install hyeong before build (need once)
 ///     run          Run hyeong code directly
-///     uninstall    Uninstall hyeong before build
+///     uninstall    Uninstall hyeong temporary build path
 /// ```
 #[cfg_attr(tarpaulin, skip)]
 #[cfg(not(feature = "number"))]
 fn main() {
     let matches = App::new("hyeong")
-        .version("0.1.1-dev")
+        .version("0.1.1")
         .about("hyeo-ung programming language tool")
         .arg(option::color())
         .subcommand(build::app())
