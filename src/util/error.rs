@@ -63,3 +63,11 @@ impl From<Error> for std::io::Error {
         Self::new(ErrorKind::Other, e)
     }
 }
+
+pub fn add_note<T, E, S>(result: Result<T, E>, note: S) -> Result<T, Error>
+where
+    E: Debug,
+    S: Into<String>,
+{
+    result.map_err(|e| Error::from(e, note))
+}
