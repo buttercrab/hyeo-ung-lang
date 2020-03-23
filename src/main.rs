@@ -85,7 +85,16 @@ fn sub_main(
             },
         )
     } else {
-        interpreter::run()
+        interpreter::run(
+            stdout,
+            &HyeongOption {
+                build_source: None,
+                color,
+                input: None,
+                optimize: 0,
+                output: None,
+            },
+        )
     }
 }
 

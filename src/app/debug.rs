@@ -34,13 +34,13 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
-    let h = hy_opt.clone();
+    let color = hy_opt.color.clone();
     let mut state = UnOptState::new();
 
     ctrlc::set_handler(move || {
         if r.load(Ordering::SeqCst) {
             r.store(false, Ordering::SeqCst);
-            let mut stdout = StandardStream::stdout(h.color);
+            let mut stdout = StandardStream::stdout(color);
             write!(stdout, "\ntype \"exit\" to exit\n").unwrap();
             stdout
                 .set_color(ColorSpec::new().set_fg(Some(Color::Red)).set_bold(true))
@@ -77,7 +77,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
             stdout.flush()?;
         }
 
-        Result::Ok(())
+        Ok(())
     });
 
     let mut err = io::CustomWriter::new(|x| {
@@ -91,7 +91,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
             stdout.flush()?;
         }
 
-        Result::Ok(())
+        Ok(())
     });
 
     let mut state_stack = vec![(state, 0)];
