@@ -4,6 +4,7 @@ use std::env;
 use std::path::PathBuf;
 use termcolor::ColorChoice;
 
+/// Path to temporarily build compiled rust code
 #[cfg_attr(tarpaulin, skip)]
 pub fn build_path<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("build-path")
@@ -14,6 +15,7 @@ pub fn build_path<'a, 'b>() -> Arg<'a, 'b> {
         .multiple(false)
 }
 
+/// Parse build path option
 #[cfg_attr(tarpaulin, skip)]
 pub fn parse_build_path(matches: &ArgMatches) -> std::io::Result<PathBuf> {
     if let Some(t) = matches.value_of("build-path") {
@@ -36,6 +38,7 @@ pub fn parse_build_path(matches: &ArgMatches) -> std::io::Result<PathBuf> {
     }
 }
 
+/// Color option
 #[cfg_attr(tarpaulin, skip)]
 pub fn color<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("color")
@@ -49,6 +52,7 @@ pub fn color<'a, 'b>() -> Arg<'a, 'b> {
         .multiple(false)
 }
 
+/// Parse color option
 #[cfg_attr(tarpaulin, skip)]
 pub fn parse_color(matches: &ArgMatches) -> Result<ColorChoice, Error> {
     match matches.value_of("color").unwrap() {
@@ -59,6 +63,7 @@ pub fn parse_color(matches: &ArgMatches) -> Result<ColorChoice, Error> {
     }
 }
 
+/// Path to input of program
 #[cfg_attr(tarpaulin, skip)]
 pub fn input<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("input")
@@ -69,6 +74,7 @@ pub fn input<'a, 'b>() -> Arg<'a, 'b> {
         .multiple(false)
 }
 
+/// Parse input and make to absolute path
 #[cfg_attr(tarpaulin, skip)]
 pub fn parse_input(matches: &ArgMatches) -> std::io::Result<PathBuf> {
     let p = PathBuf::from(matches.value_of("input").unwrap());
@@ -81,6 +87,7 @@ pub fn parse_input(matches: &ArgMatches) -> std::io::Result<PathBuf> {
     }
 }
 
+/// Optimization option
 #[cfg_attr(tarpaulin, skip)]
 pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("optimize")
@@ -94,6 +101,7 @@ pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
         .multiple(false)
 }
 
+/// Parse optimization
 #[cfg_attr(tarpaulin, skip)]
 pub fn parse_optimize(matches: &ArgMatches) -> Result<u8, Error> {
     match matches.value_of("optimize").unwrap() {
@@ -104,6 +112,7 @@ pub fn parse_optimize(matches: &ArgMatches) -> Result<u8, Error> {
     }
 }
 
+/// Path to output of program
 #[cfg_attr(tarpaulin, skip)]
 pub fn output<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("output")
@@ -115,6 +124,7 @@ pub fn output<'a, 'b>() -> Arg<'a, 'b> {
         .multiple(false)
 }
 
+/// Parse output and make to absolute path
 #[cfg_attr(tarpaulin, skip)]
 pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<PathBuf> {
     if let Some(t) = matches.value_of("output") {
@@ -133,6 +143,7 @@ pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<Pa
     }
 }
 
+/// All of the options
 #[derive(Clone)]
 pub struct HyeongOption {
     pub build_source: Option<PathBuf>,

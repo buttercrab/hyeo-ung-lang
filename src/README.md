@@ -21,7 +21,7 @@
 | `core/state.rs`         |✅     |✅     |✅    |
 | `number/big_number.rs`  |✅     |✅     |✅    |
 | `number/number.rs`      |✅     |✅     |✅    |
-| `util/error.rs`         |✅     |      |     |
+| `util/error.rs`         |✅     |✅     |✅    |
 | `util/io.rs`            |✅     |✅     |✅    |
-| `util/option.rs`        |✅     |❌     |     |
+| `util/option.rs`        |✅     |❌     |✅    |
 | `util/util.rs`          |✅     |✅     |✅    |
