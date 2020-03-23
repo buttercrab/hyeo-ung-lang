@@ -84,7 +84,7 @@ version = \"0.1.0\"
 edition = \"2018\"
 
 [dependencies]
-hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", branch = \"dev\", features = [\"number\"], default-features = false }
+hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", features = [\"number\"], default-features = false }
 ",
         ),
     )?;

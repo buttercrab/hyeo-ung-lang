@@ -35,7 +35,7 @@
 More explanation on [Documentation](https://github.com/buttercrab/hyeo-ung-lang/wiki/Documentation).
 
 ```
-hyeong 0.1.1-dev
+hyeong 0.1.1
 hyeo-ung programming language tool
 
 USAGE:
@@ -46,7 +46,7 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --color <color>    whether prints color (never, auto, always) [default: auto]
+        --color <color>    whether prints color [default: auto]  [possible values: never, auto, always]
 
 SUBCOMMANDS:
     build        Compiles hyeong code
@@ -56,6 +56,7 @@ SUBCOMMANDS:
     install      Install hyeong before build (need once)
     run          Run hyeong code directly
     uninstall    Uninstall hyeong temporary build path
+
 ```
 
 # How to install
