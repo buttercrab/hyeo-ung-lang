@@ -14,7 +14,6 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("check")
         .about("Parse your code and check if you are right")
         .arg(option::input())
-        .arg(option::verbose())
 }
 
 /// Runner for check

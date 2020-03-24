@@ -18,7 +18,6 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("debug")
         .about("Debug your code command by command")
         .arg(option::input())
-        .arg(option::verbose())
 }
 
 /// Debug function

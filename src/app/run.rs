@@ -14,7 +14,6 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .about("Run hyeong code directly")
         .arg(option::input())
         .arg(option::optimize())
-        .arg(option::verbose())
 }
 
 /// App for run

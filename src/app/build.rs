@@ -17,7 +17,6 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::input())
         .arg(option::optimize())
         .arg(option::output())
-        .arg(option::verbose())
 }
 
 /// Runner for build
