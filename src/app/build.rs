@@ -17,6 +17,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
         .arg(option::input())
         .arg(option::optimize())
         .arg(option::output())
+        .arg(option::verbose())
 }
 
 /// Runner for build
@@ -28,7 +29,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     // parse
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     // optimize
     let rust_code = if hy_opt.optimize >= 1 {
@@ -44,7 +45,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
 
     // install
     if !hy_opt
-        .build_source
+        .build_path
         .as_ref()
         .unwrap()
         .join("hyeong-build/Cargo.toml")
@@ -56,7 +57,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
     // compile to binary
     io::save_to_file(
         &hy_opt
-            .build_source
+            .build_path
             .as_ref()
             .unwrap()
             .join("hyeong-build/src/main.rs"),
@@ -69,7 +70,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
             "cargo build --manifest-path={} --release --color {}",
             util::path_to_string(
                 &hy_opt
-                    .build_source
+                    .build_path
                     .as_ref()
                     .unwrap()
                     .join("hyeong-build/Cargo.toml")
@@ -85,15 +86,11 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
     // move
     io::print_log(stdout, "moving binary to current directory")?;
     fs::copy(
-        hy_opt
-            .build_source
-            .as_ref()
-            .unwrap()
-            .join(if cfg!(windows) {
-                "hyeong-build/target/release/hyeong-build.exe"
-            } else {
-                "hyeong-build/target/release/hyeong-build"
-            }),
+        hy_opt.build_path.as_ref().unwrap().join(if cfg!(windows) {
+            "hyeong-build/target/release/hyeong-build.exe"
+        } else {
+            "hyeong-build/target/release/hyeong-build"
+        }),
         hy_opt.output.as_ref().unwrap(),
     )?;
 

@@ -2,6 +2,7 @@ use crate::core::area::Area;
 use crate::core::code::Code;
 use crate::core::state::State;
 use crate::number::number::Num;
+use crate::util::util;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
@@ -230,7 +231,6 @@ impl Stack {
         }
     }
 
-    #[allow(unused)]
     fn pop(&mut self, idx: usize) -> Num {
         if idx == 1 {
             std::process::exit(0);
@@ -285,7 +285,6 @@ impl Stack {
         "
     }
 
-    #[allow(unused)]
     fn push(&mut self, idx: usize, num: Num) {
         if idx == 1 {
             if num.is_pos() {
@@ -321,14 +320,10 @@ impl Stack {
 }
 
 fn main() {
-    #[allow(unused)]
     let mut stack = Stack::new();
-    #[allow(unused)]
     let mut point: HashMap<u128, usize> = HashMap::new();
     let mut state = 0usize;
-    #[allow(unused)]
     let mut last = Option::<usize>::None;
-    #[allow(unused)]
     let mut cur = 3usize;
 ",
     ));
@@ -341,8 +336,8 @@ fn main() {
             state
                 .get_stack(1)
                 .iter()
-                .map(|num| num.floor().to_int() as u8 as char)
-                .collect(),
+                .map(|num| util::num_to_unicode(num).unwrap())
+                .collect::<String>(),
         ));
         state.get_stack(1).clear();
     }
@@ -353,8 +348,8 @@ fn main() {
             state
                 .get_stack(2)
                 .iter()
-                .map(|num| num.floor().to_int() as u8 as char)
-                .collect(),
+                .map(|num| util::num_to_unicode(num).unwrap())
+                .collect::<String>(),
         ));
         state.get_stack(2).clear();
     }

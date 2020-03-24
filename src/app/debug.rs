@@ -18,6 +18,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("debug")
         .about("Debug your code command by command")
         .arg(option::input())
+        .arg(option::verbose())
 }
 
 /// Debug function
@@ -57,7 +58,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
 
     io::print_log(stdout, "running in debug mode")?;
 
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     for c in &un_opt_code {
         state.push_code(c.clone());

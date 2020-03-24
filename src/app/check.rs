@@ -14,12 +14,13 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("check")
         .about("Parse your code and check if you are right")
         .arg(option::input())
+        .arg(option::verbose())
 }
 
 /// Runner for check
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
     print_un_opt_codes(
         stdout,
         hy_opt,

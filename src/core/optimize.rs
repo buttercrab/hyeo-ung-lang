@@ -262,18 +262,12 @@ pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCod
         }
         opt_code_vec = opt_code_vec[idx..].to_vec();
 
-        state.get_stack(1).extend(
-            out.to_string()?
-                .as_bytes()
-                .iter()
-                .map(|&x| Num::from_num(x as isize)),
-        );
-        state.get_stack(2).extend(
-            err.to_string()?
-                .as_bytes()
-                .iter()
-                .map(|&x| Num::from_num(x as isize)),
-        );
+        state
+            .get_stack(1)
+            .extend(out.to_string()?.chars().map(|x| Num::from_num(x as isize)));
+        state
+            .get_stack(2)
+            .extend(err.to_string()?.chars().map(|x| Num::from_num(x as isize)));
     }
 
     Ok((state, opt_code_vec))
