@@ -3,56 +3,56 @@
 }
 
 function parse(input){
-    var res = new Array();
-    var hangul_count = 0;
-    var dot_count = 0;
-    var type = 10;
-    var loc = [1, 0];
-    var state = 0;
-    var area = new Area(10,Object,Object,false);
-    var leaf = area;
-    var qu_area = new Area(10,Object,Object,false);
-    var qu_leaf = qu_area;
+    let res = new Array();
+    let hangul_count = 0;
+    let dot_count = 0;
+    let type = 10;
+    let loc = [1, 0];
+    let state = 0;
+    let area = null;
+    let leaf = area;
+    let qu_area = null;
+    let qu_leaf = qu_area;
 
-    var line_count = 0;
-    var last_line_started = 0;
-    var raw_command = new String("");
+    let line_count = 0;
+    let last_line_started = 0;
+    let raw_command = new String("");
 
-    var max_pos = [0, 0, 0];
-    for(var i = 0; i < input.length; i++) {
-        var t = "엉앙앗읏읍윽".indexOf(input[i]);
+    let max_pos = [0, 0, 0];
+    for(let i = 0; i < input.length; i++) {
+        let t = "엉앙앗읏읍윽".indexOf(input[i]);
         if(t >= 0){
-            if(t == 0) max_pos[0] = i;
-            else if(t <= 6) max_pos[1] = i;
+            if(t === 0) max_pos[0] = i;
+            else if(t <= 2) max_pos[1] = i;
             else  max_pos[2] = i;
         }
     }
 
-    for(var i = 0; i < input.length; i++) {
-        var c = String.fromCodePoint(input.codePointAt(i));
-        if(c == ' ') continue;
-        if(c == '\n'){
+    for(let i = 0; i < input.length; i++) {
+        let c = String.fromCodePoint(input.codePointAt(i));
+        if(c === ' ') continue;
+        if(c === '\n'){
             line_count += 1;
             last_line_started = i + 1;      
             continue;      
         }
-        if(state == 0 || state == 2){
-            var t1 = "형항핫흣흡흑혀하흐".indexOf(c);
-            var t2 = "♥❤💕💖💗💘💙💚💛💜💝♡".indexOf(c);
+        if(state === 0 || state === 2){
+            let t1 = "형항핫흣흡흑혀하흐".indexOf(c);
+            let t2 = "♥❤💕💖💗💘💙💚💛💜💝♡".indexOf(c);
             if(t1 >= 0){
                 if(t1 >= 6 && max_pos[t1 - 6] <= i) {
                     continue;
                 }
-                if(type != 10) {
-                    var temp_area = area;
-                    if(qu_leaf.Nil){
+                if(type !== 10) {
+                    let temp_area = area;
+                    if(qu_leaf !== null){
                         qu_leaf.right = area;
                         temp_area = qu_area;
                     }
                     res.push(new UnOptCode(type,hangul_count,dot_count,loc,temp_area,raw_command));
-                    area = new Area(10,Object,Object,false);
+                    area = null;
                     leaf = area;
-                    qu_area = new Area(10,Object,Object,false);
+                    qu_area = null;
                     qu_leaf = qu_area;
                 }
                 type = t1;
@@ -68,44 +68,46 @@ function parse(input){
                 }
             }
             else if(".…⋯⋮".indexOf(c) >= 0){
-                if(c == '.') { 
-                    dot_count += 1 
-                } 
-                else { 
-                    dot_count += 3 
-                };
-                raw_command.concat(c);
+                if(state === 0){
+                    if(c === '.') { 
+                        dot_count += 1 
+                    } 
+                    else { 
+                        dot_count += 3 
+                    };
+                    raw_command.concat(c);
+                }                
             }
-            else if(c == '?'){
-                if(qu_leaf.Nil){
-                    qu_leaf.right = new Area(0,area,new Area(10,Object,Object,false),true);
+            else if(c === '?'){
+                if(qu_leaf !== null){
+                    qu_leaf.right = new Area(0,area,null);
                     qu_leaf = qu_leaf.right;
                 }
                 else{
-                    qu_area = new Area(0,area,new Area(10,Object,Object,false),true);
+                    qu_area = new Area(0,area,null);
                     qu_leaf = qu_area;
                 }
-                area = new Area(10,Object,Object,false);
+                area = null;
                 leaf = area;
                 raw_command.concat(c);
                 state = 2;
             }
-            else if(c == '!'){
-                if(leaf.Nil){
+            else if(c === '!'){
+                if(leaf !== null){
                     if(leaf.type <= 1){
-                        if(leaf.right.Nil){
-                            leaf.right = new Area(1,new Area(leaf.right.type,Object,Object,true),new Area(10,Object,Object,false),true);
+                        if(leaf.right !== null){
+                            leaf.right = new Area(1,new Area(leaf.right.type,null,null),null);
                             leaf = leaf.right;
                         }
                         else{
-                            area = new Area(1,Area(leaf.type,Object,Object,true),new Area(10,Object,Object,false),true);
+                            area = new Area(1,Area(leaf.type,null,null),null);
                             leaf = area;
                         }
                     }
                     leaf = leaf.right;
                 }
                 else{
-                    area = new Area(1,new Area(10,Object,Object,false),new Area(10,Object,Object,false),true);
+                    area = new Area(1,null,null);
                     leaf = area;
                 }
             }
@@ -116,13 +118,13 @@ function parse(input){
                     t2++;
                 }
                 t2+=2;
-                if(leaf.Nil&&leaf.type<=1){
-                    if(!leaf.right.Nil){
-                        leaf.right = new Area(t2,new Area(10,Object,Object,false),new Area(10,Object,Object,false),true);
+                if(leaf !== null&&leaf.type<=1){
+                    if(leaf.right === null){
+                        leaf.right = new Area(t2,null,null);
                     }
                 }
                 else{
-                    area = new Area(t2,new Area(10,Object,Object,false),new Area(10,Object,Object,false),true);
+                    area = new Area(t2,null,null);
                     leaf = area;
                 }
                 raw_command.concat(c);
@@ -135,9 +137,10 @@ function parse(input){
                 hangul_count += 1;
                 raw_command.concat(c);
             }
-            if(type == 6){
-                if("엉".indexOf(c)>=0) {
-                    type_ = 0;
+            if(type === 6){
+                let t = "엉".indexOf(c);
+                if(t >= 0) {
+                    type = t;
                     dot_count = 0;
                     state = 0;
                 } 
@@ -145,9 +148,10 @@ function parse(input){
                     state = 1;
                 }
             }
-            if(type == 7){
-                if("앙앗".indexOf(c)>=0) {
-                    type_ = t/3 + 1;
+            if(type === 7){
+                let t = "앙앗".indexOf(c);
+                if(t >= 0) {
+                    type = t + 1;
                     dot_count = 0;
                     state = 0;
                 } 
@@ -155,9 +159,10 @@ function parse(input){
                     state = 1;
                 }
             }
-            if(type == 8){
-                if("읏읍윽".indexOf(c)>=0) {
-                    type_ = t/3 + 3;
+            if(type === 8){
+                let t = "읏읍윽".indexOf(c);
+                if(t >= 0) {
+                    type = t + 3;
                     dot_count = 0;
                     state = 0;
                 } 
@@ -167,15 +172,14 @@ function parse(input){
             }
         }
     }
-    if(type != 10) {
-        var temp_area = area;
-        if(qu_leaf.Nil){
+    if(type !== 10) {
+        let temp_area = area;
+        if(qu_leaf !== null){
             qu_leaf.right = area;
             temp_area = qu_area;
         }
         res.push(new UnOptCode(type,hangul_count,dot_count,loc,temp_area,raw_command));
     }
-    for(var i=0;i<res.length;i++){
-        console.log(res[i].area.type);
-    }
+    return res;
 }
+
