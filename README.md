@@ -39,11 +39,12 @@ hyeong 0.1.3
 hyeo-ung programming language tool
 
 USAGE:
-    hyeong [OPTIONS] [SUBCOMMAND]
+    hyeong [FLAGS] [OPTIONS] [SUBCOMMAND]
 
 FLAGS:
     -h, --help       Prints help information
     -V, --version    Prints version information
+        --verbose    verbose output
 
 OPTIONS:
         --color <color>    whether prints color [default: auto]  [possible values: never, auto, always]
