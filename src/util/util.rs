@@ -59,6 +59,19 @@ pub fn parse_file(
 }
 
 /// change `Num` to unicode char
+///
+/// # Examples
+///
+/// ```
+/// use hyeong::number::number::Num;
+/// use hyeong::util::util;
+///
+/// let a = Num::from_num(55357);
+/// let b = Num::from_num(0xAC00);
+///
+/// assert!(util::num_to_unicode(&a).is_err());
+/// assert_eq!('가', util::num_to_unicode(&b));
+/// ```
 pub fn num_to_unicode(num: &Num) -> Result<char, Error> {
     let n = num.floor().to_int();
     std::char::from_u32(n).ok_or(Error::new(
