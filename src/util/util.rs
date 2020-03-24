@@ -63,7 +63,7 @@ pub fn num_to_unicode(num: &Num) -> Result<char, Error> {
     let n = num.floor().to_int();
     std::char::from_u32(n).ok_or(Error::new(
         "utf-8 encoding error",
-        format!("number {} was not valid unicode", n),
+        format!("number {} is not valid unicode", n),
     ))
 }
 
