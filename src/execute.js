@@ -4,7 +4,7 @@
             out.adding(String.fromCharCode(Math.floor(num)));
         }
         else {
-            out.adding((-num).toString());
+            out.adding(Math.floor(-num).toString());
         }
     }
     else if(idx === 2) {
@@ -12,21 +12,27 @@
             err.adding(String.fromCharCode(Math.floor(num)));
         }
         else {
-            err.adding((-num).toString());
+            err.adding(Math.floor(-num).toString());
         }
     }
     else {
+        console.log("?",idx,num);
         state.push_stack(idx, num);
     }
 }
 
 function pop_stack_wrap(ipt, out, err, state, idx) {
     if(idx === 0) {
-        if(state.get_stack(0).length === 0){
-            let s = ipt.toString();
-            for(let c of s){
-                state.push_stack(0, parseInt(c));
+        let s = ipt.out;
+        if(state.stack.get(0) === undefined){
+            state.set_stack(0);
+        }
+        if(state.stack.get(0).length === 0){
+            for(let i = 0; i < s.length ; i++){
+                let c = s[s.length - i - 1];
+                state.push_stack(0, c.toString().charCodeAt(0));
             }
+            ipt = new Output();
         }
         return state.pop_stack(0);
     }
@@ -37,6 +43,7 @@ function pop_stack_wrap(ipt, out, err, state, idx) {
         alert("exit 2");
     }
     else {
+        console.log("!",idx);
         return state.pop_stack(idx);
     }
 }
@@ -44,7 +51,6 @@ function pop_stack_wrap(ipt, out, err, state, idx) {
 function execute_one(ipt, out, err, state, cur_loc){
     let code = clone(state.get_code(cur_loc));
     let cur_stack = state.current_stack();
-
     if(code.type === 0){
         push_stack_wrap(out, err, state, cur_stack, (code.hangul_count)*(code.dot_count));
     }
@@ -96,9 +102,7 @@ function execute_one(ipt, out, err, state, cur_loc){
     }
 
     cur_stack = state.current_stack();
-    let n = pop_stack_wrap(ipt, out, err, state, cur_stack);
-    let area_type = calc(code.area, code.area_count(), n);
-    push_stack_wrap(out, err, state, cur_stack, n);
+    let area_type = calc(code.area, code.area_count(), ipt, out, err, state, cur_stack);
 
     if(area_type != 0){
         if(area_type != 13){
@@ -127,9 +131,9 @@ function execute_one(ipt, out, err, state, cur_loc){
 
 function execute(ipt, out, err, state, code){
     let cur_loc = state.push_code(clone(code));
-    let length = cur_loc + 1;
+    let len = cur_loc + 1;
 
-    while(cur_loc < length){
+    while(cur_loc < len){
         let [new_state, new_loc] = execute_one(ipt, out, err, state, cur_loc);
         state = new_state;
         cur_loc = new_loc;

@@ -30,10 +30,11 @@ class Area {
     }
 }
 
-function calc(area, area_value, pop){
+function calc(area, area_value, ipt, out, err, state, cur_stack){
     while(1){
         if(area !== null){
-            if(area.type == 0){
+            if(area.type === 0){
+                let pop = pop_stack_wrap(ipt, out, err, state, cur_stack);
                 if(pop < area_value){
                     area = area.left;
                 }
@@ -41,7 +42,8 @@ function calc(area, area_value, pop){
                     area = area.right;
                 }
             }
-            else if(area.type == 1){
+            else if(area.type === 1){
+                let pop = pop_stack_wrap(ipt, out, err, state, cur_stack);
                 if(pop === area_value){
                     area = area.left;
                 }
@@ -66,6 +68,10 @@ class UnOptState {
         this.point = new Map();
         this.cur = 3;
         this.latest = -1;
+    }
+
+    get_stack(){
+        return this.stack;
     }
 
     get_all_stack_index(){
@@ -121,14 +127,17 @@ class UnOptState {
         if(this.stack.get(idx) == undefined){
             this.stack.set(idx,new Array());
         }
-        if(this.stack.get(idx).legnth !=0 || num != NaN){
+        if(this.stack.get(idx).length !== 0 || num !== NaN){
             this.stack.get(idx).push(num);
         }
     }
 
     pop_stack(idx){
+        if(this.stack.get(idx) === undefined){
+            this.stack.set(idx,new Array());
+        }
         let t = this.stack.get(idx).pop();
-        if(t == undefined) return NaN;
+        if(t === undefined) return NaN;
         else return t;
     }
 }
