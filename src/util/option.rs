@@ -149,6 +149,7 @@ pub fn verbose<'a, 'b>() -> Arg<'a, 'b> {
     Arg::with_name("verbose")
         .value_name("verbose")
         .long("verbose")
+        .global(true)
         .takes_value(false)
         .required(false)
         .help("verbose output")

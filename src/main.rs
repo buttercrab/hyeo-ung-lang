@@ -14,63 +14,43 @@ fn sub_main(
     stdout: &mut StandardStream,
     stderr: &mut StandardStream,
     matches: ArgMatches,
-    color: ColorChoice,
+    hy_opt: HyeongOption,
 ) -> Result<(), Error> {
     if let Some(ref matches) = matches.subcommand_matches("build") {
         let input = option::parse_input(matches)?;
         let output = option::parse_output(matches, &input)?;
         build::run(
             stdout,
-            &HyeongOption::new()
+            &hy_opt
                 .build_path(option::parse_build_path(matches)?)
-                .color(color)
                 .input(input)
                 .optimize(option::parse_optimize(matches)?)
-                .output(output)
-                .verbose(option::parse_verbose(matches)),
+                .output(output),
         )
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
-        check::run(
-            stdout,
-            &HyeongOption::new()
-                .color(color)
-                .input(option::parse_input(matches)?)
-                .verbose(option::parse_verbose(matches)),
-        )
+        check::run(stdout, &hy_opt.input(option::parse_input(matches)?))
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
-        debug::run(
-            stdout,
-            &HyeongOption::new()
-                .color(color)
-                .input(option::parse_input(matches)?)
-                .verbose(option::parse_verbose(matches)),
-        )
+        debug::run(stdout, &hy_opt.input(option::parse_input(matches)?))
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
         run::run(
             stdout,
             stderr,
-            &HyeongOption::new()
-                .color(color)
+            &hy_opt
                 .input(option::parse_input(matches)?)
-                .optimize(option::parse_optimize(matches)?)
-                .verbose(option::parse_verbose(matches)),
+                .optimize(option::parse_optimize(matches)?),
         )
     } else if let Some(ref matches) = matches.subcommand_matches("install") {
         init::install_run(
             stdout,
-            &HyeongOption::new()
-                .build_path(option::parse_build_path(matches)?)
-                .color(color),
+            &hy_opt.build_path(option::parse_build_path(matches)?),
         )
     } else if let Some(ref matches) = matches.subcommand_matches("uninstall") {
         init::uninstall_run(
             stdout,
-            &HyeongOption::new()
-                .build_path(option::parse_build_path(matches)?)
-                .color(color),
+            &hy_opt.build_path(option::parse_build_path(matches)?),
         )
     } else {
-        interpreter::run(stdout, &HyeongOption::new().color(color))
+        interpreter::run(stdout, &hy_opt)
     }
 }
 
@@ -106,6 +86,7 @@ fn main() {
         .version("0.1.3")
         .about("hyeo-ung programming language tool")
         .arg(option::color())
+        .arg(option::verbose())
         .subcommand(build::app())
         .subcommand(check::app())
         .subcommand(debug::app())
@@ -122,7 +103,14 @@ fn main() {
 
     io::handle(
         &mut stderr,
-        sub_main(&mut stdout, &mut stderr_copy, matches, color),
+        sub_main(
+            &mut stdout,
+            &mut stderr_copy,
+            matches.clone(),
+            HyeongOption::new()
+                .color(color)
+                .verbose(option::parse_verbose(&matches)),
+        ),
     );
 }
 
