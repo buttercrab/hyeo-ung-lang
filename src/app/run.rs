@@ -27,7 +27,7 @@ pub fn run(
     stderr: &mut StandardStream,
     hy_opt: &HyeongOption,
 ) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     if hy_opt.optimize >= 1 {
         io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;
@@ -36,7 +36,7 @@ pub fn run(
 
         if !state.get_stack(1).is_empty() {
             for num in state.get_stack(1).iter() {
-                write!(stdout, "{}", num.floor().to_int() as u8 as char)?;
+                write!(stdout, "{}", util::num_to_unicode(num)?)?;
             }
             stdout.flush()?;
             state.get_stack(1).clear();
@@ -44,7 +44,7 @@ pub fn run(
 
         if !state.get_stack(2).is_empty() {
             for num in state.get_stack(2).iter() {
-                write!(stderr, "{}", num.floor().to_int() as u8 as char)?;
+                write!(stderr, "{}", util::num_to_unicode(num)?)?;
             }
             stdout.flush()?;
             state.get_stack(2).clear();

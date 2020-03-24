@@ -28,17 +28,7 @@ mod build_test {
         };
         p.push(format!(".hyeong/test/{}", name));
         if !p.join("hyeong-build/Cargo.toml").exists() {
-            init::install_run(
-                &mut s,
-                &HyeongOption {
-                    build_source: Some(p.clone()),
-                    color: ColorChoice::Always,
-                    input: None,
-                    optimize: 0,
-                    output: None,
-                },
-            )
-            .unwrap();
+            init::install_run(&mut s, &HyeongOption::new().build_path(p.clone())).unwrap();
         }
         p.push("hyeong-build");
 

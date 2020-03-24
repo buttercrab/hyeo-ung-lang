@@ -31,7 +31,7 @@ pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
 #[cfg_attr(tarpaulin, skip)]
 pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     if hy_opt
-        .build_source
+        .build_path
         .as_ref()
         .unwrap()
         .join("hyeong-build/Cargo.toml")
@@ -40,22 +40,16 @@ pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result
         return Err(Error::new(
             format!(
                 "cannot install to {}",
-                util::path_to_string(hy_opt.build_source.as_ref().unwrap())?
+                util::path_to_string(hy_opt.build_path.as_ref().unwrap())?
             ),
             "already installed",
         ));
     }
     io::print_log(stdout, "making dir for building hyeong")?;
-    fs::create_dir_all(
-        &hy_opt
-            .build_source
-            .as_ref()
-            .unwrap()
-            .join("hyeong-build/src"),
-    )?;
+    fs::create_dir_all(&hy_opt.build_path.as_ref().unwrap().join("hyeong-build/src"))?;
     io::save_to_file(
         &hy_opt
-            .build_source
+            .build_path
             .as_ref()
             .unwrap()
             .join("hyeong-build/src/main.rs"),
@@ -72,7 +66,7 @@ fn main() {
     )?;
     io::save_to_file(
         &hy_opt
-            .build_source
+            .build_path
             .as_ref()
             .unwrap()
             .join("hyeong-build/Cargo.toml"),
@@ -95,7 +89,7 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", features = [\"
             "cargo build --manifest-path={} --release --color {}",
             util::path_to_string(
                 &hy_opt
-                    .build_source
+                    .build_path
                     .as_ref()
                     .unwrap()
                     .join("hyeong-build/Cargo.toml")
@@ -115,7 +109,7 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", features = [\"
 pub fn uninstall_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "removing dir")?;
     error::add_note(
-        fs::remove_dir_all(hy_opt.build_source.as_ref().unwrap()),
+        fs::remove_dir_all(hy_opt.build_path.as_ref().unwrap()),
         "already uninstalled",
     )?;
     Ok(())

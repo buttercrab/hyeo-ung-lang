@@ -1,5 +1,6 @@
 ﻿#[cfg(test)]
 mod io_test {
+    use hyeong::util::option::HyeongOption;
     use hyeong::util::{io, util};
     use std::fs;
     use std::path::PathBuf;
@@ -13,7 +14,8 @@ mod io_test {
             "{:?}",
             util::parse_file(
                 &mut s,
-                &PathBuf::from("examples/hello_world/hello_world.hyeong")
+                &PathBuf::from("examples/hello_world/hello_world.hyeong"),
+                &HyeongOption::new()
             )
             .unwrap()[0]
         );
@@ -42,7 +44,8 @@ mod io_test {
             "{:?}",
             util::parse_file(
                 &mut s,
-                &PathBuf::from("examples/hello_world/hello_world_temp.hyeong")
+                &PathBuf::from("examples/hello_world/hello_world_temp.hyeong"),
+                &HyeongOption::new()
             )
             .unwrap()[0]
         );

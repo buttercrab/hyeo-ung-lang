@@ -19,7 +19,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 /// Runner for check
 #[cfg_attr(tarpaulin, skip)]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap())?;
+    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
     print_un_opt_codes(
         stdout,
         hy_opt,

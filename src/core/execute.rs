@@ -3,8 +3,8 @@ use crate::core::code::Code;
 use crate::core::state::State;
 use crate::number::number::Num;
 use crate::util::error::Error;
-use crate::util::io;
 use crate::util::io::ReadLine;
+use crate::util::{io, util};
 use std::io::Write;
 use std::process;
 
@@ -40,30 +40,14 @@ where
     match idx {
         1 => {
             if num.is_pos() {
-                let n = num.floor().to_int();
-                write!(
-                    out,
-                    "{}",
-                    std::char::from_u32(n).ok_or(Error::new(
-                        "utf-8 encoding error",
-                        format!("number {} was not valid unicode", n)
-                    ))?
-                )?;
+                write!(out, "{}", util::num_to_unicode(&num)?)?;
             } else {
                 write!(out, "{}", -&num)?;
             }
         }
         2 => {
             if num.is_pos() {
-                let n = num.floor().to_int();
-                write!(
-                    err,
-                    "{}",
-                    std::char::from_u32(n).ok_or(Error::new(
-                        "utf-8 encoding error",
-                        format!("number {} was not valid unicode", n)
-                    ))?
-                )?;
+                write!(err, "{}", util::num_to_unicode(&num)?)?;
             } else {
                 write!(err, "{}", -&num)?;
             }

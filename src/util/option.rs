@@ -143,12 +143,89 @@ pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<Pa
     }
 }
 
+/// verbose option
+#[cfg_attr(tarpaulin, skip)]
+pub fn verbose<'a, 'b>() -> Arg<'a, 'b> {
+    Arg::with_name("verbose")
+        .value_name("verbose")
+        .long("verbose")
+        .global(true)
+        .takes_value(false)
+        .required(false)
+        .help("verbose output")
+        .multiple(false)
+}
+
+/// Parse verbose flag
+#[cfg_attr(tarpaulin, skip)]
+pub fn parse_verbose(matches: &ArgMatches) -> bool {
+    matches.is_present("verbose")
+}
+
 /// All of the options
 #[derive(Clone)]
 pub struct HyeongOption {
-    pub build_source: Option<PathBuf>,
+    pub build_path: Option<PathBuf>,
     pub color: ColorChoice,
     pub input: Option<PathBuf>,
     pub optimize: u8,
     pub output: Option<PathBuf>,
+    pub verbose: bool,
+}
+
+impl HyeongOption {
+    /// New Hyeong option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn new() -> HyeongOption {
+        HyeongOption {
+            build_path: None,
+            color: ColorChoice::Auto,
+            input: None,
+            optimize: 0,
+            output: None,
+            verbose: false,
+        }
+    }
+
+    /// Add `build_path` option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn build_path(mut self, path: PathBuf) -> HyeongOption {
+        self.build_path = Some(path);
+        self
+    }
+
+    /// Add `color` option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn color(mut self, color: ColorChoice) -> HyeongOption {
+        self.color = color;
+        self
+    }
+
+    /// Add `input` option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn input(mut self, path: PathBuf) -> HyeongOption {
+        self.input = Some(path);
+        self
+    }
+
+    /// Add `optimize` option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn optimize(mut self, level: u8) -> HyeongOption {
+        self.optimize = level;
+        self
+    }
+
+    /// Add `output` option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn output(mut self, path: PathBuf) -> HyeongOption {
+        self.output = Some(path);
+        self
+    }
+
+    /// Add `verbose` option
+    #[cfg_attr(tarpaulin, skip)]
+    pub fn verbose(mut self, verbose: bool) -> HyeongOption {
+        self.verbose = verbose;
+        self
+    }
 }

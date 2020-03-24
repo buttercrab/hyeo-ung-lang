@@ -7,109 +7,66 @@ use hyeong::util::{error::Error, io, option, option::HyeongOption};
 #[cfg(not(feature = "number"))]
 use termcolor::{ColorChoice, StandardStream};
 
+/// Main function that executes command
 #[cfg_attr(tarpaulin, skip)]
 #[cfg(not(feature = "number"))]
 fn sub_main(
     stdout: &mut StandardStream,
     stderr: &mut StandardStream,
     matches: ArgMatches,
-    color: ColorChoice,
+    hy_opt: HyeongOption,
 ) -> Result<(), Error> {
     if let Some(ref matches) = matches.subcommand_matches("build") {
         let input = option::parse_input(matches)?;
         let output = option::parse_output(matches, &input)?;
         build::run(
             stdout,
-            &HyeongOption {
-                build_source: Some(option::parse_build_path(matches)?),
-                color,
-                input: Some(input),
-                optimize: option::parse_optimize(matches)?,
-                output: Some(output),
-            },
+            &hy_opt
+                .build_path(option::parse_build_path(matches)?)
+                .input(input)
+                .optimize(option::parse_optimize(matches)?)
+                .output(output),
         )
     } else if let Some(ref matches) = matches.subcommand_matches("check") {
-        check::run(
-            stdout,
-            &HyeongOption {
-                build_source: None,
-                color,
-                input: Some(option::parse_input(matches)?),
-                optimize: 0,
-                output: None,
-            },
-        )
+        check::run(stdout, &hy_opt.input(option::parse_input(matches)?))
     } else if let Some(ref matches) = matches.subcommand_matches("debug") {
-        debug::run(
-            stdout,
-            &HyeongOption {
-                build_source: None,
-                color,
-                input: Some(option::parse_input(matches)?),
-                optimize: 0,
-                output: None,
-            },
-        )
+        debug::run(stdout, &hy_opt.input(option::parse_input(matches)?))
     } else if let Some(ref matches) = matches.subcommand_matches("run") {
         run::run(
             stdout,
             stderr,
-            &HyeongOption {
-                build_source: None,
-                color,
-                input: Some(option::parse_input(matches)?),
-                optimize: option::parse_optimize(matches)?,
-                output: None,
-            },
+            &hy_opt
+                .input(option::parse_input(matches)?)
+                .optimize(option::parse_optimize(matches)?),
         )
     } else if let Some(ref matches) = matches.subcommand_matches("install") {
         init::install_run(
             stdout,
-            &HyeongOption {
-                build_source: Some(option::parse_build_path(matches)?),
-                color,
-                input: None,
-                optimize: 0,
-                output: None,
-            },
+            &hy_opt.build_path(option::parse_build_path(matches)?),
         )
     } else if let Some(ref matches) = matches.subcommand_matches("uninstall") {
         init::uninstall_run(
             stdout,
-            &HyeongOption {
-                build_source: Some(option::parse_build_path(matches)?),
-                color,
-                input: None,
-                optimize: 0,
-                output: None,
-            },
+            &hy_opt.build_path(option::parse_build_path(matches)?),
         )
     } else {
-        interpreter::run(
-            stdout,
-            &HyeongOption {
-                build_source: None,
-                color,
-                input: None,
-                optimize: 0,
-                output: None,
-            },
-        )
+        interpreter::run(stdout, &hy_opt)
     }
 }
 
 /// Main function of this program
 ///
 /// ```text
-/// hyeong 0.1.2
+/// hyeong 0.1.3
 /// hyeo-ung programming language tool
 ///
 /// USAGE:
-///     hyeong [OPTIONS] [SUBCOMMAND]
+///     hyeong [FLAGS] [OPTIONS] [SUBCOMMAND]
 ///
 /// FLAGS:
 ///     -h, --help       Prints help information
 ///     -V, --version    Prints version information
+///         --verbose    verbose output
 ///
 /// OPTIONS:
 ///         --color <color>    whether prints color [default: auto]  [possible values: never, auto, always]
@@ -127,9 +84,10 @@ fn sub_main(
 #[cfg(not(feature = "number"))]
 fn main() {
     let matches = App::new("hyeong")
-        .version("0.1.2")
+        .version("0.1.3")
         .about("hyeo-ung programming language tool")
         .arg(option::color())
+        .arg(option::verbose())
         .subcommand(build::app())
         .subcommand(check::app())
         .subcommand(debug::app())
@@ -146,7 +104,14 @@ fn main() {
 
     io::handle(
         &mut stderr,
-        sub_main(&mut stdout, &mut stderr_copy, matches, color),
+        sub_main(
+            &mut stdout,
+            &mut stderr_copy,
+            matches.clone(),
+            HyeongOption::new()
+                .color(color)
+                .verbose(option::parse_verbose(&matches)),
+        ),
     );
 }
 
