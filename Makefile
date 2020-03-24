@@ -8,3 +8,4 @@ install:
 
 uninstall:
 	./bin/hyeong uninstall
+	rm -rf bin
