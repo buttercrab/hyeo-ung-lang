@@ -70,7 +70,7 @@ pub fn parse_file(
 /// let b = Num::from_num(0xAC00);
 ///
 /// assert!(util::num_to_unicode(&a).is_err());
-/// assert_eq!('가', util::num_to_unicode(&b));
+/// assert!(matches!(util::num_to_unicode(&b), Ok('가')));
 /// ```
 pub fn num_to_unicode(num: &Num) -> Result<char, Error> {
     let n = num.floor().to_int();
