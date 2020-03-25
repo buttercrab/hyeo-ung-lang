@@ -127,7 +127,7 @@ class UnOptState {
         if(this.stack.get(idx) == undefined){
             this.stack.set(idx,new Array());
         }
-        if(this.stack.get(idx).length !== 0 || num !== NaN){
+        if(this.stack.get(idx).length !== 0 || String(num) !== "NaN"){
             this.stack.get(idx).push(num);
         }
     }

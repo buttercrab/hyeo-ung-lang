@@ -6,7 +6,7 @@ function check_parse(){
     let stdout = new Output();
     let stderr = new Output();
     let ipt = new Output();
-    ipt.adding(input2.toString());
+    ipt.adding(input2);
 
     for(let c of un_opt_code){
         un_opt_state = execute(ipt, stdout, stderr, un_opt_state, c);

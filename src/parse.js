@@ -20,7 +20,8 @@ function parse(input){
 
     let max_pos = [0, 0, 0];
     for(let i = 0; i < input.length; i++) {
-        let t = "엉앙앗읏읍윽".indexOf(input[i]);
+        let c = String.fromCodePoint(input.codePointAt(i));
+        let t = "엉앙앗읏읍윽".indexOf(c);
         if(t >= 0){
             if(t === 0) max_pos[0] = i;
             else if(t <= 2) max_pos[1] = i;
@@ -44,10 +45,13 @@ function parse(input){
                     continue;
                 }
                 if(type !== 10) {
-                    let temp_area = area;
+                    let temp_area;
                     if(qu_leaf !== null){
                         qu_leaf.right = area;
                         temp_area = qu_area;
+                    }
+                    else{
+                        temp_area = area;
                     }
                     res.push(new UnOptCode(type,hangul_count,dot_count,loc,temp_area,raw_command));
                     area = null;
@@ -97,19 +101,23 @@ function parse(input){
                     if(leaf.type <= 1){
                         if(leaf.right !== null){
                             leaf.right = new Area(1,new Area(leaf.right.type,null,null),null);
-                            leaf = leaf.right;
                         }
                         else{
-                            area = new Area(1,Area(leaf.type,null,null),null);
-                            leaf = area;
+                            area = new Area(1,null,null);
                         }
+                        leaf = leaf.right;
                     }
-                    leaf = leaf.right;
+                    else{
+                        area = new Area(1,new Area(leaf.type,null,null),null);
+                        leaf = area;
+                    }
                 }
                 else{
                     area = new Area(1,null,null);
                     leaf = area;
                 }
+                raw_command.concat(c);
+                state = 2;
             }
             else if(t2 >= 0){
                 if((t2%2)&(t2>=3)&(t2<=19)) continue;
@@ -118,7 +126,7 @@ function parse(input){
                     t2++;
                 }
                 t2+=2;
-                if(leaf !== null&&leaf.type<=1){
+                if(leaf !== null&& leaf.type<=1){
                     if(leaf.right === null){
                         leaf.right = new Area(t2,null,null);
                     }
@@ -140,7 +148,7 @@ function parse(input){
             if(type === 6){
                 let t = "엉".indexOf(c);
                 if(t >= 0) {
-                    type = t;
+                    type = 0;
                     dot_count = 0;
                     state = 0;
                 } 
@@ -173,11 +181,12 @@ function parse(input){
         }
     }
     if(type !== 10) {
-        let temp_area = area;
+        let temp_area;
         if(qu_leaf !== null){
             qu_leaf.right = area;
             temp_area = qu_area;
         }
+        else temp_area = area;
         res.push(new UnOptCode(type,hangul_count,dot_count,loc,temp_area,raw_command));
     }
     return res;

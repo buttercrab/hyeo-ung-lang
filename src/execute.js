@@ -16,7 +16,6 @@
         }
     }
     else {
-        console.log("?",idx,num);
         state.push_stack(idx, num);
     }
 }
@@ -25,14 +24,14 @@ function pop_stack_wrap(ipt, out, err, state, idx) {
     if(idx === 0) {
         let s = ipt.out;
         if(state.stack.get(0) === undefined){
-            state.set_stack(0);
+            state.stack.set(0,new Array());
         }
         if(state.stack.get(0).length === 0){
             for(let i = 0; i < s.length ; i++){
                 let c = s[s.length - i - 1];
                 state.push_stack(0, c.toString().charCodeAt(0));
             }
-            ipt = new Output();
+            ipt.out = "";
         }
         return state.pop_stack(0);
     }
@@ -43,7 +42,6 @@ function pop_stack_wrap(ipt, out, err, state, idx) {
         alert("exit 2");
     }
     else {
-        console.log("!",idx);
         return state.pop_stack(idx);
     }
 }
@@ -76,7 +74,7 @@ function execute_one(ipt, out, err, state, cur_loc){
         }
         for(let x of v){
             n -= x;
-            push_stack_wrap(out, err, state, cur_stack, x);
+            push_stack_wrap(out, err, state, cur_stack, -x);
         }
         push_stack_wrap(out, err, state, code.dot_count, n);
     }
@@ -95,14 +93,14 @@ function execute_one(ipt, out, err, state, cur_loc){
     else {
         let n = pop_stack_wrap(ipt, out, err, state, cur_stack);
         for(let i = 0; i < code.hangul_count ; i++){
-            push_stack_wrap(out, err, state, code.dot_count, n);
+            push_stack_wrap(out, err, state, code.dot_count, clone(n));
         }
         push_stack_wrap(out, err, state, cur_stack, n);
         state.set_current_stack(code.dot_count);
     }
 
     cur_stack = state.current_stack();
-    let area_type = calc(code.area, code.area_count(), ipt, out, err, state, cur_stack);
+    let area_type = calc(clone(code.area), code.area_count(), ipt, out, err, state, cur_stack);
 
     if(area_type != 0){
         if(area_type != 13){
