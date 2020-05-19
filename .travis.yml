@@ -24,6 +24,6 @@ script:
 
 after_success: |
   if [[ "$TRAVIS_RUST_VERSION" == nightly ]]; then
-    RUST_BACKTRACE=full cargo tarpaulin --out Xml --run-types Tests --run-types Doctests
+    cargo tarpaulin --out Xml --run-types Tests --run-types Doctests
     bash <(curl -s https://codecov.io/bash)
   fi
