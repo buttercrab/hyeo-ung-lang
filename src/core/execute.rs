@@ -174,6 +174,8 @@ where
                 v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
             }
 
+            v.reverse();
+
             for mut x in v {
                 x.minus();
                 n += &x;
@@ -189,6 +191,8 @@ where
             for _ in 0..code.get_hangul_count() {
                 v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
             }
+
+            v.reverse();
 
             for mut x in v {
                 x.flip();

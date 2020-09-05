@@ -71,6 +71,7 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}for _ in 0..{1} {{\
                      \n{0}    v.push(stack.pop(cur));\
                      \n{0}}}\
+                     \n{0}v.reverse();\
                      \n{0}for mut x in v {{\
                      \n{0}    x.minus();\
                      \n{0}    n += &x;\
@@ -89,6 +90,7 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}for _ in 0..{1} {{\
                      \n{0}    v.push(stack.pop(cur));\
                      \n{0}}}\
+                     \n{0}v.reverse();\
                      \n{0}for mut x in v {{\
                      \n{0}    x.flip();\
                      \n{0}    n *= &x;\
