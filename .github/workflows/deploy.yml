@@ -1,0 +1,22 @@
+name: Deploy
+on:
+  release:
+    types: [ created ]
+
+jobs:
+  release:
+    name: Deploy Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    steps:
+      - uses: actions/checkout@master
+      - name: Install Rust
+        run: ci/install-rust.sh stable
+        shell: bash
+      - name: Build and deploy artifacts
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ci/make-release.sh ${{ matrix.os }}
+        shell: bash
