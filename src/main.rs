@@ -8,7 +8,7 @@ use hyeong::util::{error::Error, io, option, option::HyeongOption};
 use termcolor::{ColorChoice, StandardStream};
 
 /// Main function that executes command
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 #[cfg(not(feature = "number"))]
 fn sub_main(
     stdout: &mut StandardStream,
@@ -80,7 +80,7 @@ fn sub_main(
 ///     run          Run hyeong code directly
 ///     uninstall    Uninstall hyeong temporary build path
 /// ```
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 #[cfg(not(feature = "number"))]
 fn main() {
     let matches = App::new("hyeong")
@@ -115,6 +115,6 @@ fn main() {
     );
 }
 
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 #[cfg(feature = "number")]
 fn main() {}

@@ -81,7 +81,7 @@ pub fn num_to_unicode(num: &Num) -> Result<char, Error> {
 }
 
 /// Execute command and stream stdout to `StandardStream`
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(), Error> {
     let mut cmd = if cfg!(target_os = "windows") {
         Command::new("cmd")
@@ -123,7 +123,7 @@ pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(
 }
 
 /// Execute command and stream stdout to `StandardStream`
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn execute_command_stderr(w: &mut StandardStream, command: &str) -> Result<(), Error> {
     let mut cmd = if cfg!(target_os = "windows") {
         Command::new("cmd")

@@ -13,7 +13,7 @@ use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 ///
 /// It gets code line by line and executes.
 /// Prints stdout and stderr separately.
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();

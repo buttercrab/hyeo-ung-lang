@@ -9,7 +9,7 @@ use std::fs;
 use termcolor::{StandardStream, WriteColor};
 
 /// App for build
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("build")
         .about("Compiles hyeong code")
@@ -25,7 +25,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 /// 2. optimize code
 /// 3. install if build-dir is not set
 /// 4. compile to binary
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     // parse
     let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;

@@ -13,7 +13,7 @@ use std::sync::Arc;
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// App for debug
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("debug")
         .about("Debug your code command by command")
@@ -31,7 +31,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 /// 6. [s] state       print state status
 /// 7. [p] previous    move to previous state
 /// 8. [r] run         run until breakpoint
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();

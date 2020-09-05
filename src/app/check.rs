@@ -9,7 +9,7 @@ use std::io::Write;
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// App for check
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn app<'a, 'b>() -> App<'a, 'b> {
     App::new("check")
         .about("Parse your code and check if you are right")
@@ -17,7 +17,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 }
 
 /// Runner for check
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
     print_un_opt_codes(
@@ -30,7 +30,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
 }
 
 /// Main print function for `UnOptCode`
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_un_opt_codes(
     stdout: &mut StandardStream,
     hy_opt: &HyeongOption,

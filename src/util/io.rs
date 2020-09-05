@@ -98,7 +98,7 @@ pub struct CustomReader {
 
 impl ReadLine for std::io::Stdin {
     /// `read_line` wrapper
-    #[cfg_attr(tarpaulin, skip)]
+    #[cfg(not(tarpaulin_include))]
     fn read_line_(&mut self) -> Result<String, Error> {
         let mut res = String::new();
         self.read_line(&mut res)?;
@@ -185,14 +185,14 @@ pub fn handle<T>(w: &mut StandardStream, res: Result<T, Error>) -> T {
 }
 
 /// Print error and terminate
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_error(w: &mut StandardStream, err: Error) -> ! {
     print_error_no_exit(w, err);
     process::exit(1);
 }
 
 /// Print error string and terminate
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_error_str<S>(w: &mut StandardStream, err: S) -> !
 where
     S: Display,
@@ -202,7 +202,7 @@ where
 }
 
 /// Print error
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_error_no_exit(w: &mut StandardStream, err: Error) {
     print_error_str_no_exit(w, err.get_msg());
     let note = err.get_note();
@@ -212,7 +212,7 @@ pub fn print_error_no_exit(w: &mut StandardStream, err: Error) {
 }
 
 /// Print error string
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_error_str_no_exit<S>(w: &mut StandardStream, err: S)
 where
     S: Display,
@@ -230,7 +230,7 @@ where
 }
 
 /// Print log
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_log<S>(w: &mut StandardStream, msg: S) -> Result<(), Error>
 where
     S: Display,
@@ -247,7 +247,7 @@ where
 }
 
 /// Print note
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn print_note<S>(w: &mut StandardStream, msg: S) -> Result<(), Error>
 where
     S: Display,

@@ -6,7 +6,7 @@ use std::fs;
 use termcolor::{StandardStream, WriteColor};
 
 /// App for install
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn install_app<'a, 'b>() -> App<'a, 'b> {
     App::new("install")
         .about("Install hyeong before build (need once)")
@@ -14,7 +14,7 @@ pub fn install_app<'a, 'b>() -> App<'a, 'b> {
 }
 
 /// App for uninstall
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
     App::new("uninstall")
         .about("Uninstall hyeong temporary build path")
@@ -28,7 +28,7 @@ pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
 /// 3. create Cargo.toml
 /// 4. create main.rs
 /// 5. pre-compile
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     if hy_opt
         .build_path
@@ -105,7 +105,7 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", features = [\"
     Ok(())
 }
 
-#[cfg_attr(tarpaulin, skip)]
+#[cfg(not(tarpaulin_include))]
 pub fn uninstall_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     io::print_log(stdout, "removing dir")?;
     error::add_note(
