@@ -13,10 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Install Rust
-        run: ci/install-rust.sh stable
-        shell: bash
+        run: bash ci/install-rust.sh stable
       - name: Build and deploy artifacts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ci/make-release.sh ${{ matrix.os }}
-        shell: bash
+        run: bash ci/make-release.sh ${{ matrix.os }}
