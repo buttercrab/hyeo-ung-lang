@@ -10,6 +10,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install Rust
+        run: bash ci/install-rust.sh nightly
+
       - name: Generate code coverage
         run: |
           bash <(curl https://raw.githubusercontent.com/xd009642/tarpaulin/master/travis-install.sh)
