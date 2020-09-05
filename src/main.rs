@@ -57,7 +57,7 @@ fn sub_main(
 /// Main function of this program
 ///
 /// ```text
-/// hyeong 0.2.1
+/// hyeong 0.2.2
 /// hyeo-ung programming language tool
 ///
 /// USAGE:
@@ -84,7 +84,7 @@ fn sub_main(
 #[cfg(not(feature = "number"))]
 fn main() {
     let matches = App::new("hyeong")
-        .version("0.2.1")
+        .version("0.2.2")
         .about("hyeo-ung programming language tool")
         .arg(option::color())
         .arg(option::verbose())
