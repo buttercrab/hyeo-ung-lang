@@ -1,5 +1,5 @@
 use crate::core::code::{Code, OptCode, UnOptCode};
-use crate::number::number::Num;
+use crate::number::num::Num;
 use std::collections::HashMap;
 use std::fmt;
 
@@ -124,10 +124,8 @@ impl State for OptState {
 
     /// Push value to stack
     fn push_stack(&mut self, idx: usize, num: Num) {
-        if idx < self.stack.len() {
-            if !self.stack[idx].is_empty() || !num.is_nan() {
-                self.get_stack(idx).push(num);
-            }
+        if idx < self.stack.len() && (!self.stack[idx].is_empty() || !num.is_nan()) {
+            self.get_stack(idx).push(num);
         }
     }
 
@@ -166,7 +164,7 @@ impl State for OptState {
 
     /// Return point for area
     fn get_point(&self, id: u128) -> Option<usize> {
-        self.point.get(&id).map(|&x| x)
+        self.point.get(&id).copied()
     }
 
     /// Return all points
@@ -228,13 +226,19 @@ impl UnOptState {
     }
 }
 
+impl Default for UnOptState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl State for UnOptState {
     type CodeType = UnOptCode;
 
     /// Return stack indices
     fn get_all_stack_index(&self) -> Vec<usize> {
         let mut v = Vec::with_capacity(self.stack.len());
-        for (i, _) in &self.stack {
+        for i in self.stack.keys() {
             v.push(*i);
         }
         v
@@ -257,7 +261,7 @@ impl State for UnOptState {
 
     /// Return stack
     fn get_stack(&mut self, idx: usize) -> &mut Vec<Num> {
-        self.stack.entry(idx).or_insert(Vec::new())
+        self.stack.entry(idx).or_insert_with(Vec::new)
     }
 
     /// Return code
@@ -283,7 +287,7 @@ impl State for UnOptState {
 
     /// Return point for area
     fn get_point(&self, id: u128) -> Option<usize> {
-        self.point.get(&id).map(|&x| x)
+        self.point.get(&id).copied()
     }
 
     /// Return all points
@@ -313,7 +317,7 @@ impl fmt::Debug for UnOptState {
     ///
     /// ```
     /// use hyeong::core::state::{UnOptState, State};
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let mut  a = UnOptState::new();
     /// a.push_stack(3, Num::one());
@@ -322,7 +326,7 @@ impl fmt::Debug for UnOptState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut s = format!("current stack: {}\n", self.cur);
         let mut v = self.stack.iter().collect::<Vec<_>>();
-        v.sort_by(|x, y| x.0.cmp(&y.0));
+        v.sort_by(|x, y| x.0.cmp(y.0));
         for (a, b) in v {
             s.push_str(&*format!("stack {}: {:?}\n", a, b));
         }

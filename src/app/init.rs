@@ -1,13 +1,13 @@
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
-use crate::util::{error, io, option, util};
+use crate::util::{error, ext, io, option};
 use clap::App;
 use std::fs;
 use termcolor::{StandardStream, WriteColor};
 
 /// App for install
 #[cfg(not(tarpaulin_include))]
-pub fn install_app<'a, 'b>() -> App<'a, 'b> {
+pub fn install_app<'a>() -> App<'a> {
     App::new("install")
         .about("Install hyeong before build (need once)")
         .arg(option::build_path())
@@ -15,7 +15,7 @@ pub fn install_app<'a, 'b>() -> App<'a, 'b> {
 
 /// App for uninstall
 #[cfg(not(tarpaulin_include))]
-pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
+pub fn uninstall_app<'a>() -> App<'a> {
     App::new("uninstall")
         .about("Uninstall hyeong temporary build path")
         .arg(option::build_path())
@@ -40,7 +40,7 @@ pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result
         return Err(Error::new(
             format!(
                 "cannot install to {}",
-                util::path_to_string(hy_opt.build_path.as_ref().unwrap())?
+                ext::path_to_string(hy_opt.build_path.as_ref().unwrap())?
             ),
             "already installed",
         ));
@@ -83,11 +83,11 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", features = [\"
         ),
     )?;
     io::print_log(stdout, "test pre-build")?;
-    util::execute_command_stderr(
+    ext::execute_command_stderr(
         stdout,
         &*format!(
             "cargo build --manifest-path={} --release --color {}",
-            util::path_to_string(
+            ext::path_to_string(
                 &hy_opt
                     .build_path
                     .as_ref()

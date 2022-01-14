@@ -4,7 +4,7 @@ mod build_test {
     use hyeong::core::state::UnOptState;
     use hyeong::core::{compile, optimize, parse};
     use hyeong::util::option::HyeongOption;
-    use hyeong::util::{io, util};
+    use hyeong::util::{ext, io};
     use std::env;
     use std::path::PathBuf;
     use std::process::Command;
@@ -22,7 +22,7 @@ mod build_test {
 
         let mut s = StandardStream::stdout(ColorChoice::Auto);
         let mut p = if cfg!(target_os = "windows") {
-            PathBuf::from(&env::var("USERPROFILE").unwrap().replace("\\", "/"))
+            PathBuf::from(&env::var("USERPROFILE").unwrap().replace('\\', "/"))
         } else {
             PathBuf::from(&env::var("HOME").unwrap())
         };
@@ -34,11 +34,11 @@ mod build_test {
 
         io::save_to_file(&p.join("src/main.rs"), source).unwrap();
 
-        util::execute_command_stdout(
+        ext::execute_command_stdout(
             &mut s,
             &*format!(
                 "cargo build --manifest-path={} --release",
-                util::path_to_string(&p.join("Cargo.toml")).unwrap()
+                ext::path_to_string(&p.join("Cargo.toml")).unwrap()
             ),
         )
         .unwrap();
@@ -47,7 +47,7 @@ mod build_test {
             Command::new("bash")
                 .arg("-c")
                 .arg(
-                    &*util::path_to_string(&p.join(if cfg!(target_os = "windows") {
+                    &*ext::path_to_string(&p.join(if cfg!(target_os = "windows") {
                         "target/release/hyeong-build.exe"
                     } else {
                         "target/release/hyeong-build"

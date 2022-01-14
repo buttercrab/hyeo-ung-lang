@@ -1,18 +1,18 @@
 use crate::util::error::Error;
 use clap::{Arg, ArgMatches};
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use termcolor::ColorChoice;
 
 /// Path to temporarily build compiled rust code
 #[cfg(not(tarpaulin_include))]
-pub fn build_path<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("build-path")
+pub fn build_path<'a>() -> Arg<'a> {
+    Arg::new("build-path")
         .value_name("build-path")
         .takes_value(true)
         .long("build-path")
         .help("set temporary build path")
-        .multiple(false)
+        .multiple_occurrences(false)
 }
 
 /// Parse build path option
@@ -29,7 +29,7 @@ pub fn parse_build_path(matches: &ArgMatches) -> std::io::Result<PathBuf> {
         }
     } else {
         let mut p = if cfg!(target_os = "windows") {
-            PathBuf::from(&env::var("USERPROFILE").unwrap().replace("\\", "/"))
+            PathBuf::from(&env::var("USERPROFILE").unwrap().replace('\\', "/"))
         } else {
             PathBuf::from(&env::var("HOME").unwrap())
         };
@@ -40,8 +40,8 @@ pub fn parse_build_path(matches: &ArgMatches) -> std::io::Result<PathBuf> {
 
 /// Color option
 #[cfg(not(tarpaulin_include))]
-pub fn color<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("color")
+pub fn color<'a>() -> Arg<'a> {
+    Arg::new("color")
         .value_name("color")
         .takes_value(true)
         .long("color")
@@ -49,7 +49,7 @@ pub fn color<'a, 'b>() -> Arg<'a, 'b> {
         .default_value("auto")
         .global(true)
         .possible_values(&["never", "auto", "always"])
-        .multiple(false)
+        .multiple_occurrences(false)
 }
 
 /// Parse color option
@@ -65,13 +65,13 @@ pub fn parse_color(matches: &ArgMatches) -> Result<ColorChoice, Error> {
 
 /// Path to input of program
 #[cfg(not(tarpaulin_include))]
-pub fn input<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("input")
+pub fn input<'a>() -> Arg<'a> {
+    Arg::new("input")
         .value_name("FILE.hyeong")
         .takes_value(true)
         .required(true)
         .help("input file to compile")
-        .multiple(false)
+        .multiple_occurrences(false)
 }
 
 /// Parse input and make to absolute path
@@ -89,16 +89,16 @@ pub fn parse_input(matches: &ArgMatches) -> std::io::Result<PathBuf> {
 
 /// Optimization option
 #[cfg(not(tarpaulin_include))]
-pub fn optimize<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("optimize")
+pub fn optimize<'a>() -> Arg<'a> {
+    Arg::new("optimize")
         .value_name("optimize")
         .takes_value(true)
-        .short("O")
+        .short('O')
         .long("optimize")
         .help("optimize level")
         .default_value("2")
         .possible_values(&["0", "1", "2"])
-        .multiple(false)
+        .multiple_occurrences(false)
 }
 
 /// Parse optimization
@@ -114,19 +114,19 @@ pub fn parse_optimize(matches: &ArgMatches) -> Result<u8, Error> {
 
 /// Path to output of program
 #[cfg(not(tarpaulin_include))]
-pub fn output<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("output")
+pub fn output<'a>() -> Arg<'a> {
+    Arg::new("output")
         .value_name("output")
         .takes_value(true)
-        .short("o")
+        .short('o')
         .long("output")
         .help("binary output file (filename by default)")
-        .multiple(false)
+        .multiple_occurrences(false)
 }
 
 /// Parse output and make to absolute path
 #[cfg(not(tarpaulin_include))]
-pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<PathBuf> {
+pub fn parse_output(matches: &ArgMatches, input: &Path) -> std::io::Result<PathBuf> {
     if let Some(t) = matches.value_of("output") {
         let p = PathBuf::from(t);
         if !p.is_absolute() {
@@ -137,23 +137,21 @@ pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<Pa
             Ok(p)
         }
     } else {
-        let mut p = input.clone();
-        p.set_extension("");
-        Ok(p)
+        Ok(input.with_extension(""))
     }
 }
 
 /// verbose option
 #[cfg(not(tarpaulin_include))]
-pub fn verbose<'a, 'b>() -> Arg<'a, 'b> {
-    Arg::with_name("verbose")
+pub fn verbose<'a>() -> Arg<'a> {
+    Arg::new("verbose")
         .value_name("verbose")
         .long("verbose")
         .global(true)
         .takes_value(false)
         .required(false)
         .help("verbose output")
-        .multiple(false)
+        .multiple_occurrences(false)
 }
 
 /// Parse verbose flag
@@ -173,6 +171,12 @@ pub struct HyeongOption {
     pub verbose: bool,
 }
 
+impl Default for HyeongOption {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HyeongOption {
     /// New Hyeong option
     #[cfg(not(tarpaulin_include))]
@@ -189,6 +193,7 @@ impl HyeongOption {
 
     /// Add `build_path` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn build_path(mut self, path: PathBuf) -> HyeongOption {
         self.build_path = Some(path);
         self
@@ -196,6 +201,7 @@ impl HyeongOption {
 
     /// Add `color` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn color(mut self, color: ColorChoice) -> HyeongOption {
         self.color = color;
         self
@@ -203,6 +209,7 @@ impl HyeongOption {
 
     /// Add `input` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn input(mut self, path: PathBuf) -> HyeongOption {
         self.input = Some(path);
         self
@@ -210,6 +217,7 @@ impl HyeongOption {
 
     /// Add `optimize` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn optimize(mut self, level: u8) -> HyeongOption {
         self.optimize = level;
         self
@@ -217,6 +225,7 @@ impl HyeongOption {
 
     /// Add `output` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn output(mut self, path: PathBuf) -> HyeongOption {
         self.output = Some(path);
         self
@@ -224,6 +233,7 @@ impl HyeongOption {
 
     /// Add `verbose` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn verbose(mut self, verbose: bool) -> HyeongOption {
         self.verbose = verbose;
         self

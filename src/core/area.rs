@@ -1,4 +1,4 @@
-use crate::number::number::Num;
+use crate::number::num::Num;
 use crate::util::error::Error;
 use std::cmp::Ordering;
 use std::fmt;
@@ -72,7 +72,7 @@ impl Area {
 ///
 /// # Examples
 /// ```
-/// use hyeong::number::number::Num;
+/// use hyeong::number::num::Num;
 /// use hyeong::core::area::{Area, calc};
 ///
 /// let a = Area::new(10);

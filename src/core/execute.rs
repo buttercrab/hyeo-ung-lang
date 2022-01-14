@@ -1,10 +1,10 @@
 use crate::core::area;
 use crate::core::code::Code;
 use crate::core::state::State;
-use crate::number::number::Num;
+use crate::number::num::Num;
 use crate::util::error::Error;
 use crate::util::io::ReadLine;
-use crate::util::{io, util};
+use crate::util::{ext, io};
 use std::io::Write;
 use std::process;
 
@@ -17,7 +17,7 @@ use std::process;
 /// use hyeong::util::io::CustomWriter;
 /// use hyeong::core::state::UnOptState;
 /// use hyeong::core::execute;
-/// use hyeong::number::number::Num;
+/// use hyeong::number::num::Num;
 ///
 /// let mut a = CustomWriter::new(|_| Result::Ok(()));
 /// let mut b = CustomWriter::new(|_| Result::Ok(()));
@@ -40,14 +40,14 @@ where
     match idx {
         1 => {
             if num.is_pos() {
-                write!(out, "{}", util::num_to_unicode(&num)?)?;
+                write!(out, "{}", ext::num_to_unicode(&num)?)?;
             } else {
                 write!(out, "{}", -&num)?;
             }
         }
         2 => {
             if num.is_pos() {
-                write!(err, "{}", util::num_to_unicode(&num)?)?;
+                write!(err, "{}", ext::num_to_unicode(&num)?)?;
             } else {
                 write!(err, "{}", -&num)?;
             }
@@ -230,10 +230,8 @@ where
                 }
                 None => state.set_point(id, cur_loc),
             }
-        } else {
-            if let Some(loc) = state.get_latest_loc() {
-                return Ok((state, loc));
-            }
+        } else if let Some(loc) = state.get_latest_loc() {
+            return Ok((state, loc));
         }
     }
 

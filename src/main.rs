@@ -16,7 +16,7 @@ fn sub_main(
     matches: ArgMatches,
     hy_opt: HyeongOption,
 ) -> Result<(), Error> {
-    if let Some(ref matches) = matches.subcommand_matches("build") {
+    if let Some(matches) = matches.subcommand_matches("build") {
         let input = option::parse_input(matches)?;
         let output = option::parse_output(matches, &input)?;
         build::run(
@@ -27,11 +27,11 @@ fn sub_main(
                 .optimize(option::parse_optimize(matches)?)
                 .output(output),
         )
-    } else if let Some(ref matches) = matches.subcommand_matches("check") {
+    } else if let Some(matches) = matches.subcommand_matches("check") {
         check::run(stdout, &hy_opt.input(option::parse_input(matches)?))
-    } else if let Some(ref matches) = matches.subcommand_matches("debug") {
+    } else if let Some(matches) = matches.subcommand_matches("debug") {
         debug::run(stdout, &hy_opt.input(option::parse_input(matches)?))
-    } else if let Some(ref matches) = matches.subcommand_matches("run") {
+    } else if let Some(matches) = matches.subcommand_matches("run") {
         run::run(
             stdout,
             stderr,
@@ -39,12 +39,12 @@ fn sub_main(
                 .input(option::parse_input(matches)?)
                 .optimize(option::parse_optimize(matches)?),
         )
-    } else if let Some(ref matches) = matches.subcommand_matches("install") {
+    } else if let Some(matches) = matches.subcommand_matches("install") {
         init::install_run(
             stdout,
             &hy_opt.build_path(option::parse_build_path(matches)?),
         )
-    } else if let Some(ref matches) = matches.subcommand_matches("uninstall") {
+    } else if let Some(matches) = matches.subcommand_matches("uninstall") {
         init::uninstall_run(
             stdout,
             &hy_opt.build_path(option::parse_build_path(matches)?),

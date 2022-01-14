@@ -3,7 +3,7 @@ use std::ffi::OsStr;
 use std::fmt::Display;
 use std::fs::File;
 use std::io::{ErrorKind, Read, Write};
-use std::path::PathBuf;
+use std::path::Path;
 use std::process;
 use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
@@ -138,29 +138,23 @@ impl CustomReader {
     /// ```
     pub fn new(s: String) -> CustomReader {
         CustomReader {
-            buf: s.split("\n").map(|x| String::from(x)).collect(),
+            buf: s.split('\n').map(String::from).collect(),
             idx: 0,
         }
     }
 }
 
 /// Read .hyeong file
-pub fn read_file(path: &PathBuf) -> Result<String, Error> {
-    match path.extension() {
-        Some(p) => {
-            if p == OsStr::new("hyeong") {
-                let mut buf = String::new();
-                let mut f = File::open(path)?;
-                f.read_to_string(&mut buf)?;
-                return Ok(buf);
-            }
+pub fn read_file(path: &Path) -> Result<String, Error> {
+    if let Some(p) = path.extension() {
+        if p == OsStr::new("hyeong") {
+            let mut buf = String::new();
+            let mut f = File::open(path)?;
+            f.read_to_string(&mut buf)?;
+            return Ok(buf);
         }
-        _ => {}
     }
-    Err(std::io::Error::new(
-        ErrorKind::InvalidInput,
-        "Only .hyeong extension supported",
-    ))?
+    Err(std::io::Error::new(ErrorKind::InvalidInput, "Only .hyeong extension supported").into())
 }
 
 /// If `res` is Err, it prints error and exit
@@ -226,7 +220,7 @@ where
     w.set_color(ColorSpec::new().set_bold(true)).unwrap();
     write!(w, "{}", err).unwrap();
     w.reset().unwrap();
-    write!(w, "\n").unwrap();
+    writeln!(w).unwrap();
 }
 
 /// Print log
@@ -242,7 +236,7 @@ where
     w.set_color(ColorSpec::new().set_bold(true))?;
     write!(w, "{}", msg)?;
     w.reset()?;
-    write!(w, "\n")?;
+    writeln!(w)?;
     Ok(())
 }
 
@@ -260,13 +254,13 @@ where
     w.set_color(ColorSpec::new().set_bold(true))?;
     write!(w, "{}", msg)?;
     w.reset()?;
-    write!(w, "\n")?;
+    writeln!(w)?;
     Ok(())
 }
 
 /// Save content to file
-pub fn save_to_file(path: &PathBuf, content: String) -> Result<(), Error> {
+pub fn save_to_file(path: &Path, content: String) -> Result<(), Error> {
     let mut file = File::create(path)?;
-    file.write(content.as_bytes())?;
+    file.write_all(content.as_bytes())?;
     Ok(())
 }

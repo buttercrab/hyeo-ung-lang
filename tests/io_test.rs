@@ -1,7 +1,7 @@
-﻿#[cfg(test)]
+#[cfg(test)]
 mod io_test {
     use hyeong::util::option::HyeongOption;
-    use hyeong::util::{io, util};
+    use hyeong::util::{ext, io};
     use std::fs;
     use std::path::PathBuf;
     use termcolor::{ColorChoice, StandardStream};
@@ -12,7 +12,7 @@ mod io_test {
 
         let t = format!(
             "{:?}",
-            util::parse_file(
+            ext::parse_file(
                 &mut s,
                 &PathBuf::from("examples/hello_world/hello_world.hyeong"),
                 &HyeongOption::new()
@@ -42,7 +42,7 @@ mod io_test {
 
         let t = format!(
             "{:?}",
-            util::parse_file(
+            ext::parse_file(
                 &mut s,
                 &PathBuf::from("examples/hello_world/hello_world_temp.hyeong"),
                 &HyeongOption::new()

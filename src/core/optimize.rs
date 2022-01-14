@@ -2,7 +2,7 @@ use crate::core::area;
 use crate::core::code::{Code, OptCode, UnOptCode};
 use crate::core::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::core::state::{OptState, State};
-use crate::number::number::Num;
+use crate::number::num::Num;
 use crate::util::error::Error;
 use crate::util::io;
 use crate::util::io::ReadLine;
@@ -141,12 +141,10 @@ where
                     }
                     None => state.set_point(id, cur_loc),
                 }
-            } else {
-                if let Some(loc) = state.get_latest_loc() {
-                    cur_loc = loc;
-                    exec_count += 1;
-                    continue;
-                }
+            } else if let Some(loc) = state.get_latest_loc() {
+                cur_loc = loc;
+                exec_count += 1;
+                continue;
             }
         }
 
@@ -199,7 +197,7 @@ pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCod
             }
         }
 
-        chk.sort();
+        chk.sort_unstable();
         for i in chk {
             if i <= 3 {
                 continue;

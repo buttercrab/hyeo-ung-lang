@@ -3,14 +3,14 @@ use crate::core::state::UnOptState;
 use crate::core::{compile, optimize};
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
-use crate::util::{io, option, util};
+use crate::util::{ext, io, option};
 use clap::App;
 use std::fs;
 use termcolor::{StandardStream, WriteColor};
 
 /// App for build
 #[cfg(not(tarpaulin_include))]
-pub fn app<'a, 'b>() -> App<'a, 'b> {
+pub fn app<'a>() -> App<'a> {
     App::new("build")
         .about("Compiles hyeong code")
         .arg(option::build_path())
@@ -28,7 +28,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 #[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     // parse
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
+    let un_opt_code = ext::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     // optimize
     let rust_code = if hy_opt.optimize >= 1 {
@@ -63,11 +63,11 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
         rust_code,
     )?;
     io::print_log(stdout, "compiling rust code")?;
-    util::execute_command_stderr(
+    ext::execute_command_stderr(
         stdout,
         &*format!(
             "cargo build --manifest-path={} --release --color {}",
-            util::path_to_string(
+            ext::path_to_string(
                 &hy_opt
                     .build_path
                     .as_ref()
