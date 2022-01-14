@@ -28,18 +28,38 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Install Rust
-        run: bash ci/install-rust.sh ${{ matrix.rust }}
+
+      - name: Setting up rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          override: true
+          components: clippy
+
       - name: Cargo Clippy
         run: cargo clippy -- -D warnings
+
       - name: Build and run tests
         run: cargo test
 
-  rustfmt:
-    name: Rustfmt
+  fmt:
+    name: fmt
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@master
-      - name: Install Rust
-        run: rustup update stable && rustup default stable && rustup component add rustfmt
-      - run: cargo fmt -- --check
+      - uses: actions/checkout@v2
+
+      - name: Setting up rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+          components: rustfmt
+
+      - name: Checking if code is formatted
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
