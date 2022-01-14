@@ -55,7 +55,7 @@ pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result
             .join("hyeong-build/src/main.rs"),
         String::from(
             "\
-use hyeong::number::number::Num;
+use hyeong::number::num::Num;
 
 fn main() {
     let a = Num::from_num(10);

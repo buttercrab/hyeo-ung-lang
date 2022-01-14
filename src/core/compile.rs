@@ -207,7 +207,7 @@ where
         "\
 #![allow(warnings)]
 use hyeong::number::big_number::BigNum;
-use hyeong::number::number::Num;
+use hyeong::number::num::Num;
 use std::collections::HashMap;
 
 struct Stack {
