@@ -1,7 +1,7 @@
-﻿#[cfg(test)]
+#[cfg(test)]
 mod io_test {
     use hyeong::util::option::HyeongOption;
-    use hyeong::util::{io, ext};
+    use hyeong::util::{ext, io};
     use std::fs;
     use std::path::PathBuf;
     use termcolor::{ColorChoice, StandardStream};
