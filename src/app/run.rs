@@ -2,7 +2,7 @@ use crate::core::state::{State, UnOptState};
 use crate::core::{execute, optimize};
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
-use crate::util::{io, option, util};
+use crate::util::{ext, io, option};
 use clap::App;
 use std::io::Write;
 use termcolor::StandardStream;
@@ -27,7 +27,7 @@ pub fn run(
     stderr: &mut StandardStream,
     hy_opt: &HyeongOption,
 ) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
+    let un_opt_code = ext::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     if hy_opt.optimize >= 1 {
         io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;
@@ -36,7 +36,7 @@ pub fn run(
 
         if !state.get_stack(1).is_empty() {
             for num in state.get_stack(1).iter() {
-                write!(stdout, "{}", util::num_to_unicode(num)?)?;
+                write!(stdout, "{}", ext::num_to_unicode(num)?)?;
             }
             stdout.flush()?;
             state.get_stack(1).clear();
@@ -44,7 +44,7 @@ pub fn run(
 
         if !state.get_stack(2).is_empty() {
             for num in state.get_stack(2).iter() {
-                write!(stderr, "{}", util::num_to_unicode(num)?)?;
+                write!(stderr, "{}", ext::num_to_unicode(num)?)?;
             }
             stdout.flush()?;
             state.get_stack(2).clear();

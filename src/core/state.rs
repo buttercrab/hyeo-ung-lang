@@ -1,5 +1,5 @@
 use crate::core::code::{Code, OptCode, UnOptCode};
-use crate::number::number::Num;
+use crate::number::num::Num;
 use std::collections::HashMap;
 use std::fmt;
 
@@ -317,7 +317,7 @@ impl fmt::Debug for UnOptState {
     ///
     /// ```
     /// use hyeong::core::state::{UnOptState, State};
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let mut  a = UnOptState::new();
     /// a.push_stack(3, Num::one());

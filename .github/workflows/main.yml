@@ -30,6 +30,8 @@ jobs:
       - uses: actions/checkout@master
       - name: Install Rust
         run: bash ci/install-rust.sh ${{ matrix.rust }}
+      - name: Cargo Clippy
+        run: cargo clippy -- -D warnings
       - name: Build and run tests
         run: cargo test
 

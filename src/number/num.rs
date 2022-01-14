@@ -11,7 +11,7 @@ use std::{fmt, ops};
 /// # Examples
 ///
 /// ```
-/// use hyeong::number::number::Num;
+/// use hyeong::number::num::Num;
 ///
 /// let a = Num::from_num(10);
 /// let mut b = Num::from_num(3);
@@ -34,7 +34,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::new(-10, 6);
@@ -57,7 +57,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::from_num(1234);
     ///
@@ -75,7 +75,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     /// use hyeong::number::big_number::BigNum;
     ///
     /// let a = BigNum::new(1000);
@@ -94,7 +94,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::zero();
     ///
@@ -112,7 +112,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::one();
     ///
@@ -130,7 +130,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::nan();
     ///
@@ -153,7 +153,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(7, 3);
     ///
@@ -172,7 +172,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::from_num(10);
     ///
@@ -187,7 +187,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::nan();
     /// let b = Num::new(10, 3);
@@ -204,7 +204,7 @@ impl Num {
     ///
     /// # Examples
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// assert_eq!("10/3", Num::from_string(String::from("10/3")).to_string());
     /// assert_eq!("너무 커엇...", Num::from_string(String::from("너무 커엇...")).to_string());
@@ -248,7 +248,7 @@ impl Num {
     /// # Example
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let mut a = Num::new(10, 3);
     /// a.minus();
@@ -266,7 +266,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let mut a = Num::new(-10, 3);
     /// a.flip();
@@ -293,7 +293,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::new(7, 5);
@@ -324,7 +324,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::new(7, 5);
@@ -351,7 +351,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::neg(&a);
@@ -370,7 +370,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let mut b = Num::zero();
@@ -389,7 +389,7 @@ impl Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let mut b = Num::zero();
@@ -412,7 +412,7 @@ impl PartialOrd for Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     /// use std::cmp::Ordering;
     ///
     /// let a = Num::new(10, 3);
@@ -443,7 +443,7 @@ impl fmt::Debug for Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     ///
@@ -460,7 +460,7 @@ impl fmt::Display for Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::nan();
@@ -494,7 +494,7 @@ impl ops::Add<&Num> for &Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::new(7, 5);
@@ -518,7 +518,7 @@ impl ops::AddAssign<&Num> for Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let mut a = Num::new(10, 3);
     /// let b = Num::new(7, 5);
@@ -544,7 +544,7 @@ impl ops::Mul<&Num> for &Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = Num::new(7, 5);
@@ -568,7 +568,7 @@ impl ops::MulAssign<&Num> for Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let mut a = Num::new(10, 3);
     /// let b = Num::new(7, 5);
@@ -590,7 +590,7 @@ impl ops::Neg for &Num {
     /// # Examples
     ///
     /// ```
-    /// use hyeong::number::number::Num;
+    /// use hyeong::number::num::Num;
     ///
     /// let a = Num::new(10, 3);
     /// let b = -&a;

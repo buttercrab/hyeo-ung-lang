@@ -1,8 +1,8 @@
 use crate::core::area::Area;
 use crate::core::code::Code;
 use crate::core::state::State;
-use crate::number::number::Num;
-use crate::util::util;
+use crate::number::num::Num;
+use crate::util::ext;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
@@ -334,7 +334,7 @@ fn main() {
             state
                 .get_stack(1)
                 .iter()
-                .map(|num| util::num_to_unicode(num).unwrap())
+                .map(|num| ext::num_to_unicode(num).unwrap())
                 .collect::<String>(),
         ));
         state.get_stack(1).clear();
@@ -346,7 +346,7 @@ fn main() {
             state
                 .get_stack(2)
                 .iter()
-                .map(|num| util::num_to_unicode(num).unwrap())
+                .map(|num| ext::num_to_unicode(num).unwrap())
                 .collect::<String>(),
         ));
         state.get_stack(2).clear();

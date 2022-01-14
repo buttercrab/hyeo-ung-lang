@@ -2,7 +2,7 @@ use crate::core::code::{Code, UnOptCode};
 use crate::core::parse;
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
-use crate::util::{option, util};
+use crate::util::{ext, option};
 use clap::App;
 use std::cmp::max;
 use std::io::Write;
@@ -19,7 +19,7 @@ pub fn app<'a>() -> App<'a> {
 /// Runner for check
 #[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
+    let un_opt_code = ext::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
     print_un_opt_codes(
         stdout,
         hy_opt,

@@ -389,7 +389,7 @@ impl BigNum {
     /// # Time Complexity
     ///
     /// `O(max(n, m))` where `n := lhs.len()` and `m := rhs.len()`
-    fn add_core(lhs: &[u32], rhs: &Vec<u32>) -> Vec<u32> {
+    fn add_core(lhs: &[u32], rhs: &[u32]) -> Vec<u32> {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
         for i in 0..min(lhs.len(), rhs.len()) {
@@ -422,7 +422,7 @@ impl BigNum {
     /// # Time Complexity
     ///
     /// `O(max(n, m))` where `n := lhs.len()` and `m := rhs.len()`
-    fn sub_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> (Vec<u32>, bool) {
+    fn sub_core(lhs: &[u32], rhs: &[u32]) -> (Vec<u32>, bool) {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
         // a > b => a - b
@@ -464,7 +464,7 @@ impl BigNum {
     /// # TODO
     ///
     /// - [Better Algorithm](https://en.wikipedia.org/wiki/Sch%C3%B6nhage%E2%80%93Strassen_algorithm)
-    fn mult_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
+    fn mult_core(lhs: &[u32], rhs: &[u32]) -> Vec<u32> {
         let mut v = vec![0; lhs.len() + rhs.len() + 1];
 
         for i in 0..lhs.len() {
@@ -495,7 +495,7 @@ impl BigNum {
     /// # TODO
     ///
     /// - [Better Algorithm](https://en.wikipedia.org/wiki/Division_algorithm)
-    fn div_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
+    fn div_core(lhs: &[u32], rhs: &[u32]) -> Vec<u32> {
         let mut v = vec![0; max(lhs.len(), rhs.len())];
 
         for i in (0..v.len()).rev() {
@@ -517,7 +517,7 @@ impl BigNum {
     /// # Time complexity
     ///
     /// `O(max(n, m))` where `n := lhs.len()` and `m := rhs.len()`
-    fn less_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> bool {
+    fn less_core(lhs: &[u32], rhs: &[u32]) -> bool {
         let mut a = lhs.len() - 1;
         let mut b = rhs.len() - 1;
 

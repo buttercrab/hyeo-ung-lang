@@ -2,7 +2,7 @@ use crate::core::area;
 use crate::core::code::{Code, OptCode, UnOptCode};
 use crate::core::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::core::state::{OptState, State};
-use crate::number::number::Num;
+use crate::number::num::Num;
 use crate::util::error::Error;
 use crate::util::io;
 use crate::util::io::ReadLine;

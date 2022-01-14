@@ -1,7 +1,7 @@
 use crate::util::error::Error;
 use clap::{Arg, ArgMatches};
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use termcolor::ColorChoice;
 
 /// Path to temporarily build compiled rust code
@@ -126,7 +126,7 @@ pub fn output<'a>() -> Arg<'a> {
 
 /// Parse output and make to absolute path
 #[cfg(not(tarpaulin_include))]
-pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<PathBuf> {
+pub fn parse_output(matches: &ArgMatches, input: &Path) -> std::io::Result<PathBuf> {
     if let Some(t) = matches.value_of("output") {
         let p = PathBuf::from(t);
         if !p.is_absolute() {
@@ -137,9 +137,7 @@ pub fn parse_output(matches: &ArgMatches, input: &PathBuf) -> std::io::Result<Pa
             Ok(p)
         }
     } else {
-        let mut p = input.clone();
-        p.set_extension("");
-        Ok(p)
+        Ok(input.with_extension(""))
     }
 }
 
@@ -173,6 +171,12 @@ pub struct HyeongOption {
     pub verbose: bool,
 }
 
+impl Default for HyeongOption {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl HyeongOption {
     /// New Hyeong option
     #[cfg(not(tarpaulin_include))]
@@ -189,6 +193,7 @@ impl HyeongOption {
 
     /// Add `build_path` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn build_path(mut self, path: PathBuf) -> HyeongOption {
         self.build_path = Some(path);
         self
@@ -196,6 +201,7 @@ impl HyeongOption {
 
     /// Add `color` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn color(mut self, color: ColorChoice) -> HyeongOption {
         self.color = color;
         self
@@ -203,6 +209,7 @@ impl HyeongOption {
 
     /// Add `input` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn input(mut self, path: PathBuf) -> HyeongOption {
         self.input = Some(path);
         self
@@ -210,6 +217,7 @@ impl HyeongOption {
 
     /// Add `optimize` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn optimize(mut self, level: u8) -> HyeongOption {
         self.optimize = level;
         self
@@ -217,6 +225,7 @@ impl HyeongOption {
 
     /// Add `output` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn output(mut self, path: PathBuf) -> HyeongOption {
         self.output = Some(path);
         self
@@ -224,6 +233,7 @@ impl HyeongOption {
 
     /// Add `verbose` option
     #[cfg(not(tarpaulin_include))]
+    #[must_use]
     pub fn verbose(mut self, verbose: bool) -> HyeongOption {
         self.verbose = verbose;
         self
