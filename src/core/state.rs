@@ -261,7 +261,7 @@ impl State for UnOptState {
 
     /// Return stack
     fn get_stack(&mut self, idx: usize) -> &mut Vec<Num> {
-        self.stack.entry(idx).or_insert(Vec::new())
+        self.stack.entry(idx).or_insert_with(Vec::new)
     }
 
     /// Return code
