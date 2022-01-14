@@ -1,8 +1,8 @@
 use crate::core::area::Area;
 use crate::core::code::UnOptCode;
 
-pub(crate) const COMMANDS: &'static [char] = &['형', '항', '핫', '흣', '흡', '흑'];
-const HEARTS: &'static [char] = &[
+pub(crate) const COMMANDS: &[char] = &['형', '항', '핫', '흣', '흡', '흑'];
+const HEARTS: &[char] = &[
     '♥', '❤', '💕', '💖', '💗', '💘', '💙', '💚', '💛', '💜', '💝', '♡',
 ];
 
@@ -25,7 +25,7 @@ const HEARTS: &'static [char] = &[
 /// assert_eq!(false, parse::is_hangul_syllable('д'));
 /// ```
 pub fn is_hangul_syllable(c: char) -> bool {
-    '\u{AC00}' <= c && c <= '\u{D7A3}'
+    ('\u{AC00}'..='\u{D7A3}').contains(&c)
 }
 
 /// Parse the code to unoptimized code
@@ -273,11 +273,8 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
                             ref mut right,
                         } => {
                             if *type_ <= 1 {
-                                match right.as_ref() {
-                                    Area::Nil => {
-                                        *right = Box::new(Area::new(t as u8));
-                                    }
-                                    _ => {}
+                                if let Area::Nil = right.as_ref() {
+                                    *right = Box::new(Area::new(t as u8));
                                 }
                             }
                         }

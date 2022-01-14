@@ -9,7 +9,7 @@ use termcolor::StandardStream;
 
 /// App for run
 #[cfg(not(tarpaulin_include))]
-pub fn app<'a, 'b>() -> App<'a, 'b> {
+pub fn app<'a>() -> App<'a> {
     App::new("run")
         .about("Run hyeong code directly")
         .arg(option::input())
@@ -27,7 +27,7 @@ pub fn run(
     stderr: &mut StandardStream,
     hy_opt: &HyeongOption,
 ) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
+    let un_opt_code = util::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     if hy_opt.optimize >= 1 {
         io::print_log(stdout, format!("optimizing to level {}", hy_opt.optimize))?;

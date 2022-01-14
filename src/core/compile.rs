@@ -6,7 +6,7 @@ use crate::util::util;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
-    std::iter::repeat(' ').take(value * 4).collect::<String>()
+    " ".repeat(value * 4)
 }
 
 /// Makes print function from string to print
@@ -20,7 +20,7 @@ fn fn_eprint(indent: usize, s: String) -> String {
 }
 
 /// Makes string literal of vector from vector of `Num`
-fn vec_to_str(v: &Vec<Num>) -> String {
+fn vec_to_str(v: &[Num]) -> String {
     let mut res = String::new();
     for i in v {
         res.push_str(&*format!("{:?}, ", i.to_string()));
@@ -30,7 +30,7 @@ fn vec_to_str(v: &Vec<Num>) -> String {
 
 /// Makes the code from command.
 fn command(indent: usize, c: &impl Code) -> String {
-    String::from(format!(
+    format!(
         "{}{}",
         match c.get_type() {
             0 => {
@@ -117,7 +117,7 @@ fn command(indent: usize, c: &impl Code) -> String {
             }
         },
         area(indent, c.get_area(), c.get_area_count())
-    ))
+    )
 }
 
 /// Makes code from area.
@@ -128,43 +128,39 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
     let mut st = vec![(a, &Area::Nil, false)];
     let mut res = String::new();
     loop {
-        loop {
-            if let Area::Val { type_, left, right } = st.last().unwrap().0 {
-                if *type_ <= 1 {
-                    st.push((left, right, false));
-                    res.push_str(&*format!(
-                        "\n{0}match stack.pop(cur).partial_cmp(&Num::from_num({1})) {{\
+        while let Area::Val { type_, left, right } = st.last().unwrap().0 {
+            if *type_ <= 1 {
+                st.push((left, right, false));
+                res.push_str(&*format!(
+                    "\n{0}match stack.pop(cur).partial_cmp(&Num::from_num({1})) {{\
                          \n{0}    Some(std::cmp::Ordering::{2}) => {{",
-                        make_indent(indent),
-                        cnt,
-                        if *type_ == 0 { "Less" } else { "Equal" }
-                    ));
-                    indent += 2;
-                    continue;
-                } else {
-                    if *type_ < 13 {
-                        res.push_str(&*format!(
-                            "\n{0}let v = *point.entry({1}u128).or_insert(state);\
+                    make_indent(indent),
+                    cnt,
+                    if *type_ == 0 { "Less" } else { "Equal" }
+                ));
+                indent += 2;
+                continue;
+            } else {
+                if *type_ < 13 {
+                    res.push_str(&*format!(
+                        "\n{0}let v = *point.entry({1}u128).or_insert(state);\
                              \n{0}if v != state {{\
                              \n{0}    last = Option::Some(state);\
                              \n{0}    state = v;\
                              \n{0}    continue;\
                              \n{0}}}",
-                            make_indent(indent),
-                            ((cnt as u128) << 4) + *type_ as u128
-                        ));
-                    } else {
-                        res.push_str(&*format!(
-                            "\n{0}if let Option::Some(v) = last {{\
+                        make_indent(indent),
+                        ((cnt as u128) << 4) + *type_ as u128
+                    ));
+                } else {
+                    res.push_str(&*format!(
+                        "\n{0}if let Option::Some(v) = last {{\
                              \n{0}    state = v;\
                              \n{0}    continue;\
                              \n{0}}}",
-                            make_indent(indent)
-                        ));
-                    }
-                    break;
+                        make_indent(indent)
+                    ));
                 }
-            } else {
                 break;
             }
         }
@@ -201,12 +197,12 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
 /// Since match is comparing linearly by each value,
 /// It makes binary if-else statement to minimize the comparision.
 /// So, in each movement, it would take `O(log S)`.
-pub fn build_source<T>(mut state: T, code: &Vec<T::CodeType>, level: u8) -> String
+pub fn build_source<T>(mut state: T, code: &[T::CodeType], level: u8) -> String
 where
     T: State,
 {
     let opt = level != 0;
-    let mut res = String::from(format!(
+    let mut res = format!(
         "{}{}{}{}{}{}{}{}{}",
         "\
 #![allow(warnings)]
@@ -328,7 +324,7 @@ fn main() {
     let mut last = Option::<usize>::None;
     let mut cur = 3usize;
 ",
-    ));
+    );
 
     let mut indent = 1usize;
 
@@ -356,9 +352,8 @@ fn main() {
         state.get_stack(2).clear();
     }
 
-    if code.len() > 0 {
-        let mut codes: Vec<Vec<T::CodeType>> = Vec::new();
-        codes.push(Vec::new());
+    if !code.is_empty() {
+        let mut codes: Vec<Vec<T::CodeType>> = vec![Vec::new()];
 
         if level >= 2 {
             for i in state.get_all_stack_index() {

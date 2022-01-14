@@ -101,7 +101,7 @@ pub fn execute_command_stdout(w: &mut StandardStream, command: &str) -> Result<(
     let stdout_reader = BufReader::new(stdout);
 
     for line in stdout_reader.lines() {
-        write!(w, "{}\n", line?)?;
+        writeln!(w, "{}", line?)?;
     }
 
     let e = cmd.wait()?;
@@ -143,7 +143,7 @@ pub fn execute_command_stderr(w: &mut StandardStream, command: &str) -> Result<(
     let stdout_reader = BufReader::new(stdout);
 
     for line in stdout_reader.lines() {
-        write!(w, "{}\n", line?)?;
+        writeln!(w, "{}", line?)?;
     }
 
     let e = cmd.wait()?;

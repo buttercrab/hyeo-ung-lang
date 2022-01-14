@@ -211,7 +211,7 @@ impl Num {
     /// assert_eq!("-12", Num::from_string(String::from("-12")).to_string());
     /// ```
     pub fn from_string(mut s: String) -> Num {
-        if s == String::from("너무 커엇...") {
+        if s == *"너무 커엇..." {
             Num::nan()
         } else {
             let neg = s.starts_with('-');
@@ -231,34 +231,6 @@ impl Num {
                 res.minus();
             }
             res
-        }
-    }
-
-    /// Make string from itself (10 based)
-    /// Negative numbers and NaN are supported
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::number::number::Num;
-    ///
-    /// let a = Num::new(10, 3);
-    /// let b = Num::nan();
-    /// let c = Num::from_num(-12);
-    ///
-    /// assert_eq!("10/3", a.to_string());
-    /// assert_eq!("너무 커엇...", b.to_string());
-    /// assert_eq!("-12", c.to_string());
-    /// ```
-    pub fn to_string(&self) -> String {
-        if self.is_nan() {
-            format!("너무 커엇...")
-        } else {
-            if self.down == BigNum::one() {
-                format!("{}", self.up.to_string())
-            } else {
-                format!("{}/{}", self.up.to_string(), self.down.to_string())
-            }
         }
     }
 
@@ -388,7 +360,7 @@ impl Num {
     /// ```
     pub fn neg(v: &Num) -> Num {
         Num {
-            up: (-&v.up).clone(),
+            up: (-&v.up),
             down: (&v.down).clone(),
         }
     }
@@ -455,14 +427,12 @@ impl PartialOrd for Num {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self.is_nan() || other.is_nan() {
             Option::None
+        } else if self == other {
+            Option::Some(Ordering::Equal)
+        } else if &self.up * &other.down < &self.down * &other.down {
+            Option::Some(Ordering::Less)
         } else {
-            if self == other {
-                Option::Some(Ordering::Equal)
-            } else if &self.up * &other.down < &self.down * &other.down {
-                Option::Some(Ordering::Less)
-            } else {
-                Option::Some(Ordering::Greater)
-            }
+            Option::Some(Ordering::Greater)
         }
     }
 }
@@ -480,7 +450,7 @@ impl fmt::Debug for Num {
     /// assert_eq!("10/3", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self)
     }
 }
 
@@ -493,11 +463,21 @@ impl fmt::Display for Num {
     /// use hyeong::number::number::Num;
     ///
     /// let a = Num::new(10, 3);
+    /// let b = Num::nan();
+    /// let c = Num::from_num(-12);
     ///
     /// assert_eq!("10/3", format!("{}", a));
+    /// assert_eq!("너무 커엇...", format!("{}", b));
+    /// assert_eq!("-12", format!("{}", c))
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        if self.is_nan() {
+            write!(f, "너무 커엇...")
+        } else if self.down == BigNum::one() {
+            write!(f, "{}", self.up)
+        } else {
+            write!(f, "{}/{}", self.up, self.down)
+        }
     }
 }
 

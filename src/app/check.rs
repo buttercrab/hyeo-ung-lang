@@ -10,7 +10,7 @@ use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// App for check
 #[cfg(not(tarpaulin_include))]
-pub fn app<'a, 'b>() -> App<'a, 'b> {
+pub fn app<'a>() -> App<'a> {
     App::new("check")
         .about("Parse your code and check if you are right")
         .arg(option::input())
@@ -19,7 +19,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 /// Runner for check
 #[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
+    let un_opt_code = util::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
     print_un_opt_codes(
         stdout,
         hy_opt,
@@ -44,7 +44,6 @@ pub fn print_un_opt_codes(
         .unwrap()
         .file_name()
         .unwrap()
-        .clone()
         .to_os_string()
         .into_string()
         .map_err(|_| {
@@ -69,13 +68,7 @@ pub fn print_un_opt_codes(
         stdout.set_color(ColorSpec::new().set_fg(Some(color)))?;
         write!(stdout, "{}", i)?;
         stdout.reset()?;
-        write!(
-            stdout,
-            "{} | ",
-            std::iter::repeat(' ')
-                .take(idx_len - i.to_string().len())
-                .collect::<String>()
-        )?;
+        write!(stdout, "{} | ", " ".repeat(idx_len - i.to_string().len()))?;
 
         write!(stdout, "{}:", file_name)?;
         stdout.set_color(ColorSpec::new().set_fg(Some(Color::Yellow)))?;
@@ -89,13 +82,11 @@ pub fn print_un_opt_codes(
         write!(
             stdout,
             "{}  ",
-            std::iter::repeat(' ')
-                .take(
-                    file_len
-                        - c.get_location().0.to_string().len()
-                        - c.get_location().1.to_string().len()
-                )
-                .collect::<String>()
+            " ".repeat(
+                file_len
+                    - c.get_location().0.to_string().len()
+                    - c.get_location().1.to_string().len()
+            )
         )?;
 
         if raw {

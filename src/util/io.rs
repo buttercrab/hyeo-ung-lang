@@ -138,7 +138,7 @@ impl CustomReader {
     /// ```
     pub fn new(s: String) -> CustomReader {
         CustomReader {
-            buf: s.split("\n").map(|x| String::from(x)).collect(),
+            buf: s.split('\n').map(String::from).collect(),
             idx: 0,
         }
     }
@@ -160,7 +160,7 @@ pub fn read_file(path: &PathBuf) -> Result<String, Error> {
     Err(std::io::Error::new(
         ErrorKind::InvalidInput,
         "Only .hyeong extension supported",
-    ))?
+    ).into())
 }
 
 /// If `res` is Err, it prints error and exit
@@ -226,7 +226,7 @@ where
     w.set_color(ColorSpec::new().set_bold(true)).unwrap();
     write!(w, "{}", err).unwrap();
     w.reset().unwrap();
-    write!(w, "\n").unwrap();
+    writeln!(w).unwrap();
 }
 
 /// Print log
@@ -242,7 +242,7 @@ where
     w.set_color(ColorSpec::new().set_bold(true))?;
     write!(w, "{}", msg)?;
     w.reset()?;
-    write!(w, "\n")?;
+    writeln!(w)?;
     Ok(())
 }
 
@@ -260,13 +260,13 @@ where
     w.set_color(ColorSpec::new().set_bold(true))?;
     write!(w, "{}", msg)?;
     w.reset()?;
-    write!(w, "\n")?;
+    writeln!(w)?;
     Ok(())
 }
 
 /// Save content to file
 pub fn save_to_file(path: &PathBuf, content: String) -> Result<(), Error> {
     let mut file = File::create(path)?;
-    file.write(content.as_bytes())?;
+    file.write_all(content.as_bytes())?;
     Ok(())
 }

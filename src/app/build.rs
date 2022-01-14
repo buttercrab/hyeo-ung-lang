@@ -10,7 +10,7 @@ use termcolor::{StandardStream, WriteColor};
 
 /// App for build
 #[cfg(not(tarpaulin_include))]
-pub fn app<'a, 'b>() -> App<'a, 'b> {
+pub fn app<'a>() -> App<'a> {
     App::new("build")
         .about("Compiles hyeong code")
         .arg(option::build_path())
@@ -28,7 +28,7 @@ pub fn app<'a, 'b>() -> App<'a, 'b> {
 #[cfg(not(tarpaulin_include))]
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     // parse
-    let un_opt_code = util::parse_file(stdout, &hy_opt.input.as_ref().unwrap(), hy_opt)?;
+    let un_opt_code = util::parse_file(stdout, hy_opt.input.as_ref().unwrap(), hy_opt)?;
 
     // optimize
     let rust_code = if hy_opt.optimize >= 1 {

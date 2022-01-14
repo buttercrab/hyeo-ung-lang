@@ -17,7 +17,7 @@ use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Error> {
     let running = Arc::new(AtomicBool::new(true));
     let r = running.clone();
-    let color = hy_opt.color.clone();
+    let color = hy_opt.color;
     let mut state = UnOptState::new();
 
     ctrlc::set_handler(move || {
@@ -50,7 +50,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
         let input = io::read_line_from(&mut std::io::stdin())?;
         running.store(false, Ordering::SeqCst);
 
-        if input == String::from("") {
+        if input == *"" {
             process::exit(0);
         }
 
@@ -61,7 +61,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                 stdout.set_color(ColorSpec::new().set_bold(true))?;
                 write!(stdout, "stdout")?;
                 stdout.reset()?;
-                write!(stdout, "] {}\n", x)?;
+                writeln!(stdout, "] {}", x)?;
                 stdout.flush()?;
             }
 
@@ -75,7 +75,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                 stdout.set_color(ColorSpec::new().set_bold(true).set_fg(Some(Color::Red)))?;
                 write!(stdout, "stderr")?;
                 stdout.reset()?;
-                write!(stdout, "] {}\n", x)?;
+                writeln!(stdout, "] {}", x)?;
                 stdout.flush()?;
             }
 

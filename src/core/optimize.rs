@@ -141,12 +141,10 @@ where
                     }
                     None => state.set_point(id, cur_loc),
                 }
-            } else {
-                if let Some(loc) = state.get_latest_loc() {
-                    cur_loc = loc;
-                    exec_count += 1;
-                    continue;
-                }
+            } else if let Some(loc) = state.get_latest_loc() {
+                cur_loc = loc;
+                exec_count += 1;
+                continue;
             }
         }
 
@@ -199,7 +197,7 @@ pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCod
             }
         }
 
-        chk.sort();
+        chk.sort_unstable();
         for i in chk {
             if i <= 3 {
                 continue;

@@ -22,7 +22,7 @@ mod build_test {
 
         let mut s = StandardStream::stdout(ColorChoice::Auto);
         let mut p = if cfg!(target_os = "windows") {
-            PathBuf::from(&env::var("USERPROFILE").unwrap().replace("\\", "/"))
+            PathBuf::from(&env::var("USERPROFILE").unwrap().replace('\\', "/"))
         } else {
             PathBuf::from(&env::var("HOME").unwrap())
         };

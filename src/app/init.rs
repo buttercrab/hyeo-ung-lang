@@ -7,7 +7,7 @@ use termcolor::{StandardStream, WriteColor};
 
 /// App for install
 #[cfg(not(tarpaulin_include))]
-pub fn install_app<'a, 'b>() -> App<'a, 'b> {
+pub fn install_app<'a>() -> App<'a> {
     App::new("install")
         .about("Install hyeong before build (need once)")
         .arg(option::build_path())
@@ -15,7 +15,7 @@ pub fn install_app<'a, 'b>() -> App<'a, 'b> {
 
 /// App for uninstall
 #[cfg(not(tarpaulin_include))]
-pub fn uninstall_app<'a, 'b>() -> App<'a, 'b> {
+pub fn uninstall_app<'a>() -> App<'a> {
     App::new("uninstall")
         .about("Uninstall hyeong temporary build path")
         .arg(option::build_path())

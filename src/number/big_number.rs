@@ -276,7 +276,7 @@ impl BigNum {
     /// assert_eq!("-10", b.to_string());
     /// ```
     pub fn from_string_base(s: String, _base: usize) -> Result<BigNum, Error> {
-        if _base > 36 || _base < 1 {
+        if !(1..=36).contains(&_base) {
             return Result::Err(Error::BaseSizeError(_base));
         }
 
@@ -289,9 +289,9 @@ impl BigNum {
                 flip = true;
                 continue;
             }
-            let k = if '0' <= c && c <= '9' {
+            let k = if ('0'..='9').contains(&c) {
                 c as isize - '0' as isize
-            } else if 'A' <= c && c <= 'Z' {
+            } else if ('A'..='Z').contains(&c) {
                 c as isize - 'A' as isize + 10
             } else {
                 return Result::Err(Error::ParseError);
@@ -304,28 +304,6 @@ impl BigNum {
             res.pos = false;
         }
         Result::Ok(res)
-    }
-
-    /// Make string from itself (10 based)
-    /// Negative numbers are supported
-    ///
-    /// # Time Complexity
-    ///
-    /// `O(n^2)` where `n := res.len()`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::number::big_number::BigNum;
-    ///
-    /// let a = BigNum::new(1234);
-    /// let b = BigNum::new(-4321);
-    ///
-    /// assert_eq!("1234", a.to_string());
-    /// assert_eq!("-4321", b.to_string());
-    /// ```
-    pub fn to_string(&self) -> String {
-        self.to_string_base(10).unwrap()
     }
 
     /// Make string from itself
@@ -359,7 +337,7 @@ impl BigNum {
     ///
     /// - [Better Algorithm](https://en.wikipedia.org/wiki/Double_dabble)
     pub fn to_string_base(&self, _base: usize) -> Result<String, Error> {
-        if _base > 36 || _base < 1 {
+        if !(1..=36).contains(&_base) {
             return Result::Err(Error::BaseSizeError(_base));
         }
 
@@ -373,9 +351,9 @@ impl BigNum {
             num /= &base;
 
             res.push(if k.val[0] < 10 {
-                ('0' as u8 + k.val[0] as u8) as char
+                (b'0' + k.val[0] as u8) as char
             } else {
-                ('A' as u8 + k.val[0] as u8 - 10) as char
+                (b'A' + k.val[0] as u8 - 10) as char
             });
         }
 
@@ -411,7 +389,7 @@ impl BigNum {
     /// # Time Complexity
     ///
     /// `O(max(n, m))` where `n := lhs.len()` and `m := rhs.len()`
-    fn add_core(lhs: &Vec<u32>, rhs: &Vec<u32>) -> Vec<u32> {
+    fn add_core(lhs: &[u32], rhs: &Vec<u32>) -> Vec<u32> {
         let mut v = vec![0; max(lhs.len(), rhs.len()) + 1];
 
         for i in 0..min(lhs.len(), rhs.len()) {
@@ -767,8 +745,8 @@ impl BigNum {
     /// assert_eq!("-25", BigNum::rem(&a, &b).to_string());
     /// ```
     pub fn rem(lhs: &BigNum, rhs: &BigNum) -> BigNum {
-        let q = BigNum::div(&lhs, &rhs);
-        BigNum::sub(&lhs, &BigNum::mul(&q, &rhs))
+        let q = BigNum::div(lhs, rhs);
+        BigNum::sub(lhs, &BigNum::mul(&q, rhs))
     }
 
     /// Get greatest common value of two number and make new `BigNum` as result
@@ -915,12 +893,10 @@ impl PartialOrd for BigNum {
             } else {
                 false
             }
+        } else if other.pos {
+            true
         } else {
-            if other.pos {
-                true
-            } else {
-                BigNum::less_core(&other.val, &self.val)
-            }
+            BigNum::less_core(&other.val, &self.val)
         } {
             Option::Some(Ordering::Less)
         } else {
@@ -942,12 +918,16 @@ impl fmt::Debug for BigNum {
     /// assert_eq!("1234", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self)
     }
 }
 
 impl fmt::Display for BigNum {
     /// Printing feature of `BigNum`
+    ///
+    /// # Time Complexity
+    ///
+    /// `O(n^2)` where `n := res.len()`
     ///
     /// # Examples
     ///
@@ -959,7 +939,7 @@ impl fmt::Display for BigNum {
     /// assert_eq!("1234", format!("{}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self.to_string_base(10).unwrap())
     }
 }
 

@@ -230,10 +230,8 @@ where
                 }
                 None => state.set_point(id, cur_loc),
             }
-        } else {
-            if let Some(loc) = state.get_latest_loc() {
-                return Ok((state, loc));
-            }
+        } else if let Some(loc) = state.get_latest_loc() {
+            return Ok((state, loc));
         }
     }
 
