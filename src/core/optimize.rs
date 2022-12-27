@@ -2,10 +2,10 @@ use crate::core::area;
 use crate::core::code::{Code, OptCode, UnOptCode};
 use crate::core::execute::{pop_stack_wrap, push_stack_wrap};
 use crate::core::state::{OptState, State};
-use crate::number::num::Num;
-use crate::util::error::Error;
-use crate::util::io;
-use crate::util::io::ReadLine;
+use crate::io;
+use crate::io::ReadLine;
+use anyhow::{anyhow, Result};
+use number::num::Num;
 use std::collections::HashMap;
 use std::io::{stdin, Write};
 
@@ -16,7 +16,7 @@ fn opt_execute<T>(
     err: &mut impl Write,
     mut state: T,
     code: &T::CodeType,
-) -> Result<(T, bool), Error>
+) -> Result<(T, bool)>
 where
     T: State + Clone,
 {
@@ -32,42 +32,42 @@ where
         let code = (*state.get_code(cur_loc)).clone();
         let mut cur_stack = state.current_stack();
 
-        match code.get_type() {
+        match code.type_() {
             0 => {
                 push_stack_wrap(
                     out,
                     err,
                     &mut state,
                     cur_stack,
-                    &Num::from_num(code.get_hangul_count() as isize)
-                        * &Num::from_num(code.get_dot_count() as isize),
+                    &Num::from_num(code.hangul_count() as isize)
+                        * &Num::from_num(code.dot_count() as isize),
                 )?;
             }
             1 => {
                 let mut n = Num::zero();
-                for _ in 0..code.get_hangul_count() {
+                for _ in 0..code.hangul_count() {
                     if cur_stack <= 2 {
                         return Ok((state_clone, false));
                     }
                     n += &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
                 }
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+                push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
             }
             2 => {
                 let mut n = Num::one();
-                for _ in 0..code.get_hangul_count() {
+                for _ in 0..code.hangul_count() {
                     if cur_stack <= 2 {
                         return Ok((state_clone, false));
                     }
                     n *= &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
                 }
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+                push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
             }
             3 => {
                 let mut n = Num::zero();
-                let mut v = Vec::with_capacity(code.get_hangul_count());
+                let mut v = Vec::with_capacity(code.hangul_count());
 
-                for _ in 0..code.get_hangul_count() {
+                for _ in 0..code.hangul_count() {
                     if cur_stack <= 2 {
                         return Ok((state_clone, false));
                     }
@@ -80,13 +80,13 @@ where
                     push_stack_wrap(out, err, &mut state, cur_stack, x)?;
                 }
 
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+                push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
             }
             4 => {
                 let mut n = Num::one();
-                let mut v = Vec::with_capacity(code.get_hangul_count());
+                let mut v = Vec::with_capacity(code.hangul_count());
 
-                for _ in 0..code.get_hangul_count() {
+                for _ in 0..code.hangul_count() {
                     if cur_stack <= 2 {
                         return Ok((state_clone, false));
                     }
@@ -99,7 +99,7 @@ where
                     push_stack_wrap(out, err, &mut state, cur_stack, x)?;
                 }
 
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+                push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
             }
             // 5
             _ => {
@@ -107,18 +107,18 @@ where
                     return Ok((state_clone, false));
                 }
                 let n = pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
-                for _ in 0..code.get_hangul_count() {
-                    push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone())?;
+                for _ in 0..code.hangul_count() {
+                    push_stack_wrap(out, err, &mut state, code.dot_count(), n.clone())?;
                 }
                 push_stack_wrap(out, err, &mut state, cur_stack, n)?;
-                state.set_current_stack(code.get_dot_count());
+                state.set_current_stack(code.dot_count());
             }
         }
 
         cur_stack = state.current_stack();
-        let area_type = match area::calc(code.get_area(), code.get_area_count(), || {
+        let area_type = match area::calc(code.area(), code.area_count(), || {
             if cur_stack <= 2 {
-                Err(Error::new(String::from(""), ""))
+                Err(anyhow!("Stack underflow"))
             } else {
                 pop_stack_wrap(ipt, out, err, &mut state, cur_stack)
             }
@@ -129,7 +129,7 @@ where
 
         if area_type != 0 {
             if area_type != 13 {
-                let id = ((code.get_area_count() as u128) << 4) + area_type as u128;
+                let id = ((code.area_count() as u128) << 4) + area_type as u128;
                 match state.get_point(id) {
                     Some(value) => {
                         if cur_loc != value {
@@ -177,7 +177,7 @@ where
 ///
 /// assert_eq!("3", s.get_stack(1).iter().map(|x| x.to_string()).collect::<Vec<_>>().join(""))
 /// ```
-pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCode>), Error> {
+pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCode>)> {
     let mut size = 0usize;
     let mut opt_code_vec: Vec<OptCode> = Vec::new();
 
@@ -188,12 +188,12 @@ pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCod
         let mut chk = Vec::new();
 
         for un_opt_code in &code {
-            if un_opt_code.get_type() == 0 {
+            if un_opt_code.type_() == 0 {
                 continue;
             }
             chk.push(now);
-            if un_opt_code.get_type() == 5 {
-                now = un_opt_code.get_dot_count();
+            if un_opt_code.type_() == 5 {
+                now = un_opt_code.dot_count();
             }
         }
 
@@ -210,13 +210,13 @@ pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCod
         }
 
         for un_opt_code in &code {
-            let opt_type_ = un_opt_code.get_type();
-            let opt_hangul_count = un_opt_code.get_hangul_count();
-            let mut opt_dot_count = un_opt_code.get_dot_count();
-            let opt_area_count = un_opt_code.get_area_count();
-            let opt_area = un_opt_code.get_area().clone();
+            let opt_type_ = un_opt_code.type_();
+            let opt_hangul_count = un_opt_code.hangul_count();
+            let mut opt_dot_count = un_opt_code.dot_count();
+            let opt_area_count = un_opt_code.area_count();
+            let opt_area = un_opt_code.area().clone();
 
-            if opt_type_ == 0 || un_opt_code.get_dot_count() <= 3 {
+            if opt_type_ == 0 || un_opt_code.dot_count() <= 3 {
                 opt_code_vec.push(OptCode::new(
                     opt_type_,
                     opt_hangul_count,

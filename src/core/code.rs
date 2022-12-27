@@ -2,20 +2,35 @@ use crate::core::area;
 use crate::core::area::Area;
 use std::fmt;
 
+#[derive(Debug, Copy, Clone)]
+pub enum Type {
+    // 형
+    Hyeong,
+    // 항
+    Hang,
+    // 핫
+    Hat,
+    // 흣
+    Heut,
+    // 흡
+    Heup,
+    Heuk,
+}
+
 /// Code trait
 ///
 /// It defines methods that code structure needs.
 /// [UnOptCode](struct.UnOptCode.html) and [OptCode](struct.OptCode.html) use this trait.
 pub trait Code {
-    fn get_type(&self) -> u8;
+    fn type_(&self) -> u8;
 
-    fn get_hangul_count(&self) -> usize;
+    fn hangul_count(&self) -> usize;
 
-    fn get_dot_count(&self) -> usize;
+    fn dot_count(&self) -> usize;
 
-    fn get_area(&self) -> &Area;
+    fn area(&self) -> &Area;
 
-    fn get_area_count(&self) -> usize;
+    fn area_count(&self) -> usize;
 }
 
 /// structure for optimized code
@@ -42,7 +57,7 @@ pub trait Code {
 /// assert_eq!(10, a.get_dot_count());
 /// assert_eq!(20, a.get_area_count());
 /// ```
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct OptCode {
     type_: u8,
     hangul_count: usize,
@@ -92,27 +107,27 @@ impl OptCode {
 
 impl Code for OptCode {
     /// Return type of code
-    fn get_type(&self) -> u8 {
+    fn type_(&self) -> u8 {
         self.type_
     }
 
     /// Return hangul count of code
-    fn get_hangul_count(&self) -> usize {
+    fn hangul_count(&self) -> usize {
         self.hangul_count
     }
 
     /// Return dot count of code
-    fn get_dot_count(&self) -> usize {
+    fn dot_count(&self) -> usize {
         self.dot_count
     }
 
     /// Return Area of code
-    fn get_area(&self) -> &Area {
+    fn area(&self) -> &Area {
         &self.area
     }
 
     /// Return area count of code
-    fn get_area_count(&self) -> usize {
+    fn area_count(&self) -> usize {
         self.area_count
     }
 }
@@ -128,7 +143,7 @@ impl Code for OptCode {
 /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
 /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
 /// ```
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct UnOptCode {
     // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
     // 1: 항, 하앙, 하아앙, 하아아앙 ...
@@ -165,62 +180,39 @@ impl UnOptCode {
     }
 
     /// Return location
-    pub fn get_location(&self) -> (usize, usize) {
+    pub fn location(&self) -> (usize, usize) {
         self.loc
     }
 
     /// Return raw code
-    pub fn get_raw(&self) -> String {
+    pub fn raw(&self) -> String {
         self.code.clone()
-    }
-}
-
-impl fmt::Debug for UnOptCode {
-    /// Debug format function
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::core::code::UnOptCode;
-    /// use hyeong::core::area::Area;
-    ///
-    /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
-    /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
-    /// ```
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut area = String::new();
-        area::area_to_string_debug(&mut area, &self.area);
-        write!(
-            f,
-            "type: {}, cnt1: {}, cnt2: {}, area: {:?}",
-            self.type_, self.hangul_count, self.dot_count, area
-        )
     }
 }
 
 impl Code for UnOptCode {
     /// Return type of code
-    fn get_type(&self) -> u8 {
+    fn type_(&self) -> u8 {
         self.type_
     }
 
     /// Return hangul count of code
-    fn get_hangul_count(&self) -> usize {
+    fn hangul_count(&self) -> usize {
         self.hangul_count
     }
 
     /// Return dot count of code
-    fn get_dot_count(&self) -> usize {
+    fn dot_count(&self) -> usize {
         self.dot_count
     }
 
     /// Return Area of code
-    fn get_area(&self) -> &Area {
+    fn area(&self) -> &Area {
         &self.area
     }
 
     /// Return area count of code
-    fn get_area_count(&self) -> usize {
+    fn area_count(&self) -> usize {
         self.hangul_count * self.dot_count
     }
 }

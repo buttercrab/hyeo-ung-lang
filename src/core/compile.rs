@@ -1,8 +1,8 @@
 use crate::core::area::Area;
 use crate::core::code::Code;
+use crate::core::num_to_unicode;
 use crate::core::state::State;
-use crate::number::num::Num;
-use crate::util::ext;
+use number::num::Num;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {
@@ -32,12 +32,12 @@ fn vec_to_str(v: &[Num]) -> String {
 fn command(indent: usize, c: &impl Code) -> String {
     format!(
         "{}{}",
-        match c.get_type() {
+        match c.type_() {
             0 => {
                 format!(
                     "\n{}stack.push(cur, Num::from_num({}));",
                     make_indent(indent),
-                    c.get_hangul_count() * c.get_dot_count()
+                    c.hangul_count() * c.dot_count()
                 )
             }
             1 => {
@@ -48,8 +48,8 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}}}\
                      \n{0}stack.push({2}, n);",
                     make_indent(indent),
-                    c.get_hangul_count(),
-                    c.get_dot_count()
+                    c.hangul_count(),
+                    c.dot_count()
                 )
             }
             2 => {
@@ -60,8 +60,8 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}}}\
                      \n{0}stack.push({2}, n);",
                     make_indent(indent),
-                    c.get_hangul_count(),
-                    c.get_dot_count()
+                    c.hangul_count(),
+                    c.dot_count()
                 )
             }
             3 => {
@@ -79,8 +79,8 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}}}\
                      \n{0}stack.push({2}, n);",
                     make_indent(indent),
-                    c.get_hangul_count(),
-                    c.get_dot_count()
+                    c.hangul_count(),
+                    c.dot_count()
                 )
             }
             4 => {
@@ -98,8 +98,8 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}}}\
                      \n{0}stack.push({2}, n);",
                     make_indent(indent),
-                    c.get_hangul_count(),
-                    c.get_dot_count()
+                    c.hangul_count(),
+                    c.dot_count()
                 )
             }
             _ => {
@@ -111,12 +111,12 @@ fn command(indent: usize, c: &impl Code) -> String {
                      \n{0}stack.push(cur, n);\
                      \n{0}cur = {2};",
                     make_indent(indent),
-                    c.get_hangul_count(),
-                    c.get_dot_count()
+                    c.hangul_count(),
+                    c.dot_count()
                 )
             }
         },
-        area(indent, c.get_area(), c.get_area_count())
+        area(indent, c.area(), c.area_count())
     )
 }
 
@@ -334,7 +334,7 @@ fn main() {
             state
                 .get_stack(1)
                 .iter()
-                .map(|num| ext::num_to_unicode(num).unwrap())
+                .map(|num| num_to_unicode(num).unwrap())
                 .collect::<String>(),
         ));
         state.get_stack(1).clear();
@@ -346,7 +346,7 @@ fn main() {
             state
                 .get_stack(2)
                 .iter()
-                .map(|num| ext::num_to_unicode(num).unwrap())
+                .map(|num| num_to_unicode(num).unwrap())
                 .collect::<String>(),
         ));
         state.get_stack(2).clear();
@@ -388,7 +388,7 @@ fn main() {
             let mut idx = 0;
 
             for (i, c) in state.get_all_code().iter().enumerate() {
-                match c.get_area() {
+                match c.area() {
                     Area::Val {
                         type_: _,
                         left: _,
@@ -432,7 +432,7 @@ fn main() {
         }
 
         for c in code {
-            match c.get_area() {
+            match c.area() {
                 Area::Val {
                     type_: _,
                     left: _,

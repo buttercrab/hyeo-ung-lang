@@ -1,30 +1,33 @@
 [package]
 name = "hyeong"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["buttercrab <jaeyong0201@gmail.com>"]
-edition = "2018"
+edition = "2021"
 license = "MIT"
 homepage = "https://github.com/buttercrab/hyeo-ung-lang"
 repository = "https://github.com/buttercrab/hyeo-ung-lang"
 description = "Hyeo-ung Programming Language Compiler"
 include = [
-	"src/**/*",
-	"Cargo.toml",
-	"README.md"
+    "number/**/*",
+    "src/**/*",
+    "Cargo.toml",
+    "README.md"
 ]
 readme = "README.md"
 
-[badges]
-travis-ci = { repository = "buttercrab/hyeo-ung-lang" }
-
-[features]
-default = ["clap", "ctrlc", "termcolor"]
-number = []
+[workspace]
+members = ["number"]
 
 [dependencies]
-clap = { version = "4.0.30", optional = true }
-ctrlc = { version = "3.0", features = ["termination"], optional = true }
-termcolor = { version = "1.1", optional = true }
+anyhow = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+colored = "2.0.0"
+ctrlc = { version = "3.0", features = ["termination"] }
+dirs = "4"
+fern = "0.6"
+lazy_static = "1.4"
+log = "0.4"
+number = { path = "number" }
 
 [[bin]]
 path = "src/main.rs"

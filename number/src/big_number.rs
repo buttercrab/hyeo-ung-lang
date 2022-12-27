@@ -1,4 +1,4 @@
-use std::cmp::{max, min, Ordering};
+use core::cmp::{max, min, Ordering};
 use std::{error, fmt, ops};
 
 /// Error class for `BigNum`
@@ -364,7 +364,7 @@ impl BigNum {
         if !self.pos {
             res.push('-')
         }
-        Result::Ok(res.chars().rev().collect())
+        Ok(res.chars().rev().collect())
     }
 
     /// Private function for removing leading zero in data.

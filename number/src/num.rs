@@ -1,7 +1,7 @@
-use crate::number::big_number::BigNum;
-use std::cmp::Ordering;
-use std::mem::swap;
-use std::{fmt, ops};
+use crate::big_number::BigNum;
+use core::cmp::Ordering;
+use core::mem::swap;
+use core::{fmt, ops};
 
 /// `Num` for rational number handling
 /// - Using two `BigNum` for denominator and numerator.
@@ -11,7 +11,7 @@ use std::{fmt, ops};
 /// # Examples
 ///
 /// ```
-/// use hyeong::number::num::Num;
+/// use number::num::Num;
 ///
 /// let a = Num::from_num(10);
 /// let mut b = Num::from_num(3);

@@ -1,10 +1,10 @@
-use crate::core::area;
 use crate::core::code::Code;
 use crate::core::state::State;
-use crate::number::num::Num;
-use crate::util::error::Error;
-use crate::util::io::ReadLine;
-use crate::util::{ext, io};
+use crate::core::{area, num_to_unicode};
+use crate::io;
+use crate::io::ReadLine;
+use anyhow::Result;
+use number::num::Num;
 use std::io::Write;
 use std::process;
 
@@ -33,21 +33,21 @@ pub fn push_stack_wrap<T>(
     state: &mut T,
     idx: usize,
     num: Num,
-) -> Result<(), Error>
+) -> Result<()>
 where
     T: State,
 {
     match idx {
         1 => {
             if num.is_pos() {
-                write!(out, "{}", ext::num_to_unicode(&num)?)?;
+                write!(out, "{}", num_to_unicode(&num)?)?;
             } else {
                 write!(out, "{}", -&num)?;
             }
         }
         2 => {
             if num.is_pos() {
-                write!(err, "{}", ext::num_to_unicode(&num)?)?;
+                write!(err, "{}", num_to_unicode(&num)?)?;
             } else {
                 write!(err, "{}", -&num)?;
             }
@@ -81,7 +81,7 @@ pub fn pop_stack_wrap<T>(
     err: &mut impl Write,
     state: &mut T,
     idx: usize,
-) -> Result<Num, Error>
+) -> Result<Num>
 where
     T: State,
 {
@@ -134,43 +134,43 @@ pub fn execute_one<T>(
     err: &mut impl Write,
     mut state: T,
     cur_loc: usize,
-) -> Result<(T, usize), Error>
+) -> Result<(T, usize)>
 where
     T: State,
 {
     let code = (*state.get_code(cur_loc)).clone();
     let mut cur_stack = state.current_stack();
 
-    match code.get_type() {
+    match code.type_() {
         0 => {
             push_stack_wrap(
                 out,
                 err,
                 &mut state,
                 cur_stack,
-                &Num::from_num(code.get_hangul_count() as isize)
-                    * &Num::from_num(code.get_dot_count() as isize),
+                &Num::from_num(code.hangul_count() as isize)
+                    * &Num::from_num(code.dot_count() as isize),
             )?;
         }
         1 => {
             let mut n = Num::zero();
-            for _ in 0..code.get_hangul_count() {
+            for _ in 0..code.hangul_count() {
                 n += &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
             }
-            push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+            push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
         }
         2 => {
             let mut n = Num::one();
-            for _ in 0..code.get_hangul_count() {
+            for _ in 0..code.hangul_count() {
                 n *= &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
             }
-            push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+            push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
         }
         3 => {
             let mut n = Num::zero();
-            let mut v = Vec::with_capacity(code.get_hangul_count());
+            let mut v = Vec::with_capacity(code.hangul_count());
 
-            for _ in 0..code.get_hangul_count() {
+            for _ in 0..code.hangul_count() {
                 v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
             }
 
@@ -182,13 +182,13 @@ where
                 push_stack_wrap(out, err, &mut state, cur_stack, x)?;
             }
 
-            push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+            push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
         }
         4 => {
             let mut n = Num::one();
-            let mut v = Vec::with_capacity(code.get_hangul_count());
+            let mut v = Vec::with_capacity(code.hangul_count());
 
-            for _ in 0..code.get_hangul_count() {
+            for _ in 0..code.hangul_count() {
                 v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
             }
 
@@ -200,27 +200,27 @@ where
                 push_stack_wrap(out, err, &mut state, cur_stack, x)?;
             }
 
-            push_stack_wrap(out, err, &mut state, code.get_dot_count(), n)?;
+            push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
         }
         // 5
         _ => {
             let n = pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
-            for _ in 0..code.get_hangul_count() {
-                push_stack_wrap(out, err, &mut state, code.get_dot_count(), n.clone())?;
+            for _ in 0..code.hangul_count() {
+                push_stack_wrap(out, err, &mut state, code.dot_count(), n.clone())?;
             }
             push_stack_wrap(out, err, &mut state, cur_stack, n)?;
-            state.set_current_stack(code.get_dot_count());
+            state.set_current_stack(code.dot_count());
         }
     }
 
     cur_stack = state.current_stack();
-    let area_type = area::calc(code.get_area(), code.get_area_count(), || {
+    let area_type = area::calc(code.area(), code.area_count(), || {
         pop_stack_wrap(ipt, out, err, &mut state, cur_stack)
     })?;
 
     if area_type != 0 {
         if area_type != 13 {
-            let id = ((code.get_area_count() as u128) << 4) + area_type as u128;
+            let id = ((code.area_count() as u128) << 4) + area_type as u128;
             match state.get_point(id) {
                 Some(value) => {
                     if cur_loc != value {
@@ -262,7 +262,7 @@ pub fn execute<T>(
     err: &mut impl Write,
     mut state: T,
     code: &T::CodeType,
-) -> Result<T, Error>
+) -> Result<T>
 where
     T: State,
 {

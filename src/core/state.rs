@@ -1,5 +1,5 @@
 use crate::core::code::{Code, OptCode, UnOptCode};
-use crate::number::num::Num;
+use number::num::Num;
 use std::collections::HashMap;
 use std::fmt;
 

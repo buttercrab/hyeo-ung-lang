@@ -1,120 +1,197 @@
-#[cfg(not(feature = "number"))]
-use clap::{App, ArgMatches};
-#[cfg(not(feature = "number"))]
-use hyeong::app::{build, check, debug, init, interpreter, run};
-#[cfg(not(feature = "number"))]
-use hyeong::util::{error::Error, io, option, option::HyeongOption};
-#[cfg(not(feature = "number"))]
-use termcolor::{ColorChoice, StandardStream};
+mod commands;
+mod core;
+mod io;
 
-/// Main function that executes command
-#[cfg(not(tarpaulin_include))]
-#[cfg(not(feature = "number"))]
-fn sub_main(
-    stdout: &mut StandardStream,
-    stderr: &mut StandardStream,
-    matches: ArgMatches,
-    hy_opt: HyeongOption,
-) -> Result<(), Error> {
-    if let Some(matches) = matches.subcommand_matches("build") {
-        let input = option::parse_input(matches)?;
-        let output = option::parse_output(matches, &input)?;
-        build::run(
-            stdout,
-            &hy_opt
-                .build_path(option::parse_build_path(matches)?)
-                .input(input)
-                .optimize(option::parse_optimize(matches)?)
-                .output(output),
-        )
-    } else if let Some(matches) = matches.subcommand_matches("check") {
-        check::run(stdout, &hy_opt.input(option::parse_input(matches)?))
-    } else if let Some(matches) = matches.subcommand_matches("debug") {
-        debug::run(stdout, &hy_opt.input(option::parse_input(matches)?))
-    } else if let Some(matches) = matches.subcommand_matches("run") {
-        run::run(
-            stdout,
-            stderr,
-            &hy_opt
-                .input(option::parse_input(matches)?)
-                .optimize(option::parse_optimize(matches)?),
-        )
-    } else if let Some(matches) = matches.subcommand_matches("install") {
-        init::install_run(
-            stdout,
-            &hy_opt.build_path(option::parse_build_path(matches)?),
-        )
-    } else if let Some(matches) = matches.subcommand_matches("uninstall") {
-        init::uninstall_run(
-            stdout,
-            &hy_opt.build_path(option::parse_build_path(matches)?),
-        )
-    } else {
-        interpreter::run(stdout, &hy_opt)
+use crate::commands::{build, check, debug, interpret, run};
+use anyhow::Result;
+use clap::{Parser, Subcommand, ValueEnum};
+use colored::Colorize;
+use lazy_static::lazy_static;
+use log::{error, warn, Level};
+use std::fmt;
+use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+lazy_static! {
+    static ref HYEONG_DIR: PathBuf = dirs::home_dir().unwrap().join(".hyeong");
+}
+
+static ERROR_COUNT: AtomicUsize = AtomicUsize::new(0);
+static WARN_COUNT: AtomicUsize = AtomicUsize::new(0);
+
+/// Hyeo-ung Programming Language Toolchain
+#[derive(Parser, Debug, Clone)]
+#[command(author, version, about, long_about = None)]
+struct App {
+    /// set verbose output
+    #[arg(long, global = true)]
+    verbose: bool,
+    /// whether prints with color
+    #[arg(long, default_value = "auto", global = true, hide_default_value = true)]
+    color: Color,
+    /// If no subcommand, it will run interpreter
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+#[derive(Subcommand, Debug, Clone)]
+enum Commands {
+    /// hyeong code compiler
+    ///
+    /// It compiles hyeong code to rust code and then compiles it to binary.
+    #[command(name = "build")]
+    Build {
+        /// optimize level
+        #[arg(short = 'O', long = "optimize", default_value_t = 2, value_parser(clap::value_parser!(u8).range(0..=2)))]
+        level: u8,
+        /// input file to compile
+        #[arg(required = true, value_name = "FILE.hyeong")]
+        file: PathBuf,
+    },
+    /// hyeong code checker
+    ///
+    /// It will check syntax and type of hyeong code.
+    #[command(name = "check")]
+    Check {
+        /// input file to compile
+        #[arg(required = true, value_name = "FILE.hyeong")]
+        file: PathBuf,
+        /// print each command in raw or in parsed format
+        #[arg(long)]
+        raw: bool,
+    },
+    /// hyeong code debugger
+    ///
+    /// It will debug hyeong code.
+    #[command(name = "debug")]
+    Debug {
+        /// input file to compile
+        #[arg(required = true, value_name = "FILE.hyeong")]
+        file: PathBuf,
+    },
+    /// hyeong code runner
+    ///
+    /// It will run hyeong code.
+    #[command(name = "run")]
+    Run {
+        /// optimize level
+        #[arg(short = 'O', long = "optimize", default_value_t = 2, value_parser(["0", "1", "2"]))]
+        level: u8,
+        /// input file to compile
+        #[arg(required = true, value_name = "FILE.hyeong")]
+        file: PathBuf,
+    },
+}
+
+/// whether prints color
+#[derive(ValueEnum, Debug, Clone)]
+enum Color {
+    Never,
+    Auto,
+    Always,
+}
+
+/// Sets up logging
+///
+/// Uses fern to set up logging.
+/// If `verbose` is true, then the log level is set to `Debug`.
+fn setup_logger(verbose: bool) -> Result<()> {
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            match record.level() {
+                Level::Error => {
+                    ERROR_COUNT.fetch_add(1, Ordering::SeqCst);
+                    out.finish(format_args!("{}: {}", "error".red().bold(), message));
+                }
+                Level::Warn => {
+                    WARN_COUNT.fetch_add(1, Ordering::SeqCst);
+                    out.finish(format_args!("{}: {}", "warn".yellow().bold(), message))
+                }
+                Level::Info => {
+                    if record.target().is_empty() {
+                        out.finish(format_args!("{}", message))
+                    } else {
+                        out.finish(format_args!(
+                            "{:>11} {}",
+                            record.target().green().bold(),
+                            message
+                        ))
+                    }
+                }
+                Level::Debug => {
+                    if record.target().is_empty() {
+                        out.finish(format_args!("{}: {}", "debug".blue().bold(), message))
+                    } else {
+                        out.finish(format_args!(
+                            "{:>11} {}",
+                            record.target().blue().bold(),
+                            message
+                        ))
+                    }
+                }
+                Level::Trace => {
+                    out.finish(format_args!("{}: {}", "trace".purple().bold(), message))
+                }
+            };
+        })
+        .level(if verbose {
+            log::LevelFilter::Debug
+        } else {
+            log::LevelFilter::Info
+        })
+        .chain(std::io::stdout())
+        .apply()?;
+    Ok(())
+}
+
+/// Exits when error is thrown
+///
+/// It helps to throw multiple errors and exit at once.
+pub fn error_barrier(msg: fmt::Arguments) {
+    if ERROR_COUNT.load(Ordering::SeqCst) > 0 {
+        error!("{}", msg);
+        std::process::exit(1);
     }
 }
 
-/// Main function of this program
+/// Main function of hyeong
 ///
-/// ```text
-/// hyeong 0.2.2
-/// hyeo-ung programming language tool
-///
-/// USAGE:
-///     hyeong [FLAGS] [OPTIONS] [SUBCOMMAND]
-///
-/// FLAGS:
-///     -h, --help       Prints help information
-///     -V, --version    Prints version information
-///         --verbose    verbose output
-///
-/// OPTIONS:
-///         --color <color>    whether prints color [default: auto]  [possible values: never, auto, always]
-///
-/// SUBCOMMANDS:
-///     build        Compiles hyeong code
-///     check        Parse your code and check if you are right
-///     debug        Debug your code command by command
-///     help         Prints this message or the help of the given subcommand(s)
-///     install      Install hyeong before build (need once)
-///     run          Run hyeong code directly
-///     uninstall    Uninstall hyeong temporary build path
-/// ```
-#[cfg(not(tarpaulin_include))]
-#[cfg(not(feature = "number"))]
+/// It parses arguments and runs subcommands.
+/// If there is no subcommand, it runs the interpreter.
+/// If there is an error, it prints the error and exits.
+/// If there is a warning, it prints the warning and exits.
+/// If there is no error or warning, it exits with 0.
 fn main() {
-    let matches = App::new("hyeong")
-        .version("0.2.2")
-        .about("hyeo-ung programming language tool")
-        .arg(option::color())
-        .arg(option::verbose())
-        .subcommand(build::app())
-        .subcommand(check::app())
-        .subcommand(debug::app())
-        .subcommand(run::app())
-        .subcommand(init::install_app())
-        .subcommand(init::uninstall_app())
-        .get_matches();
+    // Parse arguments
+    let app = App::parse();
 
-    let mut temp_stderr = StandardStream::stderr(ColorChoice::Auto);
-    let color = io::handle(&mut temp_stderr, option::parse_color(&matches));
-    let mut stdout = StandardStream::stdout(color);
-    let mut stderr = StandardStream::stderr(color);
-    let mut stderr_copy = StandardStream::stderr(color);
+    // setup logger color
+    match app.color {
+        Color::Never => colored::control::set_override(false),
+        Color::Always => colored::control::set_override(true),
+        _ => {}
+    }
 
-    io::handle(
-        &mut stderr,
-        sub_main(
-            &mut stdout,
-            &mut stderr_copy,
-            matches.clone(),
-            HyeongOption::new()
-                .color(color)
-                .verbose(option::parse_verbose(&matches)),
-        ),
-    );
+    // using expect since it is not possible to fail
+    setup_logger(app.verbose).expect("failed to setup logger");
+
+    // run subcommand
+    match app.command {
+        Some(Commands::Build { level, file }) => build(level, file),
+        Some(Commands::Check { file, raw }) => check(file, raw),
+        Some(Commands::Debug { file }) => debug(file),
+        Some(Commands::Run { level, file }) => run(level, file),
+        None => interpret(),
+    }
+    .unwrap_or_else(|e| {
+        error!("{}", e);
+    });
+
+    // print warning
+    let warning_count = WARN_COUNT.load(Ordering::SeqCst);
+    if warning_count > 0 {
+        warn!("{} warning(s) generated", warning_count);
+    }
+    // exit with 1 when error occurred
+    error_barrier(format_args!("could not do the job due to previous error"));
 }
-
-#[cfg(not(tarpaulin_include))]
-#[cfg(feature = "number")]
-fn main() {}

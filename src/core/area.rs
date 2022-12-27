@@ -1,5 +1,5 @@
-use crate::number::num::Num;
-use crate::util::error::Error;
+use anyhow::Result;
+use number::num::Num;
 use std::cmp::Ordering;
 use std::fmt;
 
@@ -78,9 +78,9 @@ impl Area {
 /// let a = Area::new(10);
 /// assert_eq!(10, calc(&a, 1, || Result::Ok(Num::one())).unwrap());
 /// ```
-pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Result<u8, Error>
+pub fn calc<T>(area: &Area, area_value: usize, mut pop: T) -> Result<u8>
 where
-    T: FnMut() -> Result<Num, Error>,
+    T: FnMut() -> Result<Num>,
 {
     let mut area = area;
 

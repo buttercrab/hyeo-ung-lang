@@ -1,0 +1,15 @@
+[package]
+name = "number"
+version = "0.1.0"
+authors = ["buttercrab <jaeyong0201@gmail.com>"]
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/buttercrab/hyeo-ung-lang"
+repository = "https://github.com/buttercrab/hyeo-ung-lang"
+description = "Hyeo-ung Programming Language Number"
+include = [
+    "src/**/*",
+    "Cargo.toml",
+    "../README.md"
+]
+readme = "../README.md"

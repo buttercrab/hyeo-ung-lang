@@ -1,9 +1,8 @@
 use crate::core::code::UnOptCode;
 use crate::core::parse;
-use crate::number::num::Num;
 use crate::util::error::Error;
 use crate::util::io;
-use crate::util::option::HyeongOption;
+use number::num::Num;
 use std::io::Write;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
