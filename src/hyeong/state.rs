@@ -1,4 +1,4 @@
-use crate::core::code::{Code, OptCode, UnOptCode};
+use crate::hyeong::code::{Code, OptCode, UnOptCode};
 use number::num::Num;
 use std::collections::HashMap;
 use std::fmt;
@@ -20,20 +20,6 @@ pub trait State {
 
     fn get_stack(&mut self, idx: usize) -> &mut Vec<Num>;
 
-    fn push_stack(&mut self, idx: usize, num: Num) {
-        let st = self.get_stack(idx);
-        if !st.is_empty() || !num.is_nan() {
-            st.push(num);
-        }
-    }
-
-    fn pop_stack(&mut self, idx: usize) -> Num {
-        match self.get_stack(idx).pop() {
-            Some(t) => t,
-            None => Num::nan(),
-        }
-    }
-
     fn get_code(&self, loc: usize) -> &Self::CodeType;
 
     fn push_code(&mut self, code: Self::CodeType) -> usize;
@@ -49,6 +35,10 @@ pub trait State {
     fn set_latest_loc(&mut self, loc: usize);
 
     fn get_latest_loc(&self) -> Option<usize>;
+
+    fn set_loc(&mut self, loc: usize);
+
+    fn get_loc(&self) -> usize;
 }
 
 /// State structure for optimized code
@@ -68,8 +58,9 @@ pub struct OptState {
     stack: Vec<Vec<Num>>,
     code: Vec<OptCode>,
     point: HashMap<u128, usize>,
-    cur: usize,
+    stack_idx: usize,
     latest: Option<usize>,
+    loc: usize,
 }
 
 impl OptState {
@@ -88,8 +79,9 @@ impl OptState {
             stack: vec![Vec::new(); size],
             code: vec![],
             point: HashMap::new(),
-            cur: 3,
+            stack_idx: 3,
             latest: None,
+            loc: 0,
         }
     }
 }
@@ -109,36 +101,17 @@ impl State for OptState {
 
     /// Return current stack index
     fn current_stack(&self) -> usize {
-        self.cur
+        self.stack_idx
     }
 
     /// Set current stack to `cur`
     fn set_current_stack(&mut self, cur: usize) {
-        self.cur = cur;
+        self.stack_idx = cur;
     }
 
     /// Return stack of `idx`
     fn get_stack(&mut self, idx: usize) -> &mut Vec<Num> {
         self.stack[idx].as_mut()
-    }
-
-    /// Push value to stack
-    fn push_stack(&mut self, idx: usize, num: Num) {
-        if idx < self.stack.len() && (!self.stack[idx].is_empty() || !num.is_nan()) {
-            self.get_stack(idx).push(num);
-        }
-    }
-
-    /// Pop value of stack and return popped value
-    fn pop_stack(&mut self, idx: usize) -> Num {
-        if idx < self.stack.len() {
-            match self.get_stack(idx).pop() {
-                Some(t) => t,
-                None => Num::nan(),
-            }
-        } else {
-            Num::nan()
-        }
     }
 
     /// Return code
@@ -169,21 +142,25 @@ impl State for OptState {
 
     /// Return all points
     fn get_all_point(&self) -> Vec<(u128, usize)> {
-        let mut v = Vec::with_capacity(self.point.len());
-        for (a, b) in &self.point {
-            v.push((*a, *b));
-        }
-        v
+        self.point.iter().map(|(a, b)| (*a, *b)).collect()
     }
 
     /// Set latest location
     fn set_latest_loc(&mut self, loc: usize) {
-        self.latest = Option::Some(loc);
+        self.latest = Some(loc);
     }
 
     /// Return latest location
     fn get_latest_loc(&self) -> Option<usize> {
         self.latest
+    }
+
+    fn set_loc(&mut self, loc: usize) {
+        self.loc = loc;
+    }
+
+    fn get_loc(&self) -> usize {
+        self.loc
     }
 }
 
@@ -197,15 +174,16 @@ impl State for OptState {
 /// let a = UnOptState::new();
 /// ```
 #[derive(Clone)]
-pub struct UnOptState {
+pub struct UnOptState<'a> {
     stack: HashMap<usize, Vec<Num>>,
-    code: Vec<UnOptCode>,
+    code: Vec<UnOptCode<'a>>,
     point: HashMap<u128, usize>,
-    cur: usize,
+    stack_idx: usize,
     latest: Option<usize>,
+    loc: usize,
 }
 
-impl UnOptState {
+impl<'a> UnOptState<'a> {
     /// Make new `UnOptCode`
     ///
     /// # Examples
@@ -215,25 +193,26 @@ impl UnOptState {
     ///
     /// let a = UnOptState::new();
     /// ```
-    pub fn new() -> UnOptState {
+    pub fn new() -> UnOptState<'a> {
         UnOptState {
             stack: HashMap::new(),
             code: vec![],
             point: HashMap::new(),
-            cur: 3,
+            stack_idx: 3,
             latest: None,
+            loc: 0,
         }
     }
 }
 
-impl Default for UnOptState {
+impl Default for UnOptState<'_> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl State for UnOptState {
-    type CodeType = UnOptCode;
+impl<'a> State for UnOptState<'a> {
+    type CodeType = UnOptCode<'a>;
 
     /// Return stack indices
     fn get_all_stack_index(&self) -> Vec<usize> {
@@ -251,12 +230,12 @@ impl State for UnOptState {
 
     /// Return current stack
     fn current_stack(&self) -> usize {
-        self.cur
+        self.stack_idx
     }
 
     /// Set current
     fn set_current_stack(&mut self, cur: usize) {
-        self.cur = cur;
+        self.stack_idx = cur;
     }
 
     /// Return stack
@@ -301,16 +280,24 @@ impl State for UnOptState {
 
     /// Set latest location
     fn set_latest_loc(&mut self, loc: usize) {
-        self.latest = Option::Some(loc);
+        self.latest = Some(loc);
     }
 
     /// Return latest location
     fn get_latest_loc(&self) -> Option<usize> {
         self.latest
     }
+
+    fn set_loc(&mut self, loc: usize) {
+        self.loc = loc;
+    }
+
+    fn get_loc(&self) -> usize {
+        self.loc
+    }
 }
 
-impl fmt::Debug for UnOptState {
+impl fmt::Debug for UnOptState<'_> {
     /// Debug format function
     ///
     /// # Examples
@@ -324,12 +311,12 @@ impl fmt::Debug for UnOptState {
     /// assert_eq!("current stack: 3\nstack 3: [1]\n", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut s = format!("current stack: {}\n", self.cur);
+        let mut s = format!("current stack: {}\n", self.stack_idx);
         let mut v = self.stack.iter().collect::<Vec<_>>();
         v.sort_by(|x, y| x.0.cmp(y.0));
         for (a, b) in v {
-            s.push_str(&*format!("stack {}: {:?}\n", a, b));
+            s.push_str(&format!("stack {a}: {b:?}\n"));
         }
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }

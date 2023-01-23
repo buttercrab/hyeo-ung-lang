@@ -1,7 +1,7 @@
-use crate::core::area::Area;
-use crate::core::code::Code;
-use crate::core::num_to_unicode;
-use crate::core::state::State;
+use crate::hyeong::area::{Area, AreaType};
+use crate::hyeong::code::{Code, CodeType};
+use crate::hyeong::num_to_unicode;
+use crate::hyeong::state::State;
 use number::num::Num;
 
 /// Makes indent with 4 spaces
@@ -33,14 +33,14 @@ fn command(indent: usize, c: &impl Code) -> String {
     format!(
         "{}{}",
         match c.type_() {
-            0 => {
+            CodeType::Hyeong => {
                 format!(
                     "\n{}stack.push(cur, Num::from_num({}));",
                     make_indent(indent),
                     c.hangul_count() * c.dot_count()
                 )
             }
-            1 => {
+            CodeType::Hang => {
                 format!(
                     "\n{0}let mut n = Num::zero();\
                      \n{0}for _ in 0..{1} {{\
@@ -52,7 +52,7 @@ fn command(indent: usize, c: &impl Code) -> String {
                     c.dot_count()
                 )
             }
-            2 => {
+            CodeType::Hat => {
                 format!(
                     "\n{0}let mut n = Num::one();\
                      \n{0}for _ in 0..{1} {{\
@@ -64,7 +64,7 @@ fn command(indent: usize, c: &impl Code) -> String {
                     c.dot_count()
                 )
             }
-            3 => {
+            CodeType::Heut => {
                 format!(
                     "\n{0}let mut n = Num::zero();\
                      \n{0}let mut v = Vec::with_capacity({1});\
@@ -83,7 +83,7 @@ fn command(indent: usize, c: &impl Code) -> String {
                     c.dot_count()
                 )
             }
-            4 => {
+            CodeType::Heup => {
                 format!(
                     "\n{0}let mut n = Num::one();\
                      \n{0}let mut v = Vec::with_capacity({1});\
@@ -102,7 +102,7 @@ fn command(indent: usize, c: &impl Code) -> String {
                     c.dot_count()
                 )
             }
-            _ => {
+            CodeType::Heuk => {
                 format!(
                     "\n{0}let n = stack.pop(cur);\
                      \n{0}for _ in 0..{1} {{\
@@ -124,24 +124,28 @@ fn command(indent: usize, c: &impl Code) -> String {
 /// Since area consist of binary tree,
 /// we used match and recursively put content inside.
 /// (Didn't used recursive function)
-fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
-    let mut st = vec![(a, &Area::Nil, false)];
+fn area(mut indent: usize, a: Option<&Area>, cnt: usize) -> String {
+    let mut st = vec![(a, None, false)];
     let mut res = String::new();
     loop {
-        while let Area::Val { type_, left, right } = st.last().unwrap().0 {
-            if *type_ <= 1 {
-                st.push((left, right, false));
+        while let Some(Area { type_, left, right }) = st.last().unwrap().0 {
+            if matches!(*type_, AreaType::QuestionMark | AreaType::ExclamationMark) {
+                st.push((left.as_deref(), right.as_deref(), false));
                 res.push_str(&*format!(
                     "\n{0}match stack.pop(cur).partial_cmp(&Num::from_num({1})) {{\
                          \n{0}    Some(std::cmp::Ordering::{2}) => {{",
                     make_indent(indent),
                     cnt,
-                    if *type_ == 0 { "Less" } else { "Equal" }
+                    if matches!(*type_, AreaType::QuestionMark) {
+                        "Less"
+                    } else {
+                        "Equal"
+                    }
                 ));
                 indent += 2;
                 continue;
             } else {
-                if *type_ < 13 {
+                if !matches!(*type_, AreaType::WhiteHeartSuit) {
                     res.push_str(&*format!(
                         "\n{0}let v = *point.entry({1}u128).or_insert(state);\
                              \n{0}if v != state {{\
@@ -389,11 +393,7 @@ fn main() {
 
             for (i, c) in state.get_all_code().iter().enumerate() {
                 match c.area() {
-                    Area::Val {
-                        type_: _,
-                        left: _,
-                        right: _,
-                    } => {
+                    Some(Area { .. }) => {
                         if !codes.last().unwrap().is_empty() {
                             codes.push(vec![c.clone()]);
                         } else {
@@ -405,7 +405,7 @@ fn main() {
                         }
                         codes.push(Vec::new());
                     }
-                    Area::Nil => {
+                    None => {
                         codes.last_mut().unwrap().push(c.clone());
                     }
                 }
@@ -413,14 +413,14 @@ fn main() {
 
             if opt {
                 for (a, b) in point {
-                    res.push_str(&*format!(
+                    res.push_str(&format!(
                         "
     point.insert({}u128, {});",
                         a, b
                     ));
                 }
 
-                res.push_str(&*format!(
+                res.push_str(&format!(
                     "
     state = {};",
                     codes.len(),
@@ -433,11 +433,7 @@ fn main() {
 
         for c in code {
             match c.area() {
-                Area::Val {
-                    type_: _,
-                    left: _,
-                    right: _,
-                } => {
+                Some(Area { .. }) => {
                     if !codes.last().unwrap().is_empty() {
                         codes.push(vec![c.clone()]);
                     } else {
@@ -445,7 +441,7 @@ fn main() {
                     }
                     codes.push(Vec::new());
                 }
-                Area::Nil => {
+                None => {
                     codes.last_mut().unwrap().push(c.clone());
                 }
             }
@@ -455,7 +451,7 @@ fn main() {
             codes.pop().unwrap();
         }
 
-        res.push_str(&*format!(
+        res.push_str(&format!(
             "
     while state < {} {{",
             codes.len()
@@ -467,7 +463,7 @@ fn main() {
         for i in 0..codes.len() {
             while stack.last().unwrap().0 > 1 {
                 stack.push((stack.last().unwrap().0 / 2, false));
-                res.push_str(&*format!(
+                res.push_str(&format!(
                     "\n{}if state < {} {{",
                     make_indent(indent),
                     stack.last().unwrap().0 + i
@@ -476,19 +472,19 @@ fn main() {
             }
 
             for item in &codes[i] {
-                res.push_str(&*command(indent, item));
+                res.push_str(&command(indent, item));
             }
 
             while stack.len() > 1 && stack.last().unwrap().1 {
                 stack.pop();
                 indent -= 1;
-                res.push_str(&*format!("\n{}}}", make_indent(indent)));
+                res.push_str(&format!("\n{}}}", make_indent(indent)));
             }
 
             if i != codes.len() - 1 {
                 let last = stack.pop().unwrap().0;
                 stack.push((stack.last().unwrap().0 - last, true));
-                res.push_str(&*format!("\n{}}} else {{", make_indent(indent - 1)));
+                res.push_str(&format!("\n{}}} else {{", make_indent(indent - 1)));
             }
         }
 

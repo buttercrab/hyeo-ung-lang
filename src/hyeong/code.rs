@@ -1,19 +1,20 @@
-use crate::core::area;
-use crate::core::area::Area;
-use std::fmt;
+use crate::hyeong::area::Area;
+use derive_more::{Constructor, Display};
 
-#[derive(Debug, Copy, Clone)]
-pub enum Type {
-    // 형
+/// Code Types
+#[derive(Debug, Copy, Clone, Display, Eq, PartialEq, Hash)]
+pub enum CodeType {
+    #[display(fmt = "형")]
     Hyeong,
-    // 항
+    #[display(fmt = "항")]
     Hang,
-    // 핫
+    #[display(fmt = "핫")]
     Hat,
-    // 흣
+    #[display(fmt = "흣")]
     Heut,
-    // 흡
+    #[display(fmt = "흡")]
     Heup,
+    #[display(fmt = "흑")]
     Heuk,
 }
 
@@ -22,7 +23,7 @@ pub enum Type {
 /// It defines methods that code structure needs.
 /// [UnOptCode](struct.UnOptCode.html) and [OptCode](struct.OptCode.html) use this trait.
 pub trait Code {
-    fn type_(&self) -> u8;
+    fn type_(&self) -> CodeType;
 
     fn hangul_count(&self) -> usize;
 
@@ -57,57 +58,18 @@ pub trait Code {
 /// assert_eq!(10, a.get_dot_count());
 /// assert_eq!(20, a.get_area_count());
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Constructor)]
 pub struct OptCode {
-    type_: u8,
+    type_: CodeType,
     hangul_count: usize,
     dot_count: usize,
     area_count: usize,
     area: Area,
 }
 
-impl OptCode {
-    /// Makes new `OptCode`
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use hyeong::core::code::{OptCode, Code};
-    /// use hyeong::core::area::Area;
-    ///
-    /// let a = OptCode::new(
-    ///     0,
-    ///     10,
-    ///     10,
-    ///     20,
-    ///     Area::new(3)
-    /// );
-    ///
-    /// assert_eq!(0, a.get_type());
-    /// assert_eq!(10, a.get_hangul_count());
-    /// assert_eq!(10, a.get_dot_count());
-    /// assert_eq!(20, a.get_area_count());
-    /// ```
-    pub fn new(
-        type_: u8,
-        hangul_count: usize,
-        dot_count: usize,
-        area_count: usize,
-        area: Area,
-    ) -> OptCode {
-        OptCode {
-            type_,
-            hangul_count,
-            dot_count,
-            area_count,
-            area,
-        }
-    }
-}
-
 impl Code for OptCode {
     /// Return type of code
-    fn type_(&self) -> u8 {
+    fn type_(&self) -> CodeType {
         self.type_
     }
 
@@ -143,56 +105,31 @@ impl Code for OptCode {
 /// let a = UnOptCode::new(0, 1, 2, (1, 2), Area::Nil, String::from("형.."));
 /// assert_eq!("type: 0, cnt1: 1, cnt2: 2, area: \"_\"", format!("{:?}", a));
 /// ```
-#[derive(Debug, Clone)]
-pub struct UnOptCode {
-    // 0: 형, 혀엉, 혀어엉, 혀어어엉 ...
-    // 1: 항, 하앙, 하아앙, 하아아앙 ...
-    // 2: 핫, 하앗, 하아앗, 하아아앗 ...
-    // 3: 흣, 흐읏, 흐으읏, 흐으으읏 ...
-    // 4: 흡, 흐읍, 흐으읍, 흐으으읍 ...
-    // 5: 흑, 흐윽, 흐으윽, 흐으으윽 ...
-    type_: u8,
+#[derive(Debug, Clone, Constructor)]
+pub struct UnOptCode<'a> {
+    type_: CodeType,
     hangul_count: usize,
     dot_count: usize,
     loc: (usize, usize),
     area: Area,
-    code: String,
+    code: &'a str,
 }
 
-impl UnOptCode {
-    /// Make new `UnOptCode`
-    pub fn new(
-        type_: u8,
-        hangul_count: usize,
-        dot_count: usize,
-        loc: (usize, usize),
-        area: Area,
-        code: String,
-    ) -> UnOptCode {
-        UnOptCode {
-            type_,
-            hangul_count,
-            dot_count,
-            loc,
-            area,
-            code,
-        }
-    }
-
+impl<'a> UnOptCode<'a> {
     /// Return location
     pub fn location(&self) -> (usize, usize) {
         self.loc
     }
 
     /// Return raw code
-    pub fn raw(&self) -> String {
-        self.code.clone()
+    pub fn raw(&self) -> &'a str {
+        self.code
     }
 }
 
-impl Code for UnOptCode {
+impl Code for UnOptCode<'_> {
     /// Return type of code
-    fn type_(&self) -> u8 {
+    fn type_(&self) -> CodeType {
         self.type_
     }
 

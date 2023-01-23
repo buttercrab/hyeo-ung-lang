@@ -361,7 +361,7 @@ impl Num {
     pub fn neg(v: &Num) -> Num {
         Num {
             up: (-&v.up),
-            down: (&v.down).clone(),
+            down: v.down.clone(),
         }
     }
 
@@ -450,7 +450,7 @@ impl fmt::Debug for Num {
     /// assert_eq!("10/3", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{self}")
     }
 }
 

@@ -1,4 +1,4 @@
-﻿#[cfg(test)]
+#[cfg(test)]
 mod build_test {
     use hyeong::app::init;
     use hyeong::core::state::UnOptState;
@@ -86,11 +86,7 @@ mod build_test {
     fn build_test03() {
         assert_eq!(
             "12345678",
-            helper_function(
-                "3",
-                "형 흣........💕 흣.... 형. 하앙... 흣. 흑... 흐읏....!💕",
-                1,
-            )
+            helper_function("3", "형 흣........💕 흣.... 형. 하앙... 흣. 흑... 흐읏....!💕", 1,)
         );
     }
 

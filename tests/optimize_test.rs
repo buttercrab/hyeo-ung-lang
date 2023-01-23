@@ -1,4 +1,4 @@
-﻿#[cfg(test)]
+#[cfg(test)]
 mod optimize_test {
     use hyeong::core::state::State;
     use hyeong::core::{execute, optimize, parse};
@@ -53,7 +53,13 @@ mod optimize_test {
 
     #[test]
     fn optimize_test04() {
-        helper_function("혀어어어어어어엉......핫.. 혀어어어어어어어엉........ 핫. 혀어어어어어어어엉......... 핫..", "", "H", "0Q", 2);
+        helper_function(
+            "혀어어어어어어엉......핫.. 혀어어어어어어어엉........ 핫. 혀어어어어어어어엉......... 핫..",
+            "",
+            "H",
+            "0Q",
+            2,
+        );
     }
 
     #[test]

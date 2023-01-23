@@ -1,5 +1,5 @@
 mod commands;
-mod core;
+mod hyeong;
 mod io;
 
 use crate::commands::{build, check, debug, interpret, run};
@@ -100,38 +100,28 @@ fn setup_logger(verbose: bool) -> Result<()> {
         .format(|out, message, record| {
             match record.level() {
                 Level::Error => {
-                    ERROR_COUNT.fetch_add(1, Ordering::SeqCst);
+                    ERROR_COUNT.fetch_add(1, Ordering::Release);
                     out.finish(format_args!("{}: {}", "error".red().bold(), message));
                 }
                 Level::Warn => {
-                    WARN_COUNT.fetch_add(1, Ordering::SeqCst);
+                    WARN_COUNT.fetch_add(1, Ordering::Release);
                     out.finish(format_args!("{}: {}", "warn".yellow().bold(), message))
                 }
                 Level::Info => {
                     if record.target().is_empty() {
-                        out.finish(format_args!("{}", message))
+                        out.finish(format_args!("{message}"))
                     } else {
-                        out.finish(format_args!(
-                            "{:>11} {}",
-                            record.target().green().bold(),
-                            message
-                        ))
+                        out.finish(format_args!("{:>11} {}", record.target().green().bold(), message))
                     }
                 }
                 Level::Debug => {
                     if record.target().is_empty() {
                         out.finish(format_args!("{}: {}", "debug".blue().bold(), message))
                     } else {
-                        out.finish(format_args!(
-                            "{:>11} {}",
-                            record.target().blue().bold(),
-                            message
-                        ))
+                        out.finish(format_args!("{:>11} {}", record.target().blue().bold(), message))
                     }
                 }
-                Level::Trace => {
-                    out.finish(format_args!("{}: {}", "trace".purple().bold(), message))
-                }
+                Level::Trace => out.finish(format_args!("{}: {}", "trace".purple().bold(), message)),
             };
         })
         .level(if verbose {
@@ -148,7 +138,7 @@ fn setup_logger(verbose: bool) -> Result<()> {
 ///
 /// It helps to throw multiple errors and exit at once.
 pub fn error_barrier(msg: fmt::Arguments) {
-    if ERROR_COUNT.load(Ordering::SeqCst) > 0 {
+    if ERROR_COUNT.load(Ordering::Acquire) > 0 {
         error!("{}", msg);
         std::process::exit(1);
     }

@@ -1,6 +1,5 @@
 pub mod area;
 pub mod code;
-pub mod compile;
 pub mod execute;
 pub mod optimize;
 pub mod parse;
@@ -25,6 +24,5 @@ use number::num::Num;
 /// ```
 pub fn num_to_unicode(num: &Num) -> Result<char> {
     let n = num.floor().to_int();
-    std::char::from_u32(n)
-        .ok_or_else(|| anyhow!("utf-8 encoding error: number {} is not valid unicode", n))
+    std::char::from_u32(n).ok_or_else(|| anyhow!("utf-8 encoding error: number {} is not valid unicode", n))
 }

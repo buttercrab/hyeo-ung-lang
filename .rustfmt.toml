@@ -1,1 +1,4 @@
 overflow_delimited_expr = true
+format_macro_matchers = true
+format_macro_bodies = true
+max_width = 110

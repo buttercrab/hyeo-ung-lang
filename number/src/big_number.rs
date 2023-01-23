@@ -34,7 +34,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Error::ParseError => write!(f, "Parse Error"),
-            Error::BaseSizeError(s) => write!(f, "Base Size Error: size = {}", s),
+            Error::BaseSizeError(s) => write!(f, "Base Size Error: size = {s}"),
         }
     }
 }
@@ -289,9 +289,9 @@ impl BigNum {
                 flip = true;
                 continue;
             }
-            let k = if ('0'..='9').contains(&c) {
+            let k = if c.is_ascii_digit() {
                 c as isize - '0' as isize
-            } else if ('A'..='Z').contains(&c) {
+            } else if c.is_ascii_uppercase() {
                 c as isize - 'A' as isize + 10
             } else {
                 return Result::Err(Error::ParseError);
@@ -918,7 +918,7 @@ impl fmt::Debug for BigNum {
     /// assert_eq!("1234", format!("{:?}", a));
     /// ```
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{self}")
     }
 }
 

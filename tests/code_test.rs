@@ -1,4 +1,4 @@
-﻿#[cfg(test)]
+#[cfg(test)]
 mod code_test {
     use hyeong::core::code::Code;
     use hyeong::core::state::{State, UnOptState};
@@ -7,10 +7,7 @@ mod code_test {
 
     #[test]
     fn area_test01() {
-        let t = format!(
-            "{:?}",
-            parse::parse("하아앗..? 흑..".to_string())[0].get_area()
-        );
+        let t = format!("{:?}", parse::parse("하아앗..? 흑..".to_string())[0].get_area());
         assert_eq!("?__", t);
     }
 
@@ -129,8 +126,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 2).unwrap();
-        opt_state =
-            execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
+        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
         let t1 = (opt_state.get_all_stack_index()[1], opt_state.stack_size());
         let t2 = (1, 5);
         assert_eq!(t1, t2);
@@ -143,8 +139,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 2).unwrap();
-        opt_state =
-            execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
+        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
         let t = opt_state.get_all_code()[0].get_type();
         assert_eq!(t, 5);
     }
@@ -156,8 +151,7 @@ mod code_test {
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, 1).unwrap();
-        opt_state =
-            execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
+        opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &opt_code[0]).unwrap();
         let t1 = opt_state.get_all_point()[0];
         let t2 = (37, 0);
         assert_eq!(t1, t2);
