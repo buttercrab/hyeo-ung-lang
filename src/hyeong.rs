@@ -1,12 +1,14 @@
+use anyhow::{anyhow, Result};
+
+use number::num::Num;
+
 pub mod area;
 pub mod code;
 pub mod execute;
 pub mod optimize;
 pub mod parse;
 pub mod state;
-
-use anyhow::{anyhow, Result};
-use number::num::Num;
+pub mod write_rust;
 
 /// change `Num` to unicode char
 ///

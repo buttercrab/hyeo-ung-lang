@@ -1,9 +1,11 @@
+use std::fs;
+
+use clap::App;
+use termcolor::{StandardStream, WriteColor};
+
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
 use crate::util::{error, ext, io, option};
-use clap::App;
-use std::fs;
-use termcolor::{StandardStream, WriteColor};
 
 /// App for install
 #[cfg(not(tarpaulin_include))]

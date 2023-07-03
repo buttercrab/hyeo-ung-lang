@@ -1,19 +1,13 @@
-use anyhow::Result;
-use derive_more::{Display, From};
-use number::num::Num;
 use std::cmp::Ordering;
 use std::fmt;
 use std::ops::ControlFlow;
 
-pub type Area = QuestionArea;
+use anyhow::Result;
+use derive_more::{Display, From};
 
-// #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Display)]
-// pub enum SplitType {
-//     #[display(fmt = "?")]
-//     QuestionMark,
-//     #[display(fmt = "!")]
-//     ExclamationMark,
-// }
+use number::num::Num;
+
+pub type Area = QuestionArea;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Display)]
 pub enum HeartType {
@@ -55,15 +49,15 @@ impl ExclamationArea {
         let mut it = self.0.iter();
         let init = *it.next().unwrap();
 
-        match it.copied().try_fold(init, |ret, heart| match pop() {
+        match it.copied().try_fold(init, |left, right| match pop() {
             Ok(p) => {
                 if matches!(
                     p.partial_cmp(&Num::from_num(area_size as isize)),
                     Some(Ordering::Equal)
                 ) {
-                    ControlFlow::Break(Ok(ret))
+                    ControlFlow::Break(Ok(left))
                 } else {
-                    ControlFlow::Continue(heart)
+                    ControlFlow::Continue(right)
                 }
             }
             Err(e) => ControlFlow::Break(Err(e)),
@@ -106,15 +100,15 @@ impl QuestionArea {
         let mut it = self.0.iter();
         let init = it.next().unwrap();
 
-        match it.try_fold(init, |ret, heart| match pop() {
+        match it.try_fold(init, |left, right| match pop() {
             Ok(p) => {
                 if matches!(
                     p.partial_cmp(&Num::from_num(area_size as isize)),
-                    Some(Ordering::Equal)
+                    Some(Ordering::Less)
                 ) {
-                    ControlFlow::Break(ret.calc(area_size, &mut pop))
+                    ControlFlow::Break(left.calc(area_size, &mut pop))
                 } else {
-                    ControlFlow::Continue(heart)
+                    ControlFlow::Continue(right)
                 }
             }
             Err(e) => ControlFlow::Break(Err(e)),

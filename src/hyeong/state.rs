@@ -1,7 +1,10 @@
-use crate::hyeong::code::{Code, OptCode, UnOptCode};
-use number::num::Num;
 use std::collections::HashMap;
 use std::fmt;
+
+use number::num::Num;
+
+use crate::hyeong::area::HeartType;
+use crate::hyeong::code::{Code, OptCode, UnOptCode};
 
 /// State trait
 ///
@@ -26,11 +29,11 @@ pub trait State {
 
     fn get_all_code(&self) -> Vec<Self::CodeType>;
 
-    fn set_point(&mut self, id: u128, loc: usize);
+    fn set_point(&mut self, id: (usize, HeartType), loc: usize);
 
-    fn get_point(&self, id: u128) -> Option<usize>;
+    fn get_point(&self, id: &(usize, HeartType)) -> Option<usize>;
 
-    fn get_all_point(&self) -> Vec<(u128, usize)>;
+    fn get_all_point(&self) -> Vec<((usize, HeartType), usize)>;
 
     fn set_latest_loc(&mut self, loc: usize);
 
@@ -39,6 +42,8 @@ pub trait State {
     fn set_loc(&mut self, loc: usize);
 
     fn get_loc(&self) -> usize;
+
+    fn get_exit(&self) -> Option<i32>;
 }
 
 /// State structure for optimized code
@@ -57,10 +62,11 @@ pub trait State {
 pub struct OptState {
     stack: Vec<Vec<Num>>,
     code: Vec<OptCode>,
-    point: HashMap<u128, usize>,
+    point: HashMap<(usize, HeartType), usize>,
     stack_idx: usize,
     latest: Option<usize>,
     loc: usize,
+    exit: Option<i32>,
 }
 
 impl OptState {
@@ -82,7 +88,12 @@ impl OptState {
             stack_idx: 3,
             latest: None,
             loc: 0,
+            exit: None,
         }
+    }
+
+    pub fn exit(&mut self, code: i32) {
+        self.exit = Some(code);
     }
 }
 
@@ -131,18 +142,18 @@ impl State for OptState {
     }
 
     /// Set point for area
-    fn set_point(&mut self, id: u128, loc: usize) {
+    fn set_point(&mut self, id: (usize, HeartType), loc: usize) {
         self.point.insert(id, loc);
     }
 
     /// Return point for area
-    fn get_point(&self, id: u128) -> Option<usize> {
-        self.point.get(&id).copied()
+    fn get_point(&self, id: &(usize, HeartType)) -> Option<usize> {
+        self.point.get(id).copied()
     }
 
     /// Return all points
-    fn get_all_point(&self) -> Vec<(u128, usize)> {
-        self.point.iter().map(|(a, b)| (*a, *b)).collect()
+    fn get_all_point(&self) -> Vec<((usize, HeartType), usize)> {
+        self.point.iter().map(|(k, v)| (*k, *v)).collect()
     }
 
     /// Set latest location
@@ -162,6 +173,10 @@ impl State for OptState {
     fn get_loc(&self) -> usize {
         self.loc
     }
+
+    fn get_exit(&self) -> Option<i32> {
+        self.exit
+    }
 }
 
 /// State structure for unoptimized state
@@ -177,7 +192,7 @@ impl State for OptState {
 pub struct UnOptState<'a> {
     stack: HashMap<usize, Vec<Num>>,
     code: Vec<UnOptCode<'a>>,
-    point: HashMap<u128, usize>,
+    point: HashMap<(usize, HeartType), usize>,
     stack_idx: usize,
     latest: Option<usize>,
     loc: usize,
@@ -216,11 +231,7 @@ impl<'a> State for UnOptState<'a> {
 
     /// Return stack indices
     fn get_all_stack_index(&self) -> Vec<usize> {
-        let mut v = Vec::with_capacity(self.stack.len());
-        for i in self.stack.keys() {
-            v.push(*i);
-        }
-        v
+        self.stack.keys().copied().collect()
     }
 
     /// Return stack count
@@ -260,22 +271,18 @@ impl<'a> State for UnOptState<'a> {
     }
 
     /// Set point for area
-    fn set_point(&mut self, id: u128, loc: usize) {
+    fn set_point(&mut self, id: (usize, HeartType), loc: usize) {
         self.point.insert(id, loc);
     }
 
     /// Return point for area
-    fn get_point(&self, id: u128) -> Option<usize> {
-        self.point.get(&id).copied()
+    fn get_point(&self, id: &(usize, HeartType)) -> Option<usize> {
+        self.point.get(id).copied()
     }
 
     /// Return all points
-    fn get_all_point(&self) -> Vec<(u128, usize)> {
-        let mut v = Vec::with_capacity(self.point.len());
-        for (a, b) in &self.point {
-            v.push((*a, *b));
-        }
-        v
+    fn get_all_point(&self) -> Vec<((usize, HeartType), usize)> {
+        self.point.iter().map(|(k, v)| (*k, *v)).collect()
     }
 
     /// Set latest location
@@ -294,6 +301,10 @@ impl<'a> State for UnOptState<'a> {
 
     fn get_loc(&self) -> usize {
         self.loc
+    }
+
+    fn get_exit(&self) -> Option<i32> {
+        None
     }
 }
 

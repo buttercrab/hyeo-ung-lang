@@ -1,8 +1,9 @@
+use number::num::Num;
+
 use crate::hyeong::area::{Area, AreaType};
 use crate::hyeong::code::{Code, CodeType};
 use crate::hyeong::num_to_unicode;
 use crate::hyeong::state::State;
-use number::num::Num;
 
 /// Makes indent with 4 spaces
 fn make_indent(value: usize) -> String {

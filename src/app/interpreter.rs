@@ -1,13 +1,15 @@
+use std::io::{stdin, Write};
+use std::process;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+
+use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
+
 use crate::core::state::UnOptState;
 use crate::core::{execute, parse};
 use crate::util::error::Error;
 use crate::util::io;
 use crate::util::option::HyeongOption;
-use std::io::{stdin, Write};
-use std::process;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
-use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// Interpreter
 ///

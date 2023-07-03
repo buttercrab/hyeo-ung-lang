@@ -1,11 +1,13 @@
+use std::io::Write;
+
+use clap::App;
+use termcolor::StandardStream;
+
 use crate::core::state::{State, UnOptState};
 use crate::core::{execute, optimize};
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
 use crate::util::{ext, io, option};
-use clap::App;
-use std::io::Write;
-use termcolor::StandardStream;
 
 /// App for run
 #[cfg(not(tarpaulin_include))]

@@ -1,168 +1,75 @@
-use crate::hyeong::code::{Code, CodeType, OptCode, UnOptCode};
-use crate::hyeong::state::OptState;
-use anyhow::Result;
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{HashMap, HashSet};
+use std::io::{self, BufRead, Read, Write};
 
-/// Optimization helper function for level 2 optimization
-// fn opt_execute<T>(
-//     ipt: &mut impl ReadLine,
-//     out: &mut impl Write,
-//     err: &mut impl Write,
-//     mut state: T,
-//     code: &T::CodeType,
-// ) -> Result<(T, bool)>
-// where
-//     T: State + Clone,
-// {
-//     let state_clone = state.clone();
-//     let mut cur_loc = state.push_code((*code).clone());
-//     let length = cur_loc + 1;
-//     let mut exec_count = 0;
-//     while cur_loc < length {
-//         if exec_count >= 100 {
-//             return Ok((state_clone, false));
-//         }
-//
-//         let code = (*state.get_code(cur_loc)).clone();
-//         let mut cur_stack = state.current_stack();
-//
-//         match code.type_() {
-//             CodeType::Hyeong => {
-//                 state.push_stack(
-//                     out,
-//                     err,
-//                     cur_stack,
-//                     &Num::from_num(code.hangul_count() as isize)
-//                         * &Num::from_num(code.dot_count() as isize),
-//                 )?;
-//             }
-//             CodeType::Hang => {
-//                 let mut n = Num::zero();
-//                 for _ in 0..code.hangul_count() {
-//                     if cur_stack <= 2 {
-//                         return Ok((state_clone, false));
-//                     }
-//                     n += &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
-//                 }
-//                 push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
-//             }
-//             CodeType::Hat => {
-//                 let mut n = Num::one();
-//                 for _ in 0..code.hangul_count() {
-//                     if cur_stack <= 2 {
-//                         return Ok((state_clone, false));
-//                     }
-//                     n *= &pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
-//                 }
-//                 push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
-//             }
-//             CodeType::Heut => {
-//                 let mut n = Num::zero();
-//                 let mut v = Vec::with_capacity(code.hangul_count());
-//
-//                 for _ in 0..code.hangul_count() {
-//                     if cur_stack <= 2 {
-//                         return Ok((state_clone, false));
-//                     }
-//                     v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
-//                 }
-//
-//                 for mut x in v {
-//                     x.minus();
-//                     n += &x;
-//                     push_stack_wrap(out, err, &mut state, cur_stack, x)?;
-//                 }
-//
-//                 push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
-//             }
-//             CodeType::Heup => {
-//                 let mut n = Num::one();
-//                 let mut v = Vec::with_capacity(code.hangul_count());
-//
-//                 for _ in 0..code.hangul_count() {
-//                     if cur_stack <= 2 {
-//                         return Ok((state_clone, false));
-//                     }
-//                     v.push(pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?);
-//                 }
-//
-//                 for mut x in v {
-//                     x.flip();
-//                     n *= &x;
-//                     push_stack_wrap(out, err, &mut state, cur_stack, x)?;
-//                 }
-//
-//                 push_stack_wrap(out, err, &mut state, code.dot_count(), n)?;
-//             }
-//             CodeType::Heuk => {
-//                 if cur_stack <= 2 {
-//                     return Ok((state_clone, false));
-//                 }
-//                 let n = pop_stack_wrap(ipt, out, err, &mut state, cur_stack)?;
-//                 for _ in 0..code.hangul_count() {
-//                     push_stack_wrap(out, err, &mut state, code.dot_count(), n.clone())?;
-//                 }
-//                 push_stack_wrap(out, err, &mut state, cur_stack, n)?;
-//                 state.set_current_stack(code.dot_count());
-//             }
-//         }
-//
-//         cur_stack = state.current_stack();
-//         let area_type = match code.area().calc(code.area_count(), || {
-//             if cur_stack <= 2 {
-//                 Err(anyhow!("Stack underflow"))
-//             } else {
-//                 pop_stack_wrap(ipt, out, err, &mut state, cur_stack)
-//             }
-//         }) {
-//             Ok(value) => value,
-//             Err(_) => return Ok((state_clone, false)),
-//         };
-//
-//         if area_type != 0 {
-//             if area_type != 13 {
-//                 let id = ((code.area_count() as u128) << 4) + area_type as u128;
-//                 match state.get_point(id) {
-//                     Some(value) => {
-//                         if cur_loc != value {
-//                             state.set_latest_loc(cur_loc);
-//                             cur_loc = value;
-//                             exec_count += 1;
-//                             continue;
-//                         }
-//                     }
-//                     None => state.set_point(id, cur_loc),
-//                 }
-//             } else if let Some(loc) = state.get_latest_loc() {
-//                 cur_loc = loc;
-//                 exec_count += 1;
-//                 continue;
-//             }
-//         }
-//
-//         cur_loc += 1;
-//     }
-//
-//     Ok((state, true))
-// }
+use anyhow::Result;
+
+use number::num::Num;
+
+use crate::hyeong::code::{Code, HangulType, OptCode, UnOptCode};
+use crate::hyeong::execute::ExecutableState;
+use crate::hyeong::state::{OptState, State};
+
+struct RedirectOutput(Vec<u8>);
+
+impl Write for RedirectOutput {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        self.0.write(buf)
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+impl RedirectOutput {
+    pub fn new() -> RedirectOutput {
+        RedirectOutput(Vec::new())
+    }
+
+    pub fn to_string(&self) -> Result<String> {
+        Ok(String::from_utf8(self.0.clone())?)
+    }
+}
+
+struct NoInput;
+
+impl Read for NoInput {
+    fn read(&mut self, _buf: &mut [u8]) -> io::Result<usize> {
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            anyhow::Error::msg("no-input"),
+        ))
+    }
+}
+
+impl BufRead for NoInput {
+    fn fill_buf(&mut self) -> io::Result<&[u8]> {
+        Err(io::Error::new(
+            io::ErrorKind::Other,
+            anyhow::Error::msg("no-input"),
+        ))
+    }
+
+    fn consume(&mut self, _amt: usize) {}
+}
 
 fn optimize1(code: Vec<UnOptCode>) -> Result<(OptState, Vec<OptCode>)> {
     let mut now = 3;
-    let mut chk = BTreeSet::new();
+    let mut chk = HashSet::new();
 
     for c in &code {
-        if matches!(c.type_(), CodeType::Hyeong) {
+        if matches!(c.hangul_type(), HangulType::Hyeong) {
             continue;
         }
         let _ = chk.insert(now);
-        if matches!(c.type_(), CodeType::Heuk) {
+        if matches!(c.hangul_type(), HangulType::Heuk) {
             now = c.dot_count();
         }
     }
 
     let dot_map = chk
         .into_iter()
-        .skip_while(|x| *x <= 2)
+        .filter(|x| *x <= 2)
         .enumerate()
         .map(|(i, x)| (x, i + 3))
         .collect::<HashMap<_, _>>();
@@ -170,13 +77,13 @@ fn optimize1(code: Vec<UnOptCode>) -> Result<(OptState, Vec<OptCode>)> {
     let opt_code = code
         .into_iter()
         .map(|c| {
-            let type_ = c.type_();
+            let type_ = c.hangul_type();
             let hangul_count = c.hangul_count();
             let dot_count = c.dot_count();
             let area = c.area().clone();
             let area_count = c.area_count();
 
-            if matches!(c.type_(), CodeType::Hyeong) || c.dot_count() <= 2 {
+            if matches!(c.hangul_type(), HangulType::Hyeong) || c.dot_count() <= 2 {
                 OptCode::new(type_, hangul_count, dot_count, area_count, area)
             } else {
                 let dot_count = dot_map.get(&dot_count).copied().unwrap_or(dot_map.len() + 3);
@@ -185,32 +92,42 @@ fn optimize1(code: Vec<UnOptCode>) -> Result<(OptState, Vec<OptCode>)> {
         })
         .collect::<Vec<_>>();
 
-    Ok((OptState::new(dot_map.len() + 3), opt_code))
+    Ok((OptState::new(dot_map.len() + 4), opt_code))
 }
 
-// fn optimize2(mut state: OptState, code: Vec<OptCode>) -> Result<(OptState, Vec<OptCode>)> {
-//     let mut out = io::CustomWriter::new(|_| Ok(()));
-//     let mut err = io::CustomWriter::new(|_| Ok(()));
-//
-//     let mut idx = code.len();
-//     for (i, opt_code) in code.iter().enumerate() {
-//         let (new_state, next) = opt_execute(&mut stdin(), &mut out, &mut err, state, opt_code)?;
-//         state = new_state;
-//         if !next {
-//             idx = i;
-//             break;
-//         }
-//     }
-//     let code = code[idx..].to_vec();
-//
-//     state
-//         .get_stack(1)
-//         .extend(out.to_string()?.chars().map(|x| Num::from_num(x as isize)));
-//     state
-//         .get_stack(2)
-//         .extend(err.to_string()?.chars().map(|x| Num::from_num(x as isize)));
-//     Ok((state, code))
-// }
+fn optimize2(mut state: OptState, code: Vec<OptCode>) -> Result<(OptState, Vec<OptCode>)> {
+    let mut in_ = NoInput;
+    let mut out = RedirectOutput::new();
+    let mut err = RedirectOutput::new();
+
+    let mut idx = code.len();
+    for (i, opt_code) in code.iter().cloned().enumerate() {
+        if let Err(e) = state.execute(&mut in_, &mut out, &mut err, opt_code) {
+            if e.is::<usize>() {
+                state.exit(e.downcast::<usize>().unwrap() as i32);
+            } else if e.is::<io::Error>()
+                && matches!(
+                    e.downcast_ref::<io::Error>().unwrap().kind(),
+                    io::ErrorKind::Other
+                )
+            {
+                idx = i;
+                break;
+            } else {
+                return Err(e);
+            }
+        }
+    }
+    let code = code[idx..].to_vec();
+
+    state
+        .get_stack(1)
+        .extend(out.to_string()?.chars().map(|x| Num::from_num(x as isize)));
+    state
+        .get_stack(2)
+        .extend(err.to_string()?.chars().map(|x| Num::from_num(x as isize)));
+    Ok((state, code))
+}
 
 /// Optimization function
 ///
@@ -242,11 +159,9 @@ pub fn optimize(code: Vec<UnOptCode>, level: u8) -> Result<(OptState, Vec<OptCod
         (OptState::new(1), Vec::new())
     };
 
-    // todo: refactor optimize 2 code
-    // if level >= 2 {
-    //     optimize2(state, code)
-    // } else {
-    //     Ok((state, code))
-    // }
-    Ok((state, code))
+    if level >= 2 {
+        optimize2(state, code)
+    } else {
+        Ok((state, code))
+    }
 }

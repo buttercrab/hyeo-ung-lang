@@ -1,16 +1,18 @@
+use std::collections::HashSet;
+use std::io::{stdin, Write};
+use std::process;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+
+use clap::App;
+use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
+
 use crate::app::check;
 use crate::core::execute;
 use crate::core::state::{State, UnOptState};
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
 use crate::util::{ext, io, option};
-use clap::App;
-use std::collections::HashSet;
-use std::io::{stdin, Write};
-use std::process;
-use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
-use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// App for debug
 #[cfg(not(tarpaulin_include))]
@@ -189,9 +191,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
                             check::print_un_opt_codes(
                                 stdout,
                                 hy_opt,
-                                v.iter()
-                                    .map(|&i| (*i, &un_opt_code[*i]))
-                                    .collect::<Vec<_>>(),
+                                v.iter().map(|&i| (*i, &un_opt_code[*i])).collect::<Vec<_>>(),
                                 Color::Red,
                                 true,
                             )?;

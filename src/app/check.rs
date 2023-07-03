@@ -1,12 +1,14 @@
+use std::cmp::max;
+use std::io::Write;
+
+use clap::App;
+use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
+
 use crate::core::code::{Code, UnOptCode};
 use crate::core::parse;
 use crate::util::error::Error;
 use crate::util::option::HyeongOption;
 use crate::util::{ext, option};
-use clap::App;
-use std::cmp::max;
-use std::io::Write;
-use termcolor::{Color, ColorSpec, StandardStream, WriteColor};
 
 /// App for check
 #[cfg(not(tarpaulin_include))]
@@ -83,9 +85,7 @@ pub fn print_un_opt_codes(
             stdout,
             "{}  ",
             " ".repeat(
-                file_len
-                    - c.get_location().0.to_string().len()
-                    - c.get_location().1.to_string().len()
+                file_len - c.get_location().0.to_string().len() - c.get_location().1.to_string().len()
             )
         )?;
 

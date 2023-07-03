@@ -22,15 +22,16 @@ members = ["number"]
 anyhow = "1.0"
 clap = { version = "4.0", features = ["derive"] }
 colored = "2.0"
-ctrlc = { version = "3.0", features = ["termination"] }
 derive_more = "0.99"
-dirs = "4"
+dirs = "5"
 fern = "0.6"
+inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", features = ["llvm16-0"] }
 lazy_static = "1.4"
 log = "0.4"
 nom = "7"
 nom_locate = "4.1"
 number = { path = "number" }
+rustyline = "11"
 
 [[bin]]
 path = "src/main.rs"

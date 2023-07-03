@@ -1,5 +1,3 @@
-use crate::hyeong::area::{Area, ExclamationArea, HeartType};
-use crate::hyeong::code::{CodeType, UnOptCode};
 use anyhow::Result;
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_while};
@@ -8,13 +6,16 @@ use nom::error::{context, ContextError, ParseError};
 use nom::multi::{fold_many0, many0, many_till, separated_list0};
 use nom::sequence::{pair, preceded};
 use nom::{IResult, Parser};
-use nom_locate::LocatedSpan;
+use nom_locate::{position, LocatedSpan};
+
+use crate::hyeong::area::{Area, ExclamationArea, HeartType};
+use crate::hyeong::code::{HangulType, UnOptCode};
 
 const HEARTS: &str = "♥❤💕💖💗💘💙💚💛💜💝💞♡";
 const ETC: &str = "?!.…⋯⋮";
 const HANGUL: &str = "형항핫흣흡흑혀하흐어아으엉앙앗읏읍윽";
 
-pub type Span<'a> = LocatedSpan<&'a str>;
+pub type Span<'a> = LocatedSpan<&'a str, &'a str>;
 
 fn sp<'a, E: ParseError<Span<'a>>>(i: Span<'a>) -> IResult<Span<'a>, Span<'a>, E> {
     take_while(move |c| !HEARTS.contains(c) && !ETC.contains(c) && !HANGUL.contains(c))(i)
@@ -22,17 +23,19 @@ fn sp<'a, E: ParseError<Span<'a>>>(i: Span<'a>) -> IResult<Span<'a>, Span<'a>, E
 
 fn hangul<'a, E: ParseError<Span<'a>> + ContextError<Span<'a>>>(
     i: Span<'a>,
-) -> IResult<Span<'a>, (CodeType, usize), E> {
+) -> IResult<Span<'a>, (Span<'a>, HangulType, usize), E> {
     macro_rules! build_hangul {
         ($variant:ident, $one:literal, $long_begin:literal, $long_middle:literal, $long_end:literal) => {{
             alt((
-                map(preceded(sp, tag($one)), |_| (CodeType::$variant, 1)),
+                map(preceded(sp, pair(position, tag($one))), |(s, _)| {
+                    (s, HangulType::$variant, 1)
+                }),
                 map(
                     pair(
-                        preceded(sp, tag($long_begin)),
+                        preceded(sp, pair(position, tag($long_begin))),
                         many_till(preceded(sp, tag($long_middle)), preceded(sp, tag($long_end))),
                     ),
-                    |(_, (b, _))| (CodeType::$variant, b.len() + 2),
+                    |((s, _), (b, _))| (s, HangulType::$variant, b.len() + 2),
                 ),
             ))
         }};
@@ -115,102 +118,94 @@ fn area<'a, E: ParseError<Span<'a>> + ContextError<Span<'a>>>(i: Span<'a>) -> IR
 fn code<'a, E: ParseError<Span<'a>> + ContextError<Span<'a>>>(
     i: Span<'a>,
 ) -> IResult<Span<'a>, UnOptCode, E> {
-    let (span, (((code_type, code_count), dot_count), area)) = context("code", hangul.and(dot).and(area))(i)?;
+    let (end, (((start, code_type, code_count), dot_count), area)) =
+        context("code", hangul.and(dot).and(area))(i)?;
     Ok((
-        span,
-        UnOptCode::new(
-            code_type,
-            code_count,
-            dot_count,
-            (span.location_line() as usize, span.naive_get_utf8_column()),
-            area,
-            span.fragment(),
-        ),
+        end,
+        UnOptCode::new(code_type, code_count, dot_count, start, end, area),
     ))
 }
 
 pub fn parse<'a, E: ParseError<Span<'a>> + ContextError<Span<'a>>>(
     input: &'a str,
 ) -> Result<Vec<UnOptCode>, nom::Err<E>> {
-    Ok(context("code", many0(code))(Span::new(input))?.1)
+    Ok(context("code", many0(code))(Span::new_extra(input, input))?.1)
 }
 
 #[cfg(test)]
 mod test {
-    use crate::hyeong::area::HeartType;
-    use crate::hyeong::code::CodeType;
-    use crate::hyeong::parse::{area, area_exclamation, area_one, dot, hangul, Span};
     use nom::error::ErrorKind;
+
+    use crate::hyeong::area::HeartType;
+    use crate::hyeong::code::HangulType;
+    use crate::hyeong::parse::{area, area_exclamation, area_one, dot, hangul, Span};
+
+    fn span(input: &str) -> Span {
+        Span::new_extra(input, input)
+    }
 
     #[test]
     fn hangul_test() {
-        assert_eq!(
-            hangul::<(Span, ErrorKind)>(Span::new("형")).unwrap().1,
-            (CodeType::Hyeong, 1)
-        );
-        assert_eq!(
-            hangul::<(Span, ErrorKind)>(Span::new("혀엉")).unwrap().1,
-            (CodeType::Hyeong, 2)
-        );
-        assert_eq!(
-            hangul::<(Span, ErrorKind)>(Span::new("혀어엉")).unwrap().1,
-            (CodeType::Hyeong, 3)
-        );
-        assert_eq!(
-            hangul::<(Span, ErrorKind)>(Span::new("혀 어 어   엉")).unwrap().1,
-            (CodeType::Hyeong, 4)
-        );
+        assert!(matches!(
+            hangul::<(Span, ErrorKind)>(span("형")).unwrap().1,
+            (_, HangulType::Hyeong, 1)
+        ));
+        assert!(matches!(
+            hangul::<(Span, ErrorKind)>(span("혀엉")).unwrap().1,
+            (_, HangulType::Hyeong, 2)
+        ));
+        assert!(matches!(
+            hangul::<(Span, ErrorKind)>(span("혀어엉")).unwrap().1,
+            (_, HangulType::Hyeong, 3)
+        ));
+        assert!(matches!(
+            hangul::<(Span, ErrorKind)>(span("혀 어 어   엉")).unwrap().1,
+            (_, HangulType::Hyeong, 4)
+        ));
     }
 
     #[test]
     fn dot_test() {
-        assert_eq!(dot::<(Span, ErrorKind)>(Span::new("")).unwrap().1, 0);
-        assert_eq!(dot::<(Span, ErrorKind)>(Span::new(".. . .")).unwrap().1, 4);
-        assert_eq!(dot::<(Span, ErrorKind)>(Span::new(" . .....")).unwrap().1, 6);
-        assert_eq!(dot::<(Span, ErrorKind)>(Span::new("asdf....")).unwrap().1, 4);
+        assert_eq!(dot::<(Span, ErrorKind)>(span("")).unwrap().1, 0);
+        assert_eq!(dot::<(Span, ErrorKind)>(span(".. . .")).unwrap().1, 4);
+        assert_eq!(dot::<(Span, ErrorKind)>(span(" . .....")).unwrap().1, 6);
+        assert_eq!(dot::<(Span, ErrorKind)>(span("asdf....")).unwrap().1, 4);
     }
 
     #[test]
     fn area_one_test() {
-        assert_eq!(area_one::<(Span, ErrorKind)>(Span::new("")).unwrap().1, None);
+        assert_eq!(area_one::<(Span, ErrorKind)>(span("")).unwrap().1, None);
         assert_eq!(
-            area_one::<(Span, ErrorKind)>(Span::new("   💕")).unwrap().1,
+            area_one::<(Span, ErrorKind)>(span("   💕")).unwrap().1,
             Some(HeartType::TwoHearts)
         );
         assert_eq!(
-            area_one::<(Span, ErrorKind)>(Span::new(" 💝 ")).unwrap().1,
+            area_one::<(Span, ErrorKind)>(span(" 💝 ")).unwrap().1,
             Some(HeartType::HeartWithRibbon)
         );
-        assert_eq!(
-            area_one::<(Span, ErrorKind)>(Span::new(" 형 ...")).unwrap().1,
-            None
-        );
+        assert_eq!(area_one::<(Span, ErrorKind)>(span(" 형 ...")).unwrap().1, None);
     }
 
     #[test]
     fn area_exclamation_test() {
         assert_eq!(
-            area_exclamation::<(Span, ErrorKind)>(Span::new("")).unwrap().1,
+            area_exclamation::<(Span, ErrorKind)>(span("")).unwrap().1,
             vec![None].into()
         );
         assert_eq!(
-            area_exclamation::<(Span, ErrorKind)>(Span::new("!")).unwrap().1,
+            area_exclamation::<(Span, ErrorKind)>(span("!")).unwrap().1,
             vec![None, None].into()
         );
         assert_eq!(
-            area_exclamation::<(Span, ErrorKind)>(Span::new("  ! !  "))
-                .unwrap()
-                .1,
+            area_exclamation::<(Span, ErrorKind)>(span("  ! !  ")).unwrap().1,
             vec![None, None, None].into()
         );
         assert_eq!(
-            area_exclamation::<(Span, ErrorKind)>(Span::new("💕!💕"))
-                .unwrap()
-                .1,
+            area_exclamation::<(Span, ErrorKind)>(span("💕!💕")).unwrap().1,
             vec![Some(HeartType::TwoHearts), Some(HeartType::TwoHearts)].into()
         );
         assert_eq!(
-            area_exclamation::<(Span, ErrorKind)>(Span::new("💕!  💕 !"))
+            area_exclamation::<(Span, ErrorKind)>(span("💕!  💕 !"))
                 .unwrap()
                 .1,
             vec![Some(HeartType::TwoHearts), Some(HeartType::TwoHearts), None].into()
@@ -220,27 +215,27 @@ mod test {
     #[test]
     fn area_test() {
         assert_eq!(
-            area::<(Span, ErrorKind)>(Span::new("")).unwrap().1,
+            area::<(Span, ErrorKind)>(span("")).unwrap().1,
             vec![vec![None].into()].into()
         );
         assert_eq!(
-            area::<(Span, ErrorKind)>(Span::new("?")).unwrap().1,
+            area::<(Span, ErrorKind)>(span("?")).unwrap().1,
             vec![vec![None].into(), vec![None].into()].into()
         );
         assert_eq!(
-            area::<(Span, ErrorKind)>(Span::new("  ! ?  ")).unwrap().1,
+            area::<(Span, ErrorKind)>(span("  ! ?  ")).unwrap().1,
             vec![vec![None, None].into(), vec![None].into()].into()
         );
         assert_eq!(
-            area::<(Span, ErrorKind)>(Span::new("💕!💕")).unwrap().1,
+            area::<(Span, ErrorKind)>(span("💕!💕")).unwrap().1,
             vec![vec![Some(HeartType::TwoHearts), Some(HeartType::TwoHearts)].into()].into()
         );
         assert_eq!(
-            area::<(Span, ErrorKind)>(Span::new("💕? ?  💕 ")).unwrap().1,
+            area::<(Span, ErrorKind)>(span("💕? ?  💕 ")).unwrap().1,
             vec![
                 vec![Some(HeartType::TwoHearts)].into(),
                 vec![None].into(),
-                vec![Some(HeartType::TwoHearts)].into()
+                vec![Some(HeartType::TwoHearts)].into(),
             ]
             .into()
         );

@@ -1,9 +1,11 @@
-use crate::hyeong::area::Area;
 use derive_more::{Constructor, Display};
+
+use crate::hyeong::area::Area;
+use crate::hyeong::parse::Span;
 
 /// Code Types
 #[derive(Debug, Copy, Clone, Display, Eq, PartialEq, Hash)]
-pub enum CodeType {
+pub enum HangulType {
     #[display(fmt = "형")]
     Hyeong,
     #[display(fmt = "항")]
@@ -23,7 +25,7 @@ pub enum CodeType {
 /// It defines methods that code structure needs.
 /// [UnOptCode](struct.UnOptCode.html) and [OptCode](struct.OptCode.html) use this trait.
 pub trait Code {
-    fn type_(&self) -> CodeType;
+    fn hangul_type(&self) -> HangulType;
 
     fn hangul_count(&self) -> usize;
 
@@ -60,7 +62,7 @@ pub trait Code {
 /// ```
 #[derive(Debug, Clone, Constructor)]
 pub struct OptCode {
-    type_: CodeType,
+    hangul_type: HangulType,
     hangul_count: usize,
     dot_count: usize,
     area_count: usize,
@@ -69,8 +71,8 @@ pub struct OptCode {
 
 impl Code for OptCode {
     /// Return type of code
-    fn type_(&self) -> CodeType {
-        self.type_
+    fn hangul_type(&self) -> HangulType {
+        self.hangul_type
     }
 
     /// Return hangul count of code
@@ -107,30 +109,30 @@ impl Code for OptCode {
 /// ```
 #[derive(Debug, Clone, Constructor)]
 pub struct UnOptCode<'a> {
-    type_: CodeType,
+    hangul_type: HangulType,
     hangul_count: usize,
     dot_count: usize,
-    loc: (usize, usize),
+    start: Span<'a>,
+    end: Span<'a>,
     area: Area,
-    code: &'a str,
 }
 
 impl<'a> UnOptCode<'a> {
     /// Return location
-    pub fn location(&self) -> (usize, usize) {
-        self.loc
+    pub fn start_span(&self) -> Span<'a> {
+        self.start
     }
 
     /// Return raw code
-    pub fn raw(&self) -> &'a str {
-        self.code
+    pub fn raw(&self) -> &str {
+        &self.start.extra[self.start.location_offset()..self.end.location_offset()]
     }
 }
 
 impl Code for UnOptCode<'_> {
     /// Return type of code
-    fn type_(&self) -> CodeType {
-        self.type_
+    fn hangul_type(&self) -> HangulType {
+        self.hangul_type
     }
 
     /// Return hangul count of code

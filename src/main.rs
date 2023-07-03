@@ -1,16 +1,17 @@
-mod commands;
-mod hyeong;
-mod io;
+use std::fmt;
+use std::path::PathBuf;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
-use crate::commands::{build, check, debug, interpret, run};
 use anyhow::Result;
 use clap::{Parser, Subcommand, ValueEnum};
 use colored::Colorize;
 use lazy_static::lazy_static;
 use log::{error, warn, Level};
-use std::fmt;
-use std::path::PathBuf;
-use std::sync::atomic::{AtomicUsize, Ordering};
+
+use crate::commands::{build, check, debug, interpret, run};
+
+mod commands;
+mod hyeong;
 
 lazy_static! {
     static ref HYEONG_DIR: PathBuf = dirs::home_dir().unwrap().join(".hyeong");
@@ -42,7 +43,7 @@ enum Commands {
     #[command(name = "build")]
     Build {
         /// optimize level
-        #[arg(short = 'O', long = "optimize", default_value_t = 2, value_parser(clap::value_parser!(u8).range(0..=2)))]
+        #[arg(short = 'O', long = "optimize", default_value_t = 2, value_parser(clap::value_parser ! (u8).range(0..=2)))]
         level: u8,
         /// input file to compile
         #[arg(required = true, value_name = "FILE.hyeong")]
@@ -75,7 +76,7 @@ enum Commands {
     #[command(name = "run")]
     Run {
         /// optimize level
-        #[arg(short = 'O', long = "optimize", default_value_t = 2, value_parser(["0", "1", "2"]))]
+        #[arg(short = 'O', long = "optimize", default_value_t = 2, value_parser = clap::value_parser ! (u8).range(0..=2))]
         level: u8,
         /// input file to compile
         #[arg(required = true, value_name = "FILE.hyeong")]

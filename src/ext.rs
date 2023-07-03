@@ -1,13 +1,15 @@
-use crate::core::code::UnOptCode;
-use crate::core::parse;
-use crate::util::error::Error;
-use crate::util::io;
-use number::num::Num;
 use std::io::Write;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process::{Command, Stdio};
+
+use number::num::Num;
 use termcolor::StandardStream;
+
+use crate::core::code::UnOptCode;
+use crate::core::parse;
+use crate::util::error::Error;
+use crate::util::io;
 
 /// PathBuf to String helper function
 ///

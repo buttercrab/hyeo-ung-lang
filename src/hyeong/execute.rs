@@ -1,30 +1,34 @@
-use crate::hyeong::code::{Code, CodeType};
+use std::io::{BufRead, Write};
+
+use anyhow::{bail, Result};
+
+use number::num::Num;
+
+use crate::hyeong::area::HeartType;
+use crate::hyeong::code::{Code, HangulType};
 use crate::hyeong::num_to_unicode;
 use crate::hyeong::state::{OptState, State, UnOptState};
-use crate::io::ReadLine;
-use anyhow::{bail, Result};
-use number::num::Num;
-use std::io::Write;
-
-use super::area::HeartType;
 
 pub trait ExecutableState: State {
     fn push_stack(&mut self, out: &mut impl Write, err: &mut impl Write, idx: usize, num: Num) -> Result<()> {
+        macro_rules! write_num {
+            ($to:expr, $num:expr) => {
+                if $num.is_pos() {
+                    write!($to, "{}", num_to_unicode(&$num)?)?;
+                } else {
+                    write!($to, "{}", (-&$num).floor())?;
+                }
+            };
+        }
+
         if idx == 1 {
-            if num.is_pos() {
-                write!(out, "{}", num_to_unicode(&num)?)?;
-            } else {
-                write!(out, "{}", -&num)?;
-            }
+            write_num!(out, num);
         } else if idx == 2 {
-            if num.is_pos() {
-                write!(err, "{}", num_to_unicode(&num)?)?;
-            } else {
-                write!(err, "{}", -&num)?;
-            }
+            write_num!(err, num);
         } else {
             self.push_stack_impl(idx, num);
         }
+
         Ok(())
     }
 
@@ -37,14 +41,15 @@ pub trait ExecutableState: State {
 
     fn pop_stack(
         &mut self,
-        in_: &mut impl ReadLine,
+        in_: &mut impl BufRead,
         out: &mut impl Write,
         err: &mut impl Write,
         idx: usize,
     ) -> Result<Num> {
         if idx == 0 {
             if self.get_stack(0).is_empty() {
-                let s = in_.read_line_()?;
+                let mut s = String::new();
+                in_.read_line(&mut s)?;
                 for c in s.chars() {
                     self.push_stack_impl(0, Num::from_num(c as isize));
                 }
@@ -53,7 +58,7 @@ pub trait ExecutableState: State {
         } else if idx <= 2 {
             out.flush()?;
             err.flush()?;
-            bail!(idx - 1);
+            bail!(idx);
         } else {
             Ok(self.pop_stack_impl(idx))
         }
@@ -84,7 +89,7 @@ pub trait ExecutableState: State {
     /// ```
     fn execute_one(
         &mut self,
-        in_: &mut impl ReadLine,
+        in_: &mut impl BufRead,
         out: &mut impl Write,
         err: &mut impl Write,
     ) -> Result<()> {
@@ -92,46 +97,44 @@ pub trait ExecutableState: State {
         let code = (*self.get_code(loc)).clone();
         let stack_idx = self.current_stack();
 
-        match code.type_() {
-            CodeType::Hyeong => {
-                let n = Num::from_num((code.hangul_count() + code.dot_count()) as isize);
-                self.push_stack(out, err, stack_idx, n)?;
-            }
-            CodeType::Hang => {
+        macro_rules! impl_hang_hat {
+            ($init:ident, $op:tt) => {{
                 let n = (0..code.hangul_count())
                     .map(|_| self.pop_stack(in_, out, err, stack_idx))
-                    .try_fold(Num::zero(), |acc, x| Ok::<_, anyhow::Error>(&acc + &x?))?;
+                    .try_fold(Num::$init(), |acc, x| Ok::<_, anyhow::Error>(&acc $op &x?))?;
 
                 self.push_stack(out, err, code.dot_count(), n)?;
-            }
-            CodeType::Hat => {
-                let n = (0..code.hangul_count())
-                    .map(|_| self.pop_stack(in_, out, err, stack_idx))
-                    .try_fold(Num::zero(), |acc, x| Ok::<_, anyhow::Error>(&acc * &x?))?;
+            }};
+        }
 
-                self.push_stack(out, err, code.dot_count(), n)?;
-            }
-            ty @ CodeType::Heut | ty @ CodeType::Heup => {
+        macro_rules! impl_heut_heup {
+            ($init:ident, $op:tt) => {{
                 let n = (0..code.hangul_count())
                     .map(|_| self.pop_stack(in_, out, err, stack_idx))
                     .rev()
                     .collect::<Result<Vec<_>>>()?
                     .into_iter()
-                    .try_fold(Num::zero(), |acc, mut x| {
-                        let r = if matches!(ty, CodeType::Heut) {
-                            x.minus();
-                            &acc + &x
-                        } else {
-                            x.flip();
-                            &acc * &x
-                        };
+                    .try_fold(Num::$init(), |acc, mut x| {
+                        x.flip();
+                        let r = &acc $op &x;
                         self.push_stack(out, err, stack_idx, x)?;
                         Ok::<_, anyhow::Error>(r)
                     })?;
 
                 self.push_stack(out, err, code.dot_count(), n)?;
+            }};
+        }
+
+        match code.hangul_type() {
+            HangulType::Hyeong => {
+                let n = Num::from_num((code.hangul_count() * code.dot_count()) as isize);
+                self.push_stack(out, err, stack_idx, n)?;
             }
-            CodeType::Heuk => {
+            HangulType::Hang => impl_hang_hat!(zero, +),
+            HangulType::Hat => impl_hang_hat!(one, *),
+            HangulType::Heut => impl_heut_heup!(zero, +),
+            HangulType::Heup => impl_heut_heup!(one, *),
+            HangulType::Heuk => {
                 let n = self.pop_stack(in_, out, err, stack_idx)?;
                 for _ in 0..code.hangul_count() {
                     self.push_stack(out, err, code.dot_count(), n.clone())?;
@@ -147,9 +150,9 @@ pub trait ExecutableState: State {
             .area()
             .calc(code.area_count(), || self.pop_stack(in_, out, err, stack_idx))?
         {
-            if matches!(area_type, HeartType::WhiteHeartSuit) {
-                let id = ((code.area_count() as u128) << 4) + area_type as u128;
-                match self.get_point(id) {
+            if !matches!(area_type, HeartType::WhiteHeartSuit) {
+                let id = (code.area_count(), area_type);
+                match self.get_point(&id) {
                     Some(value) => {
                         if loc != value {
                             self.set_latest_loc(loc);
@@ -189,14 +192,14 @@ pub trait ExecutableState: State {
     /// ```
     fn execute(
         &mut self,
-        in_: &mut impl ReadLine,
+        in_: &mut impl BufRead,
         out: &mut impl Write,
         err: &mut impl Write,
-        code: &Self::CodeType,
+        code: Self::CodeType,
     ) -> Result<()> {
-        let length = self.push_code((*code).clone()) + 1;
+        let length = self.push_code(code);
 
-        while self.get_loc() < length {
+        while self.get_loc() <= length {
             self.execute_one(in_, out, err)?;
         }
 
