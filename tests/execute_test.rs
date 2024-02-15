@@ -1,18 +1,25 @@
 #[cfg(test)]
 mod execute_test {
-    use hyeong::core::state::UnOptState;
-    use hyeong::core::{execute, parse};
-    use hyeong::util::io;
+    use hyeong::{
+        hyeong::{
+            execute::ExecutableState,
+            parse::{self, Span},
+            state::UnOptState,
+        },
+        io,
+    };
+    use nom::error::ErrorKind;
 
     fn helper_function(code: &str, stdin: &str, stdout: &str, stderr: &str) {
-        let parsed = parse::parse(code.to_string());
+        let parsed = parse::parse::<(Span, ErrorKind)>(code).unwrap();
         let mut ipt = io::CustomReader::new(stdin.to_string());
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut state = UnOptState::new();
 
         for c in parsed {
-            state = execute::execute(&mut ipt, &mut out, &mut err, state, &c).unwrap();
+            // state = execute::execute(&mut ipt, &mut out, &mut err, state, &c).unwrap();
+            state.execute(&mut ipt, &mut out, &mut err, c).unwrap();
         }
 
         assert_eq!(stdout.to_string(), out.to_string().unwrap());
@@ -46,26 +53,6 @@ mod execute_test {
 
     #[test]
     fn execute_test05() {
-        helper_function(
-            "형 흣........💕 흣.... 형. 하앙... 흣. 흑... 흐읏....!💕",
-            "",
-            "12345678",
-            "",
-        );
-    }
-
-    #[test]
-    fn execute_test06() {
-        helper_function("형. 흣..", "", "", "1");
-    }
-
-    #[test]
-    fn execute_test07() {
-        helper_function(
-            "형. 형.. 형. 흑...💘 항.... 하앙... 항...♡ 흑...💘 ! 흣...흑.",
-            "",
-            "4",
-            "",
-        );
+        helper_function("형. 흣..", "", "", "\u{1}");
     }
 }

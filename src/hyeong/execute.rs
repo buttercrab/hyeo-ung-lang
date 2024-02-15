@@ -33,7 +33,7 @@ pub trait ExecutableState: State {
     }
 
     fn push_stack_impl(&mut self, idx: usize, num: Num) {
-        let st = self.get_stack(idx);
+        let st = self.stack(idx);
         if !st.is_empty() || !num.is_nan() {
             st.push(num);
         }
@@ -47,7 +47,7 @@ pub trait ExecutableState: State {
         idx: usize,
     ) -> Result<Num> {
         if idx == 0 {
-            if self.get_stack(0).is_empty() {
+            if self.stack(0).is_empty() {
                 let mut s = String::new();
                 in_.read_line(&mut s)?;
                 for c in s.chars() {
@@ -65,7 +65,7 @@ pub trait ExecutableState: State {
     }
 
     fn pop_stack_impl(&mut self, idx: usize) -> Num {
-        self.get_stack(idx).pop().unwrap_or_else(Num::nan)
+        self.stack(idx).pop().unwrap_or_else(Num::nan)
     }
 
     /// Executes only one line of code and return next position of code
@@ -93,8 +93,8 @@ pub trait ExecutableState: State {
         out: &mut impl Write,
         err: &mut impl Write,
     ) -> Result<()> {
-        let loc = self.get_loc();
-        let code = (*self.get_code(loc)).clone();
+        let loc = self.loc();
+        let code = (*self.code(loc)).clone();
         let stack_idx = self.current_stack();
 
         macro_rules! impl_hang_hat {
@@ -152,7 +152,7 @@ pub trait ExecutableState: State {
         {
             if !matches!(area_type, HeartType::WhiteHeartSuit) {
                 let id = (code.area_count(), area_type);
-                match self.get_point(&id) {
+                match self.point(&id) {
                     Some(value) => {
                         if loc != value {
                             self.set_latest_loc(loc);
@@ -162,7 +162,7 @@ pub trait ExecutableState: State {
                     }
                     None => self.set_point(id, loc),
                 }
-            } else if let Some(loc) = self.get_latest_loc() {
+            } else if let Some(loc) = self.latest_loc() {
                 self.set_loc(loc);
                 return Ok(());
             }
@@ -199,7 +199,7 @@ pub trait ExecutableState: State {
     ) -> Result<()> {
         let length = self.push_code(code);
 
-        while self.get_loc() <= length {
+        while self.loc() <= length {
             self.execute_one(in_, out, err)?;
         }
 

@@ -1,24 +1,13 @@
-use std::fmt;
-use std::path::PathBuf;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::{path::PathBuf, sync::atomic::Ordering};
 
 use anyhow::Result;
 use clap::{Parser, Subcommand, ValueEnum};
 use colored::Colorize;
-use lazy_static::lazy_static;
+use hyeong::{
+    commands::{build, check, debug, interpret, run},
+    error_barrier, ERROR_COUNT, WARN_COUNT,
+};
 use log::{error, warn, Level};
-
-use crate::commands::{build, check, debug, interpret, run};
-
-mod commands;
-mod hyeong;
-
-lazy_static! {
-    static ref HYEONG_DIR: PathBuf = dirs::home_dir().unwrap().join(".hyeong");
-}
-
-static ERROR_COUNT: AtomicUsize = AtomicUsize::new(0);
-static WARN_COUNT: AtomicUsize = AtomicUsize::new(0);
 
 /// Hyeo-ung Programming Language Toolchain
 #[derive(Parser, Debug, Clone)]
@@ -135,16 +124,6 @@ fn setup_logger(verbose: bool) -> Result<()> {
     Ok(())
 }
 
-/// Exits when error is thrown
-///
-/// It helps to throw multiple errors and exit at once.
-pub fn error_barrier(msg: fmt::Arguments) {
-    if ERROR_COUNT.load(Ordering::Acquire) > 0 {
-        error!("{}", msg);
-        std::process::exit(1);
-    }
-}
-
 /// Main function of hyeong
 ///
 /// It parses arguments and runs subcommands.
@@ -183,6 +162,7 @@ fn main() {
     if warning_count > 0 {
         warn!("{} warning(s) generated", warning_count);
     }
+
     // exit with 1 when error occurred
     error_barrier(format_args!("could not do the job due to previous error"));
 }

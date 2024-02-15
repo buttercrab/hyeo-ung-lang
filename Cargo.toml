@@ -7,12 +7,7 @@ license = "MIT"
 homepage = "https://github.com/buttercrab/hyeo-ung-lang"
 repository = "https://github.com/buttercrab/hyeo-ung-lang"
 description = "Hyeo-ung Programming Language Compiler"
-include = [
-    "number/**/*",
-    "src/**/*",
-    "Cargo.toml",
-    "README.md"
-]
+include = ["number/**/*", "src/**/*", "Cargo.toml", "README.md", "tests/**/*"]
 readme = "README.md"
 
 [workspace]
@@ -25,13 +20,16 @@ colored = "2.0"
 derive_more = "0.99"
 dirs = "5"
 fern = "0.6"
-inkwell = { git = "https://github.com/TheDan64/inkwell", branch = "master", features = ["llvm16-0"] }
+inkwell = { version = "0.4.0", features = ["llvm17-0"] }
 lazy_static = "1.4"
 log = "0.4"
 nom = "7"
 nom_locate = "4.1"
 number = { path = "number" }
 rustyline = "11"
+
+[dev-dependencies]
+termcolor = "1.4"
 
 [[bin]]
 path = "src/main.rs"

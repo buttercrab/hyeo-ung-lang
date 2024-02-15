@@ -13,37 +13,37 @@ use crate::hyeong::code::{Code, OptCode, UnOptCode};
 pub trait State {
     type CodeType: Code + Clone;
 
-    fn get_all_stack_index(&self) -> Vec<usize>;
+    fn stack_indices(&self) -> Vec<usize>;
 
-    fn stack_size(&self) -> usize;
+    fn stack_count(&self) -> usize;
 
     fn current_stack(&self) -> usize;
 
     fn set_current_stack(&mut self, cur: usize);
 
-    fn get_stack(&mut self, idx: usize) -> &mut Vec<Num>;
+    fn stack(&mut self, idx: usize) -> &mut Vec<Num>;
 
-    fn get_code(&self, loc: usize) -> &Self::CodeType;
+    fn code(&self, loc: usize) -> &Self::CodeType;
 
     fn push_code(&mut self, code: Self::CodeType) -> usize;
 
-    fn get_all_code(&self) -> Vec<Self::CodeType>;
+    fn all_code(&self) -> Vec<Self::CodeType>;
 
     fn set_point(&mut self, id: (usize, HeartType), loc: usize);
 
-    fn get_point(&self, id: &(usize, HeartType)) -> Option<usize>;
+    fn point(&self, id: &(usize, HeartType)) -> Option<usize>;
 
-    fn get_all_point(&self) -> Vec<((usize, HeartType), usize)>;
+    fn all_point(&self) -> Vec<((usize, HeartType), usize)>;
 
     fn set_latest_loc(&mut self, loc: usize);
 
-    fn get_latest_loc(&self) -> Option<usize>;
+    fn latest_loc(&self) -> Option<usize>;
 
     fn set_loc(&mut self, loc: usize);
 
-    fn get_loc(&self) -> usize;
+    fn loc(&self) -> usize;
 
-    fn get_exit(&self) -> Option<i32>;
+    fn exit_code(&self) -> Option<i32>;
 }
 
 /// State structure for optimized code
@@ -92,6 +92,10 @@ impl OptState {
         }
     }
 
+    pub fn pop_code(&mut self) {
+        self.code.pop();
+    }
+
     pub fn exit(&mut self, code: i32) {
         self.exit = Some(code);
     }
@@ -101,12 +105,12 @@ impl State for OptState {
     type CodeType = OptCode;
 
     /// Return stack indices
-    fn get_all_stack_index(&self) -> Vec<usize> {
+    fn stack_indices(&self) -> Vec<usize> {
         (0..self.stack.len()).collect()
     }
 
     /// Return stack count
-    fn stack_size(&self) -> usize {
+    fn stack_count(&self) -> usize {
         self.stack.len()
     }
 
@@ -121,12 +125,12 @@ impl State for OptState {
     }
 
     /// Return stack of `idx`
-    fn get_stack(&mut self, idx: usize) -> &mut Vec<Num> {
+    fn stack(&mut self, idx: usize) -> &mut Vec<Num> {
         self.stack[idx].as_mut()
     }
 
     /// Return code
-    fn get_code(&self, loc: usize) -> &Self::CodeType {
+    fn code(&self, loc: usize) -> &Self::CodeType {
         &self.code[loc]
     }
 
@@ -137,7 +141,7 @@ impl State for OptState {
     }
 
     /// Return all code
-    fn get_all_code(&self) -> Vec<Self::CodeType> {
+    fn all_code(&self) -> Vec<Self::CodeType> {
         self.code.clone()
     }
 
@@ -147,12 +151,12 @@ impl State for OptState {
     }
 
     /// Return point for area
-    fn get_point(&self, id: &(usize, HeartType)) -> Option<usize> {
+    fn point(&self, id: &(usize, HeartType)) -> Option<usize> {
         self.point.get(id).copied()
     }
 
     /// Return all points
-    fn get_all_point(&self) -> Vec<((usize, HeartType), usize)> {
+    fn all_point(&self) -> Vec<((usize, HeartType), usize)> {
         self.point.iter().map(|(k, v)| (*k, *v)).collect()
     }
 
@@ -162,7 +166,7 @@ impl State for OptState {
     }
 
     /// Return latest location
-    fn get_latest_loc(&self) -> Option<usize> {
+    fn latest_loc(&self) -> Option<usize> {
         self.latest
     }
 
@@ -170,11 +174,11 @@ impl State for OptState {
         self.loc = loc;
     }
 
-    fn get_loc(&self) -> usize {
+    fn loc(&self) -> usize {
         self.loc
     }
 
-    fn get_exit(&self) -> Option<i32> {
+    fn exit_code(&self) -> Option<i32> {
         self.exit
     }
 }
@@ -230,12 +234,12 @@ impl<'a> State for UnOptState<'a> {
     type CodeType = UnOptCode<'a>;
 
     /// Return stack indices
-    fn get_all_stack_index(&self) -> Vec<usize> {
+    fn stack_indices(&self) -> Vec<usize> {
         self.stack.keys().copied().collect()
     }
 
     /// Return stack count
-    fn stack_size(&self) -> usize {
+    fn stack_count(&self) -> usize {
         self.stack.len()
     }
 
@@ -250,12 +254,12 @@ impl<'a> State for UnOptState<'a> {
     }
 
     /// Return stack
-    fn get_stack(&mut self, idx: usize) -> &mut Vec<Num> {
-        self.stack.entry(idx).or_insert_with(Vec::new)
+    fn stack(&mut self, idx: usize) -> &mut Vec<Num> {
+        self.stack.entry(idx).or_default()
     }
 
     /// Return code
-    fn get_code(&self, loc: usize) -> &Self::CodeType {
+    fn code(&self, loc: usize) -> &Self::CodeType {
         &self.code[loc]
     }
 
@@ -266,7 +270,7 @@ impl<'a> State for UnOptState<'a> {
     }
 
     /// Return all code
-    fn get_all_code(&self) -> Vec<Self::CodeType> {
+    fn all_code(&self) -> Vec<Self::CodeType> {
         self.code.clone()
     }
 
@@ -276,12 +280,12 @@ impl<'a> State for UnOptState<'a> {
     }
 
     /// Return point for area
-    fn get_point(&self, id: &(usize, HeartType)) -> Option<usize> {
+    fn point(&self, id: &(usize, HeartType)) -> Option<usize> {
         self.point.get(id).copied()
     }
 
     /// Return all points
-    fn get_all_point(&self) -> Vec<((usize, HeartType), usize)> {
+    fn all_point(&self) -> Vec<((usize, HeartType), usize)> {
         self.point.iter().map(|(k, v)| (*k, *v)).collect()
     }
 
@@ -291,7 +295,7 @@ impl<'a> State for UnOptState<'a> {
     }
 
     /// Return latest location
-    fn get_latest_loc(&self) -> Option<usize> {
+    fn latest_loc(&self) -> Option<usize> {
         self.latest
     }
 
@@ -299,11 +303,11 @@ impl<'a> State for UnOptState<'a> {
         self.loc = loc;
     }
 
-    fn get_loc(&self) -> usize {
+    fn loc(&self) -> usize {
         self.loc
     }
 
-    fn get_exit(&self) -> Option<i32> {
+    fn exit_code(&self) -> Option<i32> {
         None
     }
 }

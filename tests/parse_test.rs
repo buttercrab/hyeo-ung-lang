@@ -1,9 +1,17 @@
 #[cfg(test)]
 mod parse_test {
-    use hyeong::core::parse;
+    use hyeong::hyeong::{
+        code::UnOptCode,
+        parse::{self, Span},
+    };
+    use nom::error::ErrorKind;
+
+    fn p(code: &str) -> Vec<UnOptCode> {
+        parse::parse::<(Span, ErrorKind)>(code).unwrap()
+    }
 
     fn basic_test(code: &str, res: &str) {
-        let t = format!("{:?}", parse::parse(code.to_string())[0]);
+        let t = format!("{:?}", p(code)[0]);
 
         assert_eq!(res.to_string(), t);
     }
@@ -155,7 +163,7 @@ mod parse_test {
 
     #[test]
     fn multi_command_test01() {
-        let t = parse::parse("형...하앗..!??!?".to_string());
+        let t = p("형...하앗..!??!?");
 
         assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"_\"", format!("{:?}", t[0]));
         assert_eq!(
@@ -166,7 +174,7 @@ mod parse_test {
 
     #[test]
     fn multi_command_test02() {
-        let t = parse::parse("형...??!\n하읍앗...".to_string());
+        let t = p("형...??!\n하읍앗...");
 
         assert_eq!(
             "type: 0, cnt1: 1, cnt2: 3, area: \"?_?_!__\"",
@@ -177,7 +185,7 @@ mod parse_test {
 
     #[test]
     fn multi_command_test03() {
-        let t = parse::parse("형...\n\n형..?!!!".to_string());
+        let t = p("형...\n\n형..?!!!");
 
         assert_eq!("type: 0, cnt1: 1, cnt2: 3, area: \"_\"", format!("{:?}", t[0]));
         assert_eq!(

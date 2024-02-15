@@ -1,34 +1,45 @@
 #[cfg(test)]
 mod optimize_test {
-    use hyeong::core::state::State;
-    use hyeong::core::{execute, optimize, parse};
-    use hyeong::util::io;
     use std::io::Write;
 
+    use hyeong::{
+        hyeong::{
+            execute::ExecutableState,
+            optimize,
+            parse::{self, Span},
+            state::State,
+        },
+        io,
+    };
+    use nom::error::ErrorKind;
+
     fn helper_function(code: &str, stdin: &str, stdout: &str, stderr: &str, level: u8) {
-        let un_opt_code = parse::parse(code.to_string());
+        let un_opt_code = parse::parse::<(Span, ErrorKind)>(code).unwrap();
         let mut ipt = io::CustomReader::new(stdin.to_string());
         let mut out = io::CustomWriter::new(|_| Result::Ok(()));
         let mut err = io::CustomWriter::new(|_| Result::Ok(()));
         let mut out_str = String::from("");
         let mut err_str = String::from("");
         let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, level).unwrap();
-        if !opt_state.get_stack(1).is_empty() {
-            for num in opt_state.get_stack(1).iter() {
+
+        if !opt_state.stack(1).is_empty() {
+            for num in opt_state.stack(1).iter() {
                 out_str.push_str(&*format!("{}", num.floor().to_int() as u8 as char));
             }
             out.flush().unwrap();
-            opt_state.get_stack(1).clear();
+            opt_state.stack(1).clear();
         }
-        if !opt_state.get_stack(2).is_empty() {
-            for num in opt_state.get_stack(2).iter() {
+
+        if !opt_state.stack(2).is_empty() {
+            for num in opt_state.stack(2).iter() {
                 err_str.push_str(&*format!("{}", num.floor().to_int() as u8 as char));
             }
             err.flush().unwrap();
-            opt_state.get_stack(2).clear();
+            opt_state.stack(2).clear();
         }
+
         for c in opt_code {
-            opt_state = execute::execute(&mut ipt, &mut out, &mut err, opt_state, &c).unwrap();
+            opt_state.execute(&mut ipt, &mut out, &mut err, c).unwrap();
         }
         out_str.push_str(&out.to_string().unwrap());
         err_str.push_str(&err.to_string().unwrap());

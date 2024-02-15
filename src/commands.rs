@@ -88,8 +88,8 @@ pub fn build(level: u8, file: PathBuf) -> Result<()> {
         // build_source(state, &un_opt_code, level)
     };
     debug!(target: "Building", "total {} byte(s)", rust_code.len());
-    // todo: finish build
-    Ok(())
+
+    todo!("write to LLVM")
 }
 
 pub fn check(file: PathBuf, raw: bool) -> Result<()> {

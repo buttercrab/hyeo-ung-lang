@@ -58,18 +58,18 @@ fn optimize1(code: Vec<UnOptCode>) -> Result<(OptState, Vec<OptCode>)> {
     let mut chk = HashSet::new();
 
     for c in &code {
-        if matches!(c.hangul_type(), HangulType::Hyeong) {
+        if c.hangul_type() == HangulType::Hyeong {
             continue;
         }
         let _ = chk.insert(now);
-        if matches!(c.hangul_type(), HangulType::Heuk) {
+        if c.hangul_type() == HangulType::Heuk {
             now = c.dot_count();
         }
     }
 
     let dot_map = chk
         .into_iter()
-        .filter(|x| *x <= 2)
+        .filter(|x| *x > 2)
         .enumerate()
         .map(|(i, x)| (x, i + 3))
         .collect::<HashMap<_, _>>();
@@ -77,17 +77,17 @@ fn optimize1(code: Vec<UnOptCode>) -> Result<(OptState, Vec<OptCode>)> {
     let opt_code = code
         .into_iter()
         .map(|c| {
-            let type_ = c.hangul_type();
+            let hangul_type = c.hangul_type();
             let hangul_count = c.hangul_count();
             let dot_count = c.dot_count();
             let area = c.area().clone();
             let area_count = c.area_count();
 
-            if matches!(c.hangul_type(), HangulType::Hyeong) || c.dot_count() <= 2 {
-                OptCode::new(type_, hangul_count, dot_count, area_count, area)
+            if c.hangul_type() == HangulType::Hyeong || c.dot_count() <= 2 {
+                OptCode::new(hangul_type, hangul_count, dot_count, area_count, area)
             } else {
                 let dot_count = dot_map.get(&dot_count).copied().unwrap_or(dot_map.len() + 3);
-                OptCode::new(type_, hangul_count, dot_count, area_count, area)
+                OptCode::new(hangul_type, hangul_count, dot_count, area_count, area)
             }
         })
         .collect::<Vec<_>>();
@@ -112,6 +112,7 @@ fn optimize2(mut state: OptState, code: Vec<OptCode>) -> Result<(OptState, Vec<O
                 )
             {
                 idx = i;
+                state.pop_code();
                 break;
             } else {
                 return Err(e);
@@ -121,10 +122,10 @@ fn optimize2(mut state: OptState, code: Vec<OptCode>) -> Result<(OptState, Vec<O
     let code = code[idx..].to_vec();
 
     state
-        .get_stack(1)
+        .stack(1)
         .extend(out.to_string()?.chars().map(|x| Num::from_num(x as isize)));
     state
-        .get_stack(2)
+        .stack(2)
         .extend(err.to_string()?.chars().map(|x| Num::from_num(x as isize)));
     Ok((state, code))
 }
