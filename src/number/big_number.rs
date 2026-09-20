@@ -289,9 +289,9 @@ impl BigNum {
                 flip = true;
                 continue;
             }
-            let k = if ('0'..='9').contains(&c) {
+            let k = if c.is_ascii_digit() {
                 c as isize - '0' as isize
-            } else if ('A'..='Z').contains(&c) {
+            } else if c.is_ascii_uppercase() {
                 c as isize - 'A' as isize + 10
             } else {
                 return Result::Err(Error::ParseError);

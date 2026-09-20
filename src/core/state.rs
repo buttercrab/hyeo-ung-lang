@@ -261,7 +261,7 @@ impl State for UnOptState {
 
     /// Return stack
     fn get_stack(&mut self, idx: usize) -> &mut Vec<Num> {
-        self.stack.entry(idx).or_insert_with(Vec::new)
+        self.stack.entry(idx).or_default()
     }
 
     /// Return code
@@ -328,7 +328,7 @@ impl fmt::Debug for UnOptState {
         let mut v = self.stack.iter().collect::<Vec<_>>();
         v.sort_by(|x, y| x.0.cmp(y.0));
         for (a, b) in v {
-            s.push_str(&*format!("stack {}: {:?}\n", a, b));
+            s.push_str(&format!("stack {}: {:?}\n", a, b));
         }
         write!(f, "{}", s)
     }

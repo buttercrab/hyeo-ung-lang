@@ -52,7 +52,7 @@ mod io_test {
 
         assert_eq!("type: 0, cnt1: 9, cnt2: 8, area: \"_\"", t);
 
-        fs::remove_file(&PathBuf::from(
+        fs::remove_file(PathBuf::from(
             "examples/hello_world/hello_world_temp.hyeong",
         ))
         .unwrap();

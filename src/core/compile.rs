@@ -23,7 +23,7 @@ fn fn_eprint(indent: usize, s: String) -> String {
 fn vec_to_str(v: &[Num]) -> String {
     let mut res = String::new();
     for i in v {
-        res.push_str(&*format!("{:?}, ", i.to_string()));
+        res.push_str(&format!("{:?}, ", i.to_string()));
     }
     res
 }
@@ -131,7 +131,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
         while let Area::Val { type_, left, right } = st.last().unwrap().0 {
             if *type_ <= 1 {
                 st.push((left, right, false));
-                res.push_str(&*format!(
+                res.push_str(&format!(
                     "\n{0}match stack.pop(cur).partial_cmp(&Num::from_num({1})) {{\
                          \n{0}    Some(std::cmp::Ordering::{2}) => {{",
                     make_indent(indent),
@@ -142,7 +142,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
                 continue;
             } else {
                 if *type_ < 13 {
-                    res.push_str(&*format!(
+                    res.push_str(&format!(
                         "\n{0}let v = *point.entry({1}u128).or_insert(state);\
                              \n{0}if v != state {{\
                              \n{0}    last = Option::Some(state);\
@@ -153,7 +153,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
                         ((cnt as u128) << 4) + *type_ as u128
                     ));
                 } else {
-                    res.push_str(&*format!(
+                    res.push_str(&format!(
                         "\n{0}if let Option::Some(v) = last {{\
                              \n{0}    state = v;\
                              \n{0}    continue;\
@@ -168,7 +168,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
         while st.len() > 1 && st.last().unwrap().2 {
             st.pop();
             indent -= 2;
-            res.push_str(&*format!(
+            res.push_str(&format!(
                 "\n{0}    }}\
                  \n{0}}}",
                 make_indent(indent)
@@ -179,7 +179,7 @@ fn area(mut indent: usize, a: &Area, cnt: usize) -> String {
             let (left, right, _) = st.pop().unwrap();
             st.push((right, left, true));
             indent -= 1;
-            res.push_str(&*format!(
+            res.push_str(&format!(
                 "\n{0}}}\
                  \n{0}_ => {{",
                 make_indent(indent)
@@ -329,7 +329,7 @@ fn main() {
     let mut indent = 1usize;
 
     if !state.get_stack(1).is_empty() {
-        res.push_str(&*fn_print(
+        res.push_str(&fn_print(
             indent,
             state
                 .get_stack(1)
@@ -341,7 +341,7 @@ fn main() {
     }
 
     if !state.get_stack(2).is_empty() {
-        res.push_str(&*fn_eprint(
+        res.push_str(&fn_eprint(
             indent,
             state
                 .get_stack(2)
@@ -360,7 +360,7 @@ fn main() {
                 if state.get_stack(i).is_empty() {
                     continue;
                 }
-                res.push_str(&*format!(
+                res.push_str(&format!(
                     "
     stack.data[{}] = vec![{}].iter().map(|x| Num::from_string(x.to_string())).collect();",
                     i,
@@ -368,13 +368,13 @@ fn main() {
                 ));
             }
 
-            res.push_str(&*format!(
+            res.push_str(&format!(
                 "
     cur = {};",
                 state.current_stack()
             ));
 
-            res.push_str(&*format!(
+            res.push_str(&format!(
                 "
     last = Option::{};",
                 match state.get_latest_loc() {
@@ -413,14 +413,14 @@ fn main() {
 
             if opt {
                 for (a, b) in point {
-                    res.push_str(&*format!(
+                    res.push_str(&format!(
                         "
     point.insert({}u128, {});",
                         a, b
                     ));
                 }
 
-                res.push_str(&*format!(
+                res.push_str(&format!(
                     "
     state = {};",
                     codes.len(),
@@ -455,7 +455,7 @@ fn main() {
             codes.pop().unwrap();
         }
 
-        res.push_str(&*format!(
+        res.push_str(&format!(
             "
     while state < {} {{",
             codes.len()
@@ -467,7 +467,7 @@ fn main() {
         for i in 0..codes.len() {
             while stack.last().unwrap().0 > 1 {
                 stack.push((stack.last().unwrap().0 / 2, false));
-                res.push_str(&*format!(
+                res.push_str(&format!(
                     "\n{}if state < {} {{",
                     make_indent(indent),
                     stack.last().unwrap().0 + i
@@ -476,19 +476,19 @@ fn main() {
             }
 
             for item in &codes[i] {
-                res.push_str(&*command(indent, item));
+                res.push_str(&command(indent, item));
             }
 
             while stack.len() > 1 && stack.last().unwrap().1 {
                 stack.pop();
                 indent -= 1;
-                res.push_str(&*format!("\n{}}}", make_indent(indent)));
+                res.push_str(&format!("\n{}}}", make_indent(indent)));
             }
 
             if i != codes.len() - 1 {
                 let last = stack.pop().unwrap().0;
                 stack.push((stack.last().unwrap().0 - last, true));
-                res.push_str(&*format!("\n{}}} else {{", make_indent(indent - 1)));
+                res.push_str(&format!("\n{}}} else {{", make_indent(indent - 1)));
             }
         }
 

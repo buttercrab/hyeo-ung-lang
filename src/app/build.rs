@@ -65,7 +65,7 @@ pub fn run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result<(), Err
     io::print_log(stdout, "compiling rust code")?;
     ext::execute_command_stderr(
         stdout,
-        &*format!(
+        &format!(
             "cargo build --manifest-path={} --release --color {}",
             ext::path_to_string(
                 &hy_opt

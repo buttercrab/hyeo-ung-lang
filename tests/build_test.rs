@@ -36,7 +36,7 @@ mod build_test {
 
         ext::execute_command_stdout(
             &mut s,
-            &*format!(
+            &format!(
                 "cargo build --manifest-path={} --release",
                 ext::path_to_string(&p.join("Cargo.toml")).unwrap()
             ),
