@@ -46,7 +46,7 @@ pub fn install_run(stdout: &mut StandardStream, hy_opt: &HyeongOption) -> Result
         ));
     }
     io::print_log(stdout, "making dir for building hyeong")?;
-    fs::create_dir_all(&hy_opt.build_path.as_ref().unwrap().join("hyeong-build/src"))?;
+    fs::create_dir_all(hy_opt.build_path.as_ref().unwrap().join("hyeong-build/src"))?;
     io::save_to_file(
         &hy_opt
             .build_path
@@ -85,7 +85,7 @@ hyeong = { git = \"https://github.com/buttercrab/hyeo-ung-lang\", features = [\"
     io::print_log(stdout, "test pre-build")?;
     ext::execute_command_stderr(
         stdout,
-        &*format!(
+        &format!(
             "cargo build --manifest-path={} --release --color {}",
             ext::path_to_string(
                 &hy_opt

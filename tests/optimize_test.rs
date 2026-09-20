@@ -15,14 +15,14 @@ mod optimize_test {
         let (mut opt_state, opt_code) = optimize::optimize(un_opt_code, level).unwrap();
         if !opt_state.get_stack(1).is_empty() {
             for num in opt_state.get_stack(1).iter() {
-                out_str.push_str(&*format!("{}", num.floor().to_int() as u8 as char));
+                out_str.push_str(&format!("{}", num.floor().to_int() as u8 as char));
             }
             out.flush().unwrap();
             opt_state.get_stack(1).clear();
         }
         if !opt_state.get_stack(2).is_empty() {
             for num in opt_state.get_stack(2).iter() {
-                err_str.push_str(&*format!("{}", num.floor().to_int() as u8 as char));
+                err_str.push_str(&format!("{}", num.floor().to_int() as u8 as char));
             }
             err.flush().unwrap();
             opt_state.get_stack(2).clear();

@@ -21,6 +21,9 @@ travis-ci = { repository = "buttercrab/hyeo-ung-lang" }
 default = ["clap", "ctrlc", "termcolor"]
 number = []
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(tarpaulin_include)'] }
+
 [dependencies]
 clap = { version = "3.0.7", optional = true }
 ctrlc = { version = "3.0", features = ["termination"], optional = true }

@@ -6,6 +6,9 @@ jobs:
   test:
     name: coverage
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2
@@ -23,6 +26,7 @@ jobs:
           cargo tarpaulin --verbose --workspace --timeout 120 --out Xml --run-types Tests --run-types Doctests
 
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@29386c70ef20e286228c72b668a06fd0e8399192 # v1
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
+          use_oidc: true
           fail_ci_if_error: true

@@ -48,7 +48,7 @@ pub fn color<'a>() -> Arg<'a> {
         .help("whether prints color")
         .default_value("auto")
         .global(true)
-        .possible_values(&["never", "auto", "always"])
+        .possible_values(["never", "auto", "always"])
         .multiple_occurrences(false)
 }
 
@@ -97,7 +97,7 @@ pub fn optimize<'a>() -> Arg<'a> {
         .long("optimize")
         .help("optimize level")
         .default_value("2")
-        .possible_values(&["0", "1", "2"])
+        .possible_values(["0", "1", "2"])
         .multiple_occurrences(false)
 }
 

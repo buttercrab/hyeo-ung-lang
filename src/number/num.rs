@@ -361,7 +361,7 @@ impl Num {
     pub fn neg(v: &Num) -> Num {
         Num {
             up: (-&v.up),
-            down: (&v.down).clone(),
+            down: v.down.clone(),
         }
     }
 

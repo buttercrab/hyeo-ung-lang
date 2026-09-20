@@ -167,7 +167,7 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
                                     left: _,
                                     ref mut right,
                                 } => {
-                                    *right = Box::new(area);
+                                    **right = area;
                                     qu_area
                                 }
                                 Area::Nil => area,
@@ -205,11 +205,11 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
                             left: _,
                             ref mut right,
                         } => {
-                            *right = Box::new(Area::Val {
+                            **right = Area::Val {
                                 type_: 0,
                                 left: Box::new(area),
                                 right: Box::new(Area::Nil),
-                            });
+                            };
                             qu_leaf = &mut *right;
                         }
 
@@ -274,7 +274,7 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
                         } => {
                             if *type_ <= 1 {
                                 if let Area::Nil = right.as_ref() {
-                                    *right = Box::new(Area::new(t as u8));
+                                    **right = Area::new(t as u8);
                                 }
                             }
                         }
@@ -344,7 +344,7 @@ pub fn parse(code: String) -> Vec<UnOptCode> {
                     left: _,
                     ref mut right,
                 } => {
-                    *right = Box::new(area);
+                    **right = area;
                     qu_area
                 }
                 Area::Nil => area,

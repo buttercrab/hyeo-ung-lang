@@ -1,6 +1,5 @@
 use std::fmt;
 use std::fmt::{Debug, Display};
-use std::io::ErrorKind;
 use std::string::FromUtf8Error;
 
 /// Error structure of this program
@@ -120,7 +119,7 @@ impl From<std::string::FromUtf8Error> for Error {
 impl From<Error> for std::io::Error {
     /// From impl for `std::io::Error`
     fn from(e: Error) -> Self {
-        Self::new(ErrorKind::Other, e)
+        Self::other(e)
     }
 }
 
